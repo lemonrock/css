@@ -1,0 +1,34 @@
+# This file is part of css. It is subject to the license terms in the COPYRIGHT file found in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT. No part of css, including this file, may be copied, modified, propagated, or distributed except according to the terms contained in the COPYRIGHT file.
+# Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
+
+
+[package]
+name = "css"
+description = "css"
+keywords = ["css"]
+license = "MPL-2.0"
+authors = ["Raphael Cohn <raphael.cohn@stormmq.com>"]
+documentation = "https://github.com/lemonrock/css/blob/master/README.md"
+homepage = "https://github.com/lemonrock/css"
+repository = "https://github.com/lemonrock/css.git"
+exclude = ["*"]
+include = ["README.md", "LICENSE", "COPYRIGHT", "src/**/*.rs", "benches/**/*.rs", "examples/**/*.rs", "tests/**/*.rs", "Cargo.toml", "rustfmt.toml", "clippy.toml", "lib/**/*", "src/**/*.h", "tools/**/*", "bindgen-wrapper.conf.d/**/*", "compile-*.conf.d/**/*"]
+build = "src/build.rs"
+# Relative to Cargo.toml
+readme = "README.md"
+publish = false
+version = "0.0.0"
+
+[profile.release]
+opt-level = 3
+debug = false
+rpath = false
+lto = true
+debug-assertions = false
+codegen-units = 1
+
+[dependencies]
+bitflags = "^1.0"
+cssparser = "0.21.2"
+num-traits = "0.1.40"
+phf = "0.7.21"

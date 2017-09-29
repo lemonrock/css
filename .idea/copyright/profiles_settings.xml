@@ -1,0 +1,10 @@
+<component name="CopyrightManager">
+  <settings default="cordial">
+    <module2copyright>
+      <element module="All" copyright="css" />
+    </module2copyright>
+    <LanguageOptions name="__TEMPLATE__">
+      <option name="block" value="false" />
+    </LanguageOptions>
+  </settings>
+</component>

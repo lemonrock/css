@@ -1,0 +1,22 @@
+// This file is part of css. It is subject to the license terms in the COPYRIGHT file found in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT. No part of predicator, including this file, may be copied, modified, propagated, or distributed except according to the terms contained in the COPYRIGHT file.
+// Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
+
+
+/// https://drafts.csswg.org/css-counter-styles/#counter-style-pad
+#[derive(Clone, Debug, ToCss)]
+pub struct Pad(pub u32, pub Symbol);
+
+impl Parse for Pad
+{
+	fn parse<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i>>
+	{
+		let pad_with = input.try(|input| Symbol::parse(context, input));
+		let min_length = input.expect_integer()?;
+		if min_length < 0
+		{
+			return Err(StyleParseError::UnspecifiedError.into())
+		}
+		let pad_with = pad_with.or_else(|_| Symbol::parse(context, input))?;
+		Ok(Pad(min_length as u32, pad_with))
+	}
+}
