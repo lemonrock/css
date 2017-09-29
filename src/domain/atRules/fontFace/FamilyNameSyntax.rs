@@ -2,21 +2,13 @@
 // Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
 
 
-use super::*;
-
-
-include!("FamilyName.rs");
-include!("FamilyNameSyntax.rs");
-include!("FontDisplay.rs");
-include!("FontFace.rs");
-include!("FontFaceAtRule.rs");
-include!("FontFamily.rs");
-include!("FontFeatureSettings.rs");
-include!("FontLanguageOverride.rs");
-include!("FontStretch.rs");
-include!("FontStyle.rs");
-include!("FontUrlSource.rs");
-include!("FontWeight.rs");
-include!("GenericFontFamilyName.rs");
-include!("OpenTypeLanguageTag.rs");
-include!("Source.rs");
+#[derive(Clone, Debug, Eq, Hash, PartialEq)]
+pub enum FamilyNameSyntax
+{
+	/// The family name was specified in a quoted form, e.g. "Font Name" or 'Font Name'.
+	Quoted,
+	
+	/// The family name was specified in an unquoted form as a sequence of identifiers.
+	/// The `String` is the serialization of the sequence of identifiers.
+	Identifiers(String),
+}

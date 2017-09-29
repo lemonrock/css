@@ -7,11 +7,11 @@
 define_css_keyword_enum!
 (
 	FontDisplay:
-	"auto" => Auto,
-	"block" => Block,
-	"swap" => Swap,
-	"fallback" => Fallback,
-	"optional" => Optional
+	"auto" => auto,
+	"block" => block,
+	"swap" => swap,
+	"fallback" => fallback,
+	"optional" => optional
 );
 
 

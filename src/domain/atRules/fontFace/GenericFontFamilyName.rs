@@ -2,24 +2,32 @@
 // Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
 
 
-/// A `UrlSource` represents a font-face source that has been specified with a `url()` function.
-///
-/// https://drafts.csswg.org/css-fonts/#src-desc
-#[derive(Clone, Debug, Eq, PartialEq)]
-pub struct FontUrlSource
+#[derive(Debug, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
+pub enum GenericFontFamilyName
 {
-	/// The specified url.
-	pub url: SpecifiedUrl,
-	
-	/// The format hints specified with the `format()` function.
-	/// Examples are "truetype", "opentype" and "woff"
-	pub format_hints: Vec<String>,
+	serif,
+	sans_serif,
+	cursive,
+	fantasy,
+	monospace,
 }
 
-impl ToCss for FontUrlSource
+impl ToCss for GenericFontFamilyName
 {
 	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
 	{
-		self.url.to_css(dest)
+		use self::GenericFontFamilyName::*;
+		
+		let name = match *self
+		{
+			serif => "serif",
+			sans_serif => "sans-serif",
+			cursive => "cursive",
+			fantasy => "fantasy",
+			monospace => "monospace",
+		};
+		
+		// All generic values accepted by the parser are known to not require escaping.
+		write!(dest, "{}", name)
 	}
 }

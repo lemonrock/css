@@ -11,7 +11,6 @@
 struct FontFeatureValuesAtRuleParser<'a, R: 'a>
 {
 	context: &'a ParserContext<'a>,
-	error_context: &'a ParserErrorContext<'a, R>,
 	rule: &'a mut FontFeatureValuesAtRule,
 }
 

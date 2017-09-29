@@ -22,4 +22,10 @@ pub enum CustomParseError<'i>
 	UnsupportedViewportDescriptorDeclaration(PreciseParseError<'i>),
 	
 	ImportantIsNotAllowedInKeyframePropertyDeclarationValues(SourceLocation),
+	InvalidFontLanguageOverrideIdentifier(String),
+	InvalidFontLanguageOverrideOpenTypeLanguageTag(String),
+	FontFeatureSettingOpenTypeFeatureTagMustBeFourCharacters(String),
+	FontFeatureSettingOpenTypeFeatureTagMustBePrintableAscii(String),
+	FontFeatureSettingIfNotAnIntegerMustBeOnOrOff(String),
+	FontFeatureSettingIntegerMustBePositive(i32),
 }

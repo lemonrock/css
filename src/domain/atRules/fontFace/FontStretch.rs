@@ -2,21 +2,24 @@
 // Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
 
 
-use super::*;
+define_css_keyword_enum!
+{
+	FontStretch:
+	"normal" => normal,
+	"ultra-condensed" => ultra_condensed,
+	"extra-condensed" => extra_condensed,
+	"condensed" => condensed,
+	"semi-condensed" => semi_condensed,
+	"semi-expanded" => semi_expanded,
+	"expanded" => expanded,
+	"extra-expanded" => extra_expanded,
+	"ultra-expanded" => ultra_expanded,
+}
 
-
-include!("FamilyName.rs");
-include!("FamilyNameSyntax.rs");
-include!("FontDisplay.rs");
-include!("FontFace.rs");
-include!("FontFaceAtRule.rs");
-include!("FontFamily.rs");
-include!("FontFeatureSettings.rs");
-include!("FontLanguageOverride.rs");
-include!("FontStretch.rs");
-include!("FontStyle.rs");
-include!("FontUrlSource.rs");
-include!("FontWeight.rs");
-include!("GenericFontFamilyName.rs");
-include!("OpenTypeLanguageTag.rs");
-include!("Source.rs");
+impl Parse for FontStretch
+{
+	fn parse<'i, 't>(_: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i>>
+	{
+		FontStretch::parse(input)
+	}
+}

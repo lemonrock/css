@@ -18,6 +18,27 @@ pub enum FontWeight
 	_900,
 }
 
+impl ToCss for FontWeight
+{
+	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
+	{
+		use self::FontWeight::*;;
+		
+		match *self
+		{
+			_100 => serialize_identifier("100", dest),
+			_200 => serialize_identifier("200", dest),
+			_300 => serialize_identifier("300", dest),
+			_400 => serialize_identifier("400", dest),
+			_500 => serialize_identifier("500", dest),
+			_600 => serialize_identifier("600", dest),
+			_700 => serialize_identifier("700", dest),
+			_800 => serialize_identifier("800", dest),
+			_900 => serialize_identifier("900", dest),
+		}
+	}
+}
+
 impl Parse for FontWeight
 {
 	fn parse<'i, 't>(_: &ParserContext, input: &mut Parser<'i, 't>) -> Result<FontWeight, ParseError<'i>>
@@ -28,8 +49,8 @@ impl Parse for FontWeight
 			match_ignore_ascii_case!
 			{
 				&ident,
-                "normal" => Ok(FontWeight::_400),
-                "bold" => Ok(FontWeight::_700),
+                "normal" => Ok(FontWeight::Normal),
+                "bold" => Ok(FontWeight::Bold),
                 _ => Err(())
             }
 		});
@@ -113,4 +134,8 @@ impl FontWeight
 			_700
 		}
 	}
+	
+	pub const Normal: FontWeight = FontWeight::_400;
+	
+	pub const Bold: FontWeight = FontWeight::_700;
 }

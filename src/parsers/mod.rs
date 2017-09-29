@@ -15,6 +15,7 @@ use super::domain::separators::*;
 include!("AllowedNumericType.rs");
 include!("AtRuleBlockPrelude.rs");
 include!("CounterStyleRuleParser.rs");
+include!("FontFaceAtRuleParser.rs");
 include!("FontFeatureValuesBlockType.rs");
 include!("FontFeatureValuesDeclarationsParser.rs");
 include!("FontFeatureValuesAtRuleParser.rs");

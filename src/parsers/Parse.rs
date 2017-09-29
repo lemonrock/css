@@ -2,9 +2,6 @@
 // Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
 
 
-// XXXManishearth Replace all specified value parse impls with impls of this trait.
-// This will make it easy to write more generic values in the future.
-/// A trait to abstract parsing of a specified value given a `ParserContext` and CSS input.
 pub trait Parse: Sized
 {
 	/// Parse a value of this type.

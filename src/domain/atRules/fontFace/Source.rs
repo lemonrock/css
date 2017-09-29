@@ -18,3 +18,49 @@ impl OneOrMoreSeparated for Source
 {
 	type S = Comma;
 }
+
+impl Parse for Source
+{
+	fn parse<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Source, ParseError<'i>>
+	{
+		use self::Source::*;
+		
+		if input.try(|input| input.expect_function_matching("local")).is_ok()
+		{
+			input.parse_nested_block(|input|	 FamilyName::parse(context, input)).map(Local)
+		}
+		else
+		{
+			let url = SpecifiedUrl::parse(context, input)?;
+			
+			// Parsing optional format()
+			let format_hints = if input.try(|input| input.expect_function_matching("format")).is_ok()
+			{
+				input.parse_nested_block(|input|
+				{
+					input.parse_comma_separated(|input|
+					{
+						Ok(input.expect_string()?.as_ref().to_owned())
+					})
+				})?
+			}
+			else
+			{
+				vec![]
+			};
+			
+			Ok
+			(
+				Url
+				(
+					UrlSource
+					{
+						url,
+						format_hints,
+					}
+				)
+			)
+		}
+		
+	}
+}
