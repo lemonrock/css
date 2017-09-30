@@ -3,19 +3,16 @@
 
 
 /// The parser for the top-level rules in a stylesheet.
-pub(crate) struct TopLevelRuleParser<'a, R: 'a>
+pub(crate) struct TopLevelRuleParser<'a>
 {
 	/// This won't contain any namespaces, and only nested parsers created with `ParserContext::new_with_rule_type` will.
 	pub(crate) context: ParserContext<'a>,
-	
-	/// The context required for reporting parse errors.
-	pub(crate) error_context: ParserErrorContext<'a, R>,
 	
 	/// The current state of the parser.
 	pub(crate) state: State,
 }
 
-impl<'a, 'i, R: ParseErrorReporter> AtRuleParser<'i> for TopLevelRuleParser<'a, R>
+impl<'a, 'i> AtRuleParser<'i> for TopLevelRuleParser<'a>
 {
 	type PreludeNoBlock = CssRule;
 	
@@ -23,14 +20,11 @@ impl<'a, 'i, R: ParseErrorReporter> AtRuleParser<'i> for TopLevelRuleParser<'a, 
 	
 	type AtRule = CssRule;
 	
-	type Error = CustomParseError<'a>;
+	type Error = CustomParseError<'i>;
 	
 	fn parse_prelude<'t>(&mut self, name: CowRcStr<'i>, input: &mut Parser<'i, 't>) -> Result<AtRuleType<Self::PreludeNoBlock, Self::PreludeBlock>, ParseError<'i, Self::Error>>
 	{
 		let source_location = input.current_source_location();
-		
-		use self::AtRuleNonBlockPrelude::*;
-		use self::AtRuleType::WithoutBlock;
 		
 		match_ignore_ascii_case!
 		{
@@ -83,7 +77,7 @@ impl<'a, 'i, R: ParseErrorReporter> AtRuleParser<'i> for TopLevelRuleParser<'a, 
 			"charset" =>
 			{
 				// @charset is removed by cssparser if it’s the first rule in the stylesheet; anything left is invalid.
-				Err(StyleParseError::UnexpectedCharsetRule.into())
+				Err(ParseError::Custom(CustomParseError::UnexpectedCharsetAtRule))
 			}
 			
 			_ =>
@@ -92,7 +86,7 @@ impl<'a, 'i, R: ParseErrorReporter> AtRuleParser<'i> for TopLevelRuleParser<'a, 
 				if self.state > State::Body
 				{
 					self.state = State::Invalid;
-					return Err(StyleParseError::UnspecifiedError.into());
+					return Err(ParseError::Custom(CustomParseError::InvalidParseState));
 				}
 				self.state = State::Body;
 				
@@ -102,10 +96,10 @@ impl<'a, 'i, R: ParseErrorReporter> AtRuleParser<'i> for TopLevelRuleParser<'a, 
 	}
 	
 	#[inline]
-	fn rule_without_block(&mut self, prelude: AtRuleNonBlockPrelude) -> Self::AtRule
+	fn rule_without_block(&mut self, prelude: Self::AtRule) -> Self::AtRule
 	{
-		use self::AtRuleNonBlockPrelude::*;
 		use self::State::*;
+		use self::CssRule::*;
 		
 		match prelude
 		{
@@ -123,11 +117,9 @@ impl<'a, 'i, R: ParseErrorReporter> AtRuleParser<'i> for TopLevelRuleParser<'a, 
 			
 			Namespace(prefix, url, source_location) =>
 			{
-				let id = register_namespace(&url);
-				
 				self.state = Namespaces;
 				
-				CssRule::Namespace(NamespaceRule
+				CssRule::Namespace(NamespaceAtRule
 				{
 					prefix,
 					url,
@@ -145,13 +137,13 @@ impl<'a, 'i, R: ParseErrorReporter> AtRuleParser<'i> for TopLevelRuleParser<'a, 
 	}
 }
 
-impl<'a, 'i, R: ParseErrorReporter> QualifiedRuleParser<'i> for TopLevelRuleParser<'a, R>
+impl<'a, 'i> QualifiedRuleParser<'i> for TopLevelRuleParser<'a>
 {
 	type Prelude = QualifiedRuleParserPrelude;
 	
 	type QualifiedRule = CssRule;
 	
-	type Error = CustomParseError<'a>;
+	type Error = CustomParseError<'i>;
 	
 	#[inline]
 	fn parse_prelude<'t>(&mut self, input: &mut Parser<'i, 't>) -> Result<Self::Prelude, ParseError<'i, Self::Error>>
@@ -168,9 +160,9 @@ impl<'a, 'i, R: ParseErrorReporter> QualifiedRuleParser<'i> for TopLevelRulePars
 	}
 }
 
-impl<'b, R> TopLevelRuleParser<'b, R>
+impl<'b> TopLevelRuleParser<'b>
 {
-	fn nested<'a: 'b>(&'a self) -> NestedRuleParser<'a, 'b, R>
+	fn nested<'a: 'b>(&'a self) -> NestedRuleParser<'a, 'b>
 	{
 		NestedRuleParser
 		{

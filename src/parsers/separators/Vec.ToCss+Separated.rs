@@ -2,5 +2,24 @@
 // Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
 
 
-/// A CSS integer value.
-pub type CSSInteger = i32;
+impl<T> ToCss for Vec<T> where T: ToCss + Separated
+{
+	fn to_css<W: Write>(&self, dest: &mut W) -> fmt::Result
+	{
+		if self.is_empty()
+		{
+			return Ok(());
+		}
+		
+		let mut iterator = self.iter();
+		iterator.next().unwrap().to_css(dest)?;
+		
+		for item in iterator
+		{
+			dest.write_str(<T as Separated>::Delimiter::separator())?;
+			item.to_css(dest)?;
+		}
+		
+		Ok(())
+	}
+}

@@ -62,9 +62,8 @@ impl FromMeta for ViewportLength
 
 impl ViewportLength
 {
-	fn parse<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i>>
+	fn parse<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
 	{
-		// we explicitly do not accept 'extend-to-zoom', since it is a UA internal value for <META> viewport translation
 		LengthOrPercentageOrAuto::parse_non_negative(context, input).map(Specified)
 	}
 }

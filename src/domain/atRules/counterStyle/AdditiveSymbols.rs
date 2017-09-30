@@ -3,18 +3,34 @@
 
 
 /// https://drafts.csswg.org/css-counter-styles/#descdef-counter-style-additive-symbols
-#[derive(Clone, Debug, ToCss)]
+#[derive(Clone, Debug)]
 pub struct AdditiveSymbols(pub Vec<AdditiveTuple>);
+
+impl ToCss for AdditiveSymbols
+{
+	fn to_css<W: Write>(&self, dest: &mut W) -> fmt::Result
+	{
+		let mut iter = self.0.iter();
+		let first = iter.next().unwrap();
+		first.to_css(dest)?;
+		for item in iter
+		{
+			dest.write_char(',')?;
+			item.to_css(dest)?;
+		}
+		Ok(())
+	}
+}
 
 impl Parse for AdditiveSymbols
 {
-	fn parse<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i>>
+	fn parse<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
 	{
 		let tuples = Vec::<AdditiveTuple>::parse(context, input)?;
 		// FIXME maybe? https://github.com/w3c/csswg-drafts/issues/1220
 		if tuples.windows(2).any(|window| window[0].weight <= window[1].weight)
 		{
-			return Err(StyleParseError::UnspecifiedError.into())
+			return Err(ParseError::Custom(CustomParseError::CounterStyleAdditiveSymbolsCanNotHaveASecondWeightEqualToOrGreaterThanTheFirst))
 		}
 		Ok(AdditiveSymbols(tuples))
 	}

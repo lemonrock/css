@@ -9,16 +9,16 @@
 pub enum ViewportPercentageLength
 {
 	/// A vw unit: https://drafts.csswg.org/css-values/#vw
-	Vw(CSSFloat),
+	Vw(CssFloat),
 	
 	/// A vh unit: https://drafts.csswg.org/css-values/#vh
-	Vh(CSSFloat),
+	Vh(CssFloat),
 	
 	/// https://drafts.csswg.org/css-values/#vmin
-	Vmin(CSSFloat),
+	Vmin(CssFloat),
 	
 	/// https://drafts.csswg.org/css-values/#vmax
-	Vmax(CSSFloat)
+	Vmax(CssFloat)
 }
 
 impl ToCss for ViewportPercentageLength
@@ -37,12 +37,12 @@ impl ToCss for ViewportPercentageLength
 	}
 }
 
-impl Mul<CSSFloat> for ViewportPercentageLength
+impl Mul<CssFloat> for ViewportPercentageLength
 {
 	type Output = ViewportPercentageLength;
 	
 	#[inline]
-	fn mul(self, scalar: CSSFloat) -> Self::Output
+	fn mul(self, scalar: CssFloat) -> Self::Output
 	{
 		use self::ViewportPercentageLength::*;
 		

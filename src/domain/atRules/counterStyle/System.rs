@@ -3,7 +3,7 @@
 
 
 /// https://drafts.csswg.org/css-counter-styles/#counter-style-system
-#[derive(Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
+#[derive(Debug, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub enum System
 {
 	/// 'cyclic'
@@ -34,13 +34,15 @@ pub enum System
 
 impl Parse for System
 {
-	fn parse<'i, 't>(_context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i>>
+	fn parse<'i, 't>(_context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
 	{
 		use self::System::*;
 		
-		try_match_ident_ignore_ascii_case!
+		let identifier = input.expect_ident()?;
+		
+		match_ignore_ascii_case!
 		{
-			input.expect_ident_cloned()?,
+			&*identifier,
 			
             "cyclic" => Ok(Cyclic),
             
@@ -59,6 +61,8 @@ impl Parse for System
             }
             
             "extends" =>  Ok(Extends(CounterStyleIdent::parse(input)?)),
+            
+            _ => Err(ParseError::Custom(CustomParseError::CounterStyleSystemIsNotKnown(identifier.to_owned()))),
         }
 	}
 }

@@ -63,7 +63,7 @@ macro_rules! __define_css_keyword_enum__actual
 		impl $name
 		{
 			/// Parse this property from a CSS input stream.
-			pub(crate) fn parse<'i, 't>(input: &mut ::cssparser::Parser<'i, 't>) -> Result<$name, $crate::ParseError<'i>>
+			pub(crate) fn parse<'i, 't>(input: &mut ::cssparser::Parser<'i, 't>) -> Result<$name, ::cssparser::ParseError<'i, $crate::CustomParseError<'i>>>
 			{
 				let ident = input.expect_ident()?;
 				Self::from_ident(&ident).map_err(|()| ParseError::Basic(BasicParseError::UnexpectedToken(Token::Ident(ident.clone()))))

@@ -3,27 +3,37 @@
 
 
 /// https://drafts.csswg.org/mediaqueries/#media-types
-#[derive(Clone, Debug, Eq, PartialEq)]
-pub struct MediaType(pub CustomIdent);
+#[derive(Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
+pub enum MediaType
+{
+	print,
+	screen,
+	speech,
+}
+
+impl ToCss for MediaType
+{
+	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
+	{
+		use self::MediaType::*;
+		
+		let identifier = match *self
+		{
+			print => "print",
+			screen => "screen",
+			speech => "speech",
+		};
+		
+		dest.write_str(identifier)
+	}
+}
 
 impl MediaType
 {
-	/// The `screen` media type.
-	#[inline(always)]
-	pub fn screen() -> Self
+	fn parse<'i>(ident: &str) -> Result<Self, CustomParseError<'i>>
 	{
-		MediaType(CustomIdent(Atom::from("screen")))
-	}
-	
-	/// The `print` media type.
-	#[inline(always)]
-	pub fn print() -> Self
-	{
-		MediaType(CustomIdent(Atom::from("print")))
-	}
-	
-	fn parse(name: &str) -> Result<Self, ()>
-	{
+		use self::MediaType::*;
+		
 		// From https://drafts.csswg.org/mediaqueries/#mq-syntax:
 		//
 		//   The <media-type> production does not include the keywords not, or, and, and only.
@@ -31,9 +41,21 @@ impl MediaType
 		// Here we also perform the to-ascii-lowercase part of the serialization algorithm: https://drafts.csswg.org/cssom/#serializing-media-queries
 		match_ignore_ascii_case!
 		{
-			name,
-            "not" | "or" | "and" | "only" => Err(()),
-            _ => Ok(MediaType(CustomIdent(Atom(name.to_ascii_lowercase())))),
+			ident,
+			
+			"print" => Ok(print),
+			
+			"screen" => Ok(screen),
+			
+			"speech" => Ok(speech),
+			
+			"aural" => Ok(speech),
+			
+			"tty" | "tv" | "projection" | "handheld" | "braille" | "embossed" | "3d-glasses" => Err(CustomParseError::DeprecatedMediaType(ident.to_owned())),
+			
+            "not" | "or" | "and" | "only" => Err(CustomParseError::InvalidMediaType(ident.to_owned())),
+            
+            _ => Err(CustomParseError::UnrecognisedMediaType(ident.to_owned())),
         }
 	}
 }

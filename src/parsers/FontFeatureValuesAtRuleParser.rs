@@ -8,23 +8,23 @@
 /// }
 /// <feature-type> = @stylistic | @historical-forms | @styleset |
 /// @character-variant | @swash | @ornaments | @annotation
-struct FontFeatureValuesAtRuleParser<'a, R: 'a>
+pub(crate) struct FontFeatureValuesAtRuleParser<'a>
 {
 	context: &'a ParserContext<'a>,
 	rule: &'a mut FontFeatureValuesAtRule,
 }
 
 /// Default methods reject all qualified rules.
-impl<'a, 'i, R: ParseErrorReporter> QualifiedRuleParser<'i> for FontFeatureValuesAtRuleParser<'a, R>
+impl<'a, 'i> QualifiedRuleParser<'i> for FontFeatureValuesAtRuleParser<'a>
 {
 	type Prelude = ();
 	
 	type QualifiedRule = ();
 	
-	type Error = SelectorParseError<'i, StyleParseError<'i>>;
+	type Error = CustomParseError<'i>;
 }
 
-impl<'a, 'i, R: ParseErrorReporter> AtRuleParser<'i> for FontFeatureValuesAtRuleParser<'a, R>
+impl<'a, 'i> AtRuleParser<'i> for FontFeatureValuesAtRuleParser<'a>
 {
 	type PreludeNoBlock = ();
 	
@@ -32,7 +32,7 @@ impl<'a, 'i, R: ParseErrorReporter> AtRuleParser<'i> for FontFeatureValuesAtRule
 	
 	type AtRule = ();
 	
-	type Error = SelectorParseError<'i, StyleParseError<'i>>;
+	type Error = CustomParseError<'i>;
 	
 	fn parse_prelude<'t>(&mut self, name: CowRcStr<'i>, _input: &mut Parser<'i, 't>) -> Result<AtRuleType<Self::PreludeNoBlock, Self::PreludeBlock>, ParseError<'i, Self::Error>>
 	{
@@ -59,7 +59,7 @@ impl<'a, 'i, R: ParseErrorReporter> AtRuleParser<'i> for FontFeatureValuesAtRule
 		}
 	}
 	
-	fn parse_block<'t>(&mut self, prelude: Self::PreludeBlock, input: &mut Parser<'i, 't>) -> Result<Self::AtRule, ParseError<'i>>
+	fn parse_block<'t>(&mut self, prelude: Self::PreludeBlock, input: &mut Parser<'i, 't>) -> Result<Self::AtRule, ParseError<'i, CustomParseError<'i>>>
 	{
 		debug_assert_eq!(self.context.rule_type(), CssRuleType::FontFeatureValues);
 		
@@ -77,10 +77,10 @@ impl<'a, 'i, R: ParseErrorReporter> AtRuleParser<'i> for FontFeatureValuesAtRule
 	}
 }
 
-impl<'a, R: 'a> FontFeatureValuesAtRuleParser<'a, R>
+impl<'a> FontFeatureValuesAtRuleParser<'a>
 {
 	#[inline(always)]
-	fn parseBlock<'i, 't, T: 'a>(&self, input: &mut Parser<'i, 't>, declarations: &'a mut Vec<FontFeatureValuesDeclaration<T>>) -> Result<(), ParseError<'i>>
+	fn parseBlock<'i, 't, T: 'a>(&self, input: &mut Parser<'i, 't>, declarations: &'a mut Vec<FontFeatureValuesDeclaration<T>>) -> Result<(), ParseError<'i, CustomParseError<'i>>>
 	{
 		FontFeatureValuesDeclarationsParser::parseBlock(input, self.context, declarations)
 	}

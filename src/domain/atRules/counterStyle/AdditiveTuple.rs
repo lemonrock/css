@@ -3,7 +3,7 @@
 
 
 /// <integer> && <symbol>
-#[derive(Clone, Debug, ToCss)]
+#[derive(Clone, Debug)]
 pub struct AdditiveTuple
 {
 	/// <integer>
@@ -13,20 +13,30 @@ pub struct AdditiveTuple
 	pub symbol: Symbol,
 }
 
-impl OneOrMoreSeparated for AdditiveTuple
+impl ToCss for AdditiveTuple
 {
-	type S = Comma;
+	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
+	{
+		self.0.to_css(dest)?;
+		dest.write_char(' ')?;
+		self.1.to_css(dest)
+	}
+}
+
+impl Separated for AdditiveTuple
+{
+	type Delimiter = Comma;
 }
 
 impl Parse for AdditiveTuple
 {
-	fn parse<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i>>
+	fn parse<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
 	{
 		let symbol = input.try(|input| Symbol::parse(context, input));
 		let weight = input.expect_integer()?;
 		if weight < 0
 		{
-			return Err(StyleParseError::UnspecifiedError.into())
+			return Err(ParseError::Custom(CustomParseError::CounterStyleAdditiveTupleWeightCanNotBeNegative(weight)))
 		}
 		let symbol = symbol.or_else(|_| Symbol::parse(context, input))?;
 		Ok

@@ -8,7 +8,7 @@ pub struct PairValues(pub u32, pub Option<u32>);
 
 impl Parse for PairValues
 {
-	fn parse<'i, 't>(_context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<PairValues, ParseError<'i>>
+	fn parse<'i, 't>(_context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<PairValues, ParseError<'i, CustomParseError<'i>>>
 	{
 		let first = match *input.next()?
 		{

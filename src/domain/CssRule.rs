@@ -78,7 +78,7 @@ impl CssRule
 		
 		match *self
 		{
-			/// No Charset here, CSSCharsetRule has been removed from CSSOM (https://drafts.csswg.org/cssom/#changes-from-5-december-2013)
+			// No Charset here, CSSCharsetRule has been removed from CSSOM (https://drafts.csswg.org/cssom/#changes-from-5-december-2013)
 			// Charset(..) => Start,
 			Import(..) => Imports,
 			Namespace(..) => Namespaces,

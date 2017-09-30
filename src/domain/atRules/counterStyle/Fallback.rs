@@ -3,13 +3,21 @@
 
 
 /// https://drafts.csswg.org/css-counter-styles/#counter-style-fallback
-#[derive(Clone, Debug, ToCss)]
-pub struct Fallback(pub CounterStyleName);
+#[derive(Clone, Debug)]
+pub struct Fallback(pub CounterStyleIdent);
+
+impl ToCss for Negative
+{
+	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
+	{
+		self.0.to_css(dest)
+	}
+}
 
 impl Parse for Fallback
 {
 	#[inline(always)]
-	fn parse<'i, 't>(_context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i>>
+	fn parse<'i, 't>(_context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
 	{
 		CounterStyleIdent::parse(input).map(Fallback)
 	}

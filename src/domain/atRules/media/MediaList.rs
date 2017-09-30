@@ -15,7 +15,7 @@ impl ToCss for MediaList
 {
 	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
 	{
-		serialize_comma_separated_list(dest, &self.media_queries)
+		self.media_queries.to_css(dest)
 	}
 }
 
@@ -34,7 +34,7 @@ impl MediaList
 	///
 	/// Always returns a media query list. If any invalid media query is found, the media query list is only filled with the equivalent of "not all", see:-
 	/// https://drafts.csswg.org/mediaqueries/#error-handling
-	pub(crate) fn parse_media_query_list<R: ParseErrorReporter>(context: &ParserContext, input: &mut Parser, error_reporter: &R, allowInvalidMediaQueries: bool) -> Result<MediaList, ParseError>
+	pub(crate) fn parse_media_query_list<'i>(context: &ParserContext, input: &mut Parser, allowInvalidMediaQueries: bool) -> Result<MediaList, ParseError<'i, CustomParseError<'i>>>
 	{
 		if input.is_exhausted()
 		{
@@ -83,7 +83,7 @@ impl MediaList
 	
 	
 	/// Evaluate a whole `MediaList` against `Device`.
-	pub fn evaluate<D: Device>(&self, device: &D, quirks_mode: QuirksMode) -> bool
+	pub fn evaluate<D: Device>(&self, device: &D) -> bool
 	{
 		// Check if it is an empty media query list or any queries match (OR condition)
 		// https://drafts.csswg.org/mediaqueries-4/#mq-list
@@ -92,7 +92,7 @@ impl MediaList
 			let media_match = mediaQuery.media_type.matches(device.media_type());
 			
 			// Check if all conditions match (AND condition)
-			let query_match =	media_match && mediaQuery.expressions.iter().all(|expression| expression.matches(&device, quirks_mode));
+			let query_match =	media_match && mediaQuery.expressions.iter().all(|expression| expression.matches(&device));
 			
 			// Apply the logical NOT qualifier to the result
 			match mediaQuery.qualifier

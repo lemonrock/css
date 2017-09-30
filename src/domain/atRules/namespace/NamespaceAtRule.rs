@@ -5,10 +5,10 @@
 /// A `@namespace` rule.
 #[derive(Clone, Debug, PartialEq)]
 #[allow(missing_docs)]
-pub struct NamespaceRule
+pub struct NamespaceAtRule
 {
 	/// The namespace prefix, and `None` if it's the default Namespace
-	pub prefix: Option<Prefix>,
+	pub prefix: Option<NamespacePrefix>,
 	
 	/// The actual namespace url.
 	pub url: NamespaceUrl,
@@ -17,9 +17,9 @@ pub struct NamespaceRule
 	pub source_location: SourceLocation,
 }
 
-impl ToCss for NamespaceRule
+impl ToCss for NamespaceAtRule
 {
-	// https://drafts.csswg.org/cssom/#serialize-a-css-rule CSSNamespaceRule
+	// https://drafts.csswg.org/cssom/#serialize-a-css-rule
 	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
 	{
 		dest.write_str("@namespace ")?;

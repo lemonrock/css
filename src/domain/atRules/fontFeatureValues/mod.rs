@@ -3,6 +3,7 @@
 
 
 use super::*;
+use super::parsers::FontFeatureValuesAtRuleParser;
 
 
 include!("FontFeatureValuesAtRule.rs");

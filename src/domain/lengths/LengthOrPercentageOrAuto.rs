@@ -4,26 +4,35 @@
 
 /// Either a `<length>`, a `<percentage>`, or the `auto` keyword.
 #[allow(missing_docs)]
-#[derive(Clone, Debug, PartialEq, ToCss)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum LengthOrPercentageOrAuto
 {
 	Length(NoCalcLength),
 	
-	Percentage(::css::domain::Percentage),
+	Percentage(Percentage),
 	
 	Auto,
 	
-	/*
-	
-		There are two implementations of CalcLengthOrPercentage:-
-			components/style/values/specified/calc.rs
-			components/style/values/computed/length.rs
-		
-		CalcNode resides in components/style/values/specified/calc.rs
-	
-	
-	*/
 	Calc(Box<CalcLengthOrPercentage>),
+}
+
+impl ToCss for LengthOrPercentageOrAuto
+{
+	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
+	{
+		use self::LengthOrPercentageOrAuto::*;
+		
+		match *self
+		{
+			Length(ref length) => length.to_css(dest),
+			
+			Percentage(ref percentage) => percentage.to_css(dest),
+			
+			Auto => dest.write_str("auto"),
+			
+			Calc(ref calc) => calc.to_css(dest)
+		}
+	}
 }
 
 impl From<NoCalcLength> for LengthOrPercentageOrAuto
@@ -35,21 +44,21 @@ impl From<NoCalcLength> for LengthOrPercentageOrAuto
 	}
 }
 
-impl From<computed::Percentage> for LengthOrPercentageOrAuto
+impl From<::domain::Percentage> for LengthOrPercentageOrAuto
 {
 	#[inline]
-	fn from(pc: ::css::domain::Percentage) -> Self
+	fn from(percentage: ::domain::Percentage) -> Self
 	{
-		LengthOrPercentageOrAuto::Percentage(pc)
+		LengthOrPercentageOrAuto::Percentage(percentage)
 	}
 }
 
 impl Parse for LengthOrPercentageOrAuto
 {
 	#[inline]
-	fn parse<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i>>
+	fn parse<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
 	{
-		Self::parse_quirky(context, input, AllowQuirks::No)
+		Self::parse_all(context, input)
 	}
 }
 
@@ -70,31 +79,22 @@ impl LengthOrPercentageOrAuto
 	/// Returns a value representing `0%`.
 	pub fn zero_percent() -> Self
 	{
-		LengthOrPercentageOrAuto::Percentage(computed::Percentage::zero())
+		LengthOrPercentageOrAuto::Percentage(domain::Percentage::zero())
 	}
 	
-	/// Parses, with quirks.
 	#[inline]
-	pub(crate) fn parse_quirky<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>, allow_quirks: AllowQuirks) -> Result<Self, ParseError<'i>>
+	pub(crate) fn parse_all<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
 	{
-		Self::parse_internal(context, input, AllowedNumericType::All, allow_quirks)
+		Self::parse_internal(context, input, AllowedNumericType::All)
 	}
 	
-	/// Parse a non-negative length, percentage, or auto.
 	#[inline]
-	pub(crate) fn parse_non_negative<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i>>
+	pub(crate) fn parse_non_negative<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
 	{
-		Self::parse_non_negative_quirky(context, input, AllowQuirks::No)
+		Self::parse_internal(context, input, AllowedNumericType::NonNegative)
 	}
 	
-	/// Parse a non-negative length, percentage, or auto.
-	#[inline]
-	pub fn parse_non_negative_quirky<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>, allow_quirks: AllowQuirks) -> Result<Self, ParseError<'i>>
-	{
-		Self::parse_internal(context, input, AllowedNumericType::NonNegative, allow_quirks)
-	}
-	
-	fn parse_internal<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>, num_context: AllowedNumericType, allow_quirks: AllowQuirks) -> Result<Self, ParseError<'i>>
+	fn parse_internal<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>, num_context: AllowedNumericType) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
 	{
 		use self::LengthOrPercentageOrAuto::*;
 		use self::NoCalcLength::Absolute;
@@ -111,16 +111,10 @@ impl LengthOrPercentageOrAuto
 					.map_err(|()| BasicParseError::UnexpectedToken(token.clone()).into())
 				}
 				
-				Token::Percentage { unit_value, .. } if num_context.is_ok(context.parsing_mode, unit_value) => return Ok(Percentage(computed::Percentage(unit_value))),
+				Token::Percentage { unit_value, .. } if num_context.is_ok(context.parsing_mode, unit_value) => return Ok(Percentage(domain::Percentage(unit_value))),
 				
-				Token::Number { value, .. } if num_context.is_ok(context.parsing_mode, value) =>
-				{
-					if value != 0. && !context.parsing_mode.allows_unitless_lengths() && !allow_quirks.allowed(context.quirks_mode)
-					{
-						return Err(StyleParseError::UnspecifiedError.into())
-					}
-					return Ok(Length(Absolute(Px(value))))
-				}
+				// A little lenient
+				Token::Number { value, .. } if num_context.is_ok(context.parsing_mode, value) => Ok(Length(Absolute(Px(value)))),
 				
 				Token::Ident(ref value) if value.eq_ignore_ascii_case("auto") => return Ok(Auto),
 				

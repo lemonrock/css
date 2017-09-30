@@ -10,6 +10,24 @@ pub struct PropertyDeclaration
 	importance: Importance,
 }
 
+impl ToCss for PropertyDeclaration
+{
+	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
+	{
+		serialize_identifier(&self.name)?;
+		dest.write_str(":")?;
+		
+		self.value.to_css(dest)?;
+		
+		if self.importance.important()
+		{
+			dest.write_str("!important")?;
+		}
+		
+		dest.write_str(";")
+	}
+}
+
 impl PropertyDeclaration
 {
 	/// https://drafts.csswg.org/css-variables/#typedef-custom-property-name

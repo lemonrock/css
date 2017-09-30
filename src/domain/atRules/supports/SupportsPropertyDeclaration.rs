@@ -17,12 +17,12 @@ impl ToCss for SupportsPropertyDeclaration
 impl SupportsPropertyDeclaration
 {
 	/// Parse a declaration
-	pub(crate) fn parse<'i, 't>(input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i>>
+	pub(crate) fn parse<'i, 't>(input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
 	{
 		let pos = input.position();
 		input.expect_ident()?;
 		input.expect_colon()?;
 		consume_any_value(input)?;
-		Ok(PropertyDeclaration(input.slice_from(pos).to_owned()))
+		Ok(SupportsPropertyDeclaration(input.slice_from(pos).to_owned()))
 	}
 }

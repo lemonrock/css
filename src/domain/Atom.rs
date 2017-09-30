@@ -6,7 +6,7 @@
 #[derive(Debug, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct Atom(String);
 
-impl Deref<str> for Atom
+impl Deref for Atom
 {
 	type Target = str;
 	

@@ -6,7 +6,7 @@
 ///
 /// https://drafts.csswg.org/css-fonts/#font-face-rule
 #[derive(Clone, Debug, Eq, PartialEq)]
-pub struct FontFaceRuleData
+pub struct FontFaceAtRule
 {
 	/// The name of this font face
 	pub family: Option<FamilyName>,
@@ -39,7 +39,7 @@ pub struct FontFaceRuleData
 	pub source_location: SourceLocation,
 }
 
-impl ToCss for FontFaceRuleData
+impl ToCss for FontFaceAtRule
 {
 	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
 	{
@@ -92,7 +92,7 @@ impl FontFaceAtRule
 	}
 
 	/// Parse the block inside a `@font-face` rule.
-	pub(crate) fn parse_body<'i>(context: &ParserContext, input: &mut Parser, source_location: SourceLocation) -> Result<FontFaceAtRule, ParseError<'i>>
+	pub(crate) fn parse_body<'i>(context: &ParserContext, input: &mut Parser, source_location: SourceLocation) -> Result<FontFaceAtRule, ParseError<'i, CustomParseError<'i>>>
 	{
 		let mut rule = Self::empty(source_location);
 		

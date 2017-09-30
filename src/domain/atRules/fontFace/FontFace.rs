@@ -20,7 +20,7 @@ impl<'a> FontFace<'a>
 	}
 	
 	/// The style of this font face
-	pub fn style(&self) -> font_style::T
+	pub fn style(&self) -> FontStyle
 	{
 		if let Some(ref value) = self.0.style
 		{

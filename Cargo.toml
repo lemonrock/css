@@ -13,7 +13,6 @@ homepage = "https://github.com/lemonrock/css"
 repository = "https://github.com/lemonrock/css.git"
 exclude = ["*"]
 include = ["README.md", "LICENSE", "COPYRIGHT", "src/**/*.rs", "benches/**/*.rs", "examples/**/*.rs", "tests/**/*.rs", "Cargo.toml", "rustfmt.toml", "clippy.toml", "lib/**/*", "src/**/*.h", "tools/**/*", "bindgen-wrapper.conf.d/**/*", "compile-*.conf.d/**/*"]
-build = "src/build.rs"
 # Relative to Cargo.toml
 readme = "README.md"
 publish = false
@@ -32,3 +31,5 @@ bitflags = "^1.0"
 cssparser = "0.21.2"
 num-traits = "0.1.40"
 phf = "0.7.21"
+phf_macros = "0.7.21"
+selectors = "0.18.0"

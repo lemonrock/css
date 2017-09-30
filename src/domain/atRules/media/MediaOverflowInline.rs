@@ -2,7 +2,6 @@
 // Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
 
 
-impl OneOrMoreSeparated for UnicodeRange
-{
-	type S = Comma;
-}
+define_css_keyword_enum!(MediaOverflowInline:
+                         "none" => none,
+                         "scroll" => scroll);

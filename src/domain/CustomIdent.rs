@@ -9,7 +9,7 @@ pub struct CustomIdent(pub Atom);
 impl CustomIdent
 {
 	/// Parse an already-tokenizer identifier
-	pub(crate) fn from_ident<'i>(ident: &CowRcStr<'i>, excluding: &[&str]) -> Result<Self, ParseError<'i>>
+	pub(crate) fn from_ident<'i>(ident: &CowRcStr<'i>, excluding: &[&str]) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
 	{
 		match_ignore_ascii_case!
 		{

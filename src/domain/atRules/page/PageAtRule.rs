@@ -4,8 +4,7 @@
 
 /// A [`@page`][page] rule.
 ///
-/// This implements only a limited subset of the CSS
-/// 2.2 syntax.
+/// This implements only a limited subset of the CSS 2.2 syntax.
 ///
 /// In this subset, [page selectors][page-selectors] are not implemented.
 ///
@@ -15,7 +14,7 @@
 pub struct PageAtRule
 {
 	/// The declaration block this page rule contains.
-	pub declarations: Vec<PropertyDeclaration>,
+	pub property_declarations: PropertyDeclarations,
 	
 	/// The source position this rule was found at.
 	pub source_location: SourceLocation,
@@ -26,9 +25,8 @@ impl ToCss for PageAtRule
 	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
 	{
 		dest.write_str("@page { ")?;
-		let declaration_block = self.block.read_with(guard);
-		declaration_block.to_css(dest)?;
-		if !declaration_block.declarations().is_empty()
+		self.declarations.to_css(dest)?;
+		if !self.declarations.is_empty()
 		{
 			dest.write_str(" ")?;
 		}

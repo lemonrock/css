@@ -135,15 +135,15 @@ impl ToCss for CounterStyleIdent
 
 impl CounterStyleIdent
 {
-	pub(crate) fn parse<'i, 't>(input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i>>
+	pub(crate) fn parse<'i, 't>(input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
 	{
 		let ident = input.expect_ident()?;
 		Self::from_ident(ident).map_err(|_| CustomParseError::NoneIsNotAllowedInACounterStyleIdent)
 	}
 	
-	pub(crate) fn parseForCounterStyleAtRule<'i, 't>(input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i>>
+	pub(crate) fn parseForCounterStyleAtRule<'i, 't>(input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
 	{
-		let counterStyleIdent = self::parse(input)?;
+		let counterStyleIdent = Self::parse(input)?;
 		if counterStyleIdent.is_not_allowed_in_counter_style_at_rule()
 		{
 			Err(CustomParseError::DecimalOrDiscIsNotAllowedInACounterStyleIdentInACounterStyleAtRule)

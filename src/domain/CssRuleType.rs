@@ -40,7 +40,7 @@ pub enum CssRuleType
 impl CssRuleType
 {
 	#[inline(always)]
-	pub(crate) fn context(self, nestedRuleParser: NestedRuleParser) -> ParserContext
+	pub(crate) fn context<'a>(self, nestedRuleParser: NestedRuleParser) -> ParserContext<'a>
 	{
 		nestedRuleParser.context_new_with_rule_type(self)
 	}

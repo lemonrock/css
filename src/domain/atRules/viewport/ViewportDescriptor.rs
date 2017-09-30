@@ -4,7 +4,8 @@
 
 macro_rules! declare_viewport_descriptor
 {
-    ( $( $variant_name: expr => $variant: ident($data: ident), )+ ) => {
+    ( $( $variant_name: expr => $variant: ident($data: ident), )+ ) =>
+    {
          declare_viewport_descriptor_inner!([] [ $( $variant_name => $variant($data), )+ ] 0);
     };
 }
@@ -96,5 +97,5 @@ declare_viewport_descriptor!
     "max-zoom" => MaxZoom(Zoom),
 
     "user-zoom" => UserZoom(UserZoom),
-    "orientation" => Orientation(Orientation),
+    "orientation" => Orientation(ViewportOrientation),
 }

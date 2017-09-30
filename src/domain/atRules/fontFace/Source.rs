@@ -3,25 +3,38 @@
 
 
 /// A source for a font-face rule.
-#[derive(Clone, Debug, Eq, PartialEq, ToCss)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub enum Source
 {
 	/// A `url()` source.
 	Url(FontUrlSource),
 	
 	/// A `local()` source.
-	#[css(function)]
 	Local(FamilyName),
 }
 
-impl OneOrMoreSeparated for Source
+impl ToCss for Source
 {
-	type S = Comma;
+	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
+	{
+		use self::Source::*;
+		
+		match *self
+		{
+			Url(ref fontUrlSource) => fontUrlSource.to_css(dest),
+			Local(ref familyName) => familyName.to_css(dest),
+		}
+	}
+}
+
+impl Separated for Source
+{
+	type Delimiter = Comma;
 }
 
 impl Parse for Source
 {
-	fn parse<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Source, ParseError<'i>>
+	fn parse<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Source, ParseError<'i, CustomParseError<'i>>>
 	{
 		use self::Source::*;
 		
@@ -53,7 +66,7 @@ impl Parse for Source
 			(
 				Url
 				(
-					UrlSource
+					FontUrlSource
 					{
 						url,
 						format_hints,

@@ -2,8 +2,8 @@
 // Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
 
 
-/// An enum to represent a CSS Wide keyword.
-#[derive(Clone, Copy, Debug, Eq, PartialEq, ToCss)]
+/// An enum to represent a CSS-wide keyword.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum CssWideKeyword
 {
 	/// The `initial` keyword.
@@ -14,6 +14,23 @@ pub enum CssWideKeyword
 	
 	/// The `unset` keyword.
 	unset,
+}
+
+impl ToCss for UnparsedPropertyValue
+{
+	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
+	{
+		use self::CssWideKeyword::*;
+		
+		let value = match *self
+		{
+			initial => "initial",
+			inherit => "inherit",
+			unset => "unset",
+		};
+		
+		dest.write_str(value)
+	}
 }
 
 impl CssWideKeyword
@@ -38,11 +55,11 @@ impl CssWideKeyword
 		{
 			ident,
 			
-			"initial" => Some(Initial),
+			"initial" => Some(initial),
 			
-			"inherit" => Some(Inherit),
+			"inherit" => Some(inherit),
 			
-			"unset" => Some(Unset),
+			"unset" => Some(unset),
 			
 			_ => None
 		}

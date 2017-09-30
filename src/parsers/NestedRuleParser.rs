@@ -3,28 +3,28 @@
 
 
 #[derive(Clone)]
-struct NestedRuleParser<'a, 'b: 'a, R: 'b>
+pub(crate) struct NestedRuleParser<'a, 'b: 'a>
 {
 	context: &'a ParserContext<'b>,
-	error_context: &'a ParserErrorContext<'b, R>,
 }
 
-impl<'a, 'b, 'i, R: ParseErrorReporter> AtRuleParser<'i> for NestedRuleParser<'a, 'b, R>
+impl<'a, 'b, 'i> AtRuleParser<'i> for NestedRuleParser<'a, 'b>
 {
-	type PreludeNoBlock = AtRuleNonBlockPrelude;
+	type PreludeNoBlock = ();
 	
 	type PreludeBlock = AtRuleBlockPrelude;
 	
 	type AtRule = CssRule;
 	
-	type Error = SelectorParseError<'i, StyleParseError<'i>>;
+	type Error = CustomParseError<'i>;
 	
-	fn parse_prelude<'t>(&mut self, name: CowRcStr<'i>, input: &mut Parser<'i, 't>) -> Result<AtRuleType<AtRuleNonBlockPrelude, AtRuleBlockPrelude>, ParseError<'i, Self::Error>>
+	fn parse_prelude<'t>(&mut self, name: CowRcStr<'i>, input: &mut Parser<'i, 't>) -> Result<AtRuleType<Self::PreludeNoBlock, Self::PreludeBlock>, ParseError<'i, Self::Error>>
 	{
-		let location = input.current_source_location();
+		let source_location = input.current_source_location();
 		
 		use self::AtRuleType::WithBlock;
 		use self::AtRuleBlockPrelude::*;
+		use self::VendorPrefix::*;
 		
 		match_ignore_ascii_case!
 		{
@@ -32,53 +32,29 @@ impl<'a, 'b, 'i, R: ParseErrorReporter> AtRuleParser<'i> for NestedRuleParser<'a
 			
 			"counter-style" => Ok(WithBlock(CounterStyle(CounterStyleIdent::parseForCounterStyleAtRule(input)?))),
 			
-			"document" | "-moz-document" =>
-			{
-				let prefix = if ::str::starts_with_ignore_ascii_case(&*name, "-moz-")
-                {
-                    Some(VendorPrefix::moz)
-                }
-                else
-                {
-                    None
-				};
-				
-				Ok(WithBlock(Document(prefix, DocumentCondition::parse(self.context, input)?, location))),
-			}
+			"document" => Ok(WithBlock(Document(None, DocumentCondition::parse(self.context, input)?, source_location))),
 			
-			"font-face" => Ok(WithBlock(FontFace(location))),
+			"-moz-document" => Ok(WithBlock(Document(Some(moz), DocumentCondition::parse(self.context, input)?, source_location))),
 			
-			"font-feature-values" => Ok(WithBlock(FontFeatureValues(parse_family_name_list(self.context, input)?, location))),
+			"font-face" => Ok(WithBlock(FontFace(source_location))),
 			
-			"keyframes" | "-webkit-keyframes" | "-moz-keyframes" =>
-			{
-				let vendor_prefix = if ::str::starts_with_ignore_ascii_case(&*name, "-webkit-")
-				{
-                    Some(VendorPrefix::webkit)
-                }
-                else if ::str::starts_with_ignore_ascii_case(&*name, "-moz-")
-                {
-                    Some(VendorPrefix::moz)
-                }
-                else
-                {
-                    None
-				};
-				
-				let name = KeyframesName::parse(self.context, input)?;
-				
-				Ok(WithBlock(Keyframes(vendor_prefix, name, location)))
-			},
+			"font-feature-values" => Ok(WithBlock(FontFeatureValues(FamilyName::parse_family_name_list(self.context, input)?, source_location))),
 			
-			"media" => Ok(WithBlock(Media(MediaList::parse_media_query_list(self.context, input, self.error_context.error_reporter), location))),
+			"keyframes" => Ok(WithBlock(Keyframes(None, name, source_location))),
 			
-			"page" => Ok(WithBlock(Page(location))),
+			"-webkit-keyframes" => Ok(WithBlock(Keyframes(Some(webkit), name, source_location))),
 			
-			"supports" => Ok(WithBlock(Supports(SupportsCondition::parse(input)?, location))),
+			"-moz-keyframes" => Ok(WithBlock(Keyframes(Some(moz), name, source_location))),
+			
+			"media" => Ok(WithBlock(Media(MediaList::parse_media_query_list(self.context, input, false), source_location))),
+			
+			"page" => Ok(WithBlock(Page(source_location))),
+			
+			"supports" => Ok(WithBlock(Supports(SupportsCondition::parse(input)?, source_location))),
 			
 			"viewport" => Ok(WithBlock(Viewport)),
 			
-			_ => Err(StyleParseError::UnsupportedAtRule(name.clone()).into())
+			_ => Err(ParseError::Custom(CustomParseError::UnsupportedAtRule(name.to_owned())))
 		}
 	}
 	
@@ -88,7 +64,7 @@ impl<'a, 'b, 'i, R: ParseErrorReporter> AtRuleParser<'i> for NestedRuleParser<'a
 		
 		let cssRule = match prelude
 		{
-			CounterStyle(name) => CssRule::CounterStyle(CounterStyleAtRule::parse_body(name, &CssRuleType::CounterStyle.context(self), self.error_context, input)?.into()),
+			CounterStyle(name) => CssRule::CounterStyle(CounterStyleAtRule::parse_body(name, &CssRuleType::CounterStyle.context(self), input)?.into()),
 			
 			Document(vendor_prefix, condition, source_location) => CssRule::Document(DocumentAtRule
 			{
@@ -100,21 +76,26 @@ impl<'a, 'b, 'i, R: ParseErrorReporter> AtRuleParser<'i> for NestedRuleParser<'a
 			
 			FontFace(source_location) => CssRule::FontFace(FontFaceAtRule::parse_body(&CssRuleType::FontFace.context(self), input, source_location)?),
 			
-			FontFeatureValues(family_names, source_location) => CssRule::FontFeatureValues(FontFeatureValuesAtRule::parse_body(&CssRuleType::FontFeatureValues.context(self), self.error_context, input, family_names, source_location)),
+			FontFeatureValues(family_names, source_location) => CssRule::FontFeatureValues(FontFeatureValuesAtRule::parse_body(&CssRuleType::FontFeatureValues.context(self), input, family_names, source_location)),
 			
 			Keyframes(vendor_prefix, name, source_location) => CssRule::Keyframes(KeyframesAtRule
 			{
 				vendor_prefix,
 				name,
-				keyframes: KeyframeListParser::parse_keyframe_list(&CssRuleType::Keyframes.context(self), self.error_context, input),
+				keyframes: KeyframeListParser::parse_keyframe_list(&CssRuleType::Keyframes.context(self), input),
 				source_location,
 			}),
 			
-			Media(media_queries, source_location) => CssRule::Media(MediaAtRule),
+			Media(media_queries, source_location) => CssRule::Media(MediaAtRule
+			{
+				media_queries: MediaList::parse_media_query_list(&CssRuleType::Media.context(self), input, false),
+				rules: self.parse_nested_rules(input, CssRuleType::Media),
+				source_location,
+			}),
 			
 			Page(source_location) => CssRule::Page(PageAtRule
 			{
-				propertyDeclarations: PropertyDeclarationParser::parse_property_declaration_list(&CssRuleType::Page.context(self), input, false),
+				property_declarations: PropertyDeclarations::parse_property_declaration_list(&CssRuleType::Page.context(self), input, false),
 				source_location,
 			}),
 			
@@ -125,22 +106,22 @@ impl<'a, 'b, 'i, R: ParseErrorReporter> AtRuleParser<'i> for NestedRuleParser<'a
 				source_location,
 			}),
 			
-			Viewport => CssRule::Viewport(ViewportAtRule::parse_body(&CssRuleType::Viewport.context(self), self.error_context, input)?),
+			Viewport => CssRule::Viewport(ViewportAtRule::parse_body(&CssRuleType::Viewport.context(self), input)?),
 		};
 		
 		Ok(cssRule)
 	}
 }
 
-impl<'a, 'b, 'i, R: ParseErrorReporter> QualifiedRuleParser<'i> for NestedRuleParser<'a, 'b, R>
+impl<'a, 'b, 'i> QualifiedRuleParser<'i> for NestedRuleParser<'a, 'b>
 {
 	type Prelude = QualifiedRuleParserPrelude;
 	
 	type QualifiedRule = CssRule;
 	
-	type Error = SelectorParseError<'i, StyleParseError<'i>>;
+	type Error = CustomParseError<'i>;
 	
-	fn parse_prelude<'t>(&mut self, input: &mut Parser<'i, 't>) -> Result<QualifiedRuleParserPrelude, ParseError<'i, Self::Error>>
+	fn parse_prelude<'t>(&mut self, input: &mut Parser<'i, 't>) -> Result<Self::Prelude, ParseError<'i, Self::Error>>
 	{
 		let selector_parser = SelectorParser;
 		
@@ -164,7 +145,7 @@ impl<'a, 'b, 'i, R: ParseErrorReporter> QualifiedRuleParser<'i> for NestedRulePa
 		let styleRule = StyleRule
 		{
 			selectors: prelude.selectors,
-			propertyDeclarations: PropertyDeclarationParser::parse_property_declaration_list(&context, input, false)?,
+			property_declarations: PropertyDeclarations::parse_property_declaration_list(&context, input, false)?,
 			source_location: prelude.source_location,
 		};
 		
@@ -172,7 +153,7 @@ impl<'a, 'b, 'i, R: ParseErrorReporter> QualifiedRuleParser<'i> for NestedRulePa
 	}
 }
 
-impl<'a, 'b, R: ParseErrorReporter> NestedRuleParser<'a, 'b, R>
+impl<'a, 'b> NestedRuleParser<'a, 'b>
 {
 	#[inline(always)]
 	pub(crate) fn context_new_with_rule_type(&self, cssRuleType: CssRuleType) -> ParserContext
@@ -180,14 +161,13 @@ impl<'a, 'b, R: ParseErrorReporter> NestedRuleParser<'a, 'b, R>
 		ParserContext::new_with_rule_type(self.context, cssRuleType)
 	}
 	
-	fn parse_nested_rules<'i>(&mut self, input: &mut Parser, rule_type: CssRuleType) -> Result<Vec<CssRule>, PreciseParseError<'i, SelectorParseError<'i, StyleParseError<'i>>>>
+	fn parse_nested_rules<'i>(&mut self, input: &mut Parser, rule_type: CssRuleType) -> Result<Vec<CssRule>, PreciseParseError<'i, CustomParseError<'i>>>
 	{
 		let context = rule_type.context();
 		
 		let nested_parser = NestedRuleParser
 		{
 			context: &context,
-			error_context: &self.error_context,
 		};
 		
 		let mut iter = RuleListParser::new_for_nested_rule(input, nested_parser);

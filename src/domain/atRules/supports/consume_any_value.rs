@@ -3,7 +3,7 @@
 
 
 /// https://drafts.csswg.org/css-syntax-3/#typedef-any-value
-fn consume_any_value<'i, 't>(input: &mut Parser<'i, 't>) -> Result<(), ParseError<'i>>
+fn consume_any_value<'i, 't>(input: &mut Parser<'i, 't>) -> Result<(), ParseError<'i, CustomParseError<'i>>>
 {
 	input.expect_no_error_token().map_err(|err| err.into())
 }

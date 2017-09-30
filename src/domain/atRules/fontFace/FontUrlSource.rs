@@ -20,6 +20,21 @@ impl ToCss for FontUrlSource
 {
 	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
 	{
-		self.url.to_css(dest)
+		self.url.to_css(dest)?;
+		
+		if !self.format_hints.is_empty()
+		{
+			dest.write_str(" format(")?;
+			let mut formatHintsIterator = self.format_hints.iter();
+			serialize_string(formatHintsIterator.next().unwrap(), dest)?;
+			for formatHint in formatHintsIterator
+			{
+				dest.write_char(',')?;
+				serialize_string(formatHint)?;
+			}
+			dest.write_char(')')?;
+		}
+		
+		Ok(())
 	}
 }

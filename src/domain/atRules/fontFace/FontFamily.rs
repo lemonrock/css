@@ -27,7 +27,7 @@ impl ToCss for FontFamily
 impl FontFamily
 {
 	/// Parse a font-family value
-	pub(crate) fn parse<'i, 't>(input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i>>
+	pub(crate) fn parse<'i, 't>(input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
 	{
 		use self::FontFamily::Generic;
 		use self::FamilyNameSyntax::*;
@@ -61,7 +61,7 @@ impl FontFamily
 				&first_ident,
 				
 				"serif" => return Ok(Generic(serif)),
-				"sans-serif" => return Ok(Generic(sans-serif)),
+				"sans-serif" => return Ok(Generic(sans_serif)),
 				"cursive" => return Ok(Generic(cursive)),
 				"fantasy" => return Ok(Generic(fantasy)),
 				"monospace" => return Ok(Generic(monospace)),

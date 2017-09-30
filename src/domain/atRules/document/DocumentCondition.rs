@@ -29,7 +29,7 @@ impl ToCss for DocumentCondition
 impl DocumentCondition
 {
 	/// Parse a document condition.
-	pub(crate) fn parse<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i>>
+	pub(crate) fn parse<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
 	{
 		input.parse_comma_separated(|input| UrlMatchingFunction::parse(context, input)).map(DocumentCondition)
 	}

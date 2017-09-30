@@ -10,7 +10,7 @@ pub struct StyleRule
 	pub selectors: SelectorList<SelectorImpl>,
 	
 	/// The declaration block with the properties it contains.
-	pub propertyDeclarations: Vec<PropertyDeclaration>,
+	pub property_declarations: PropertyDeclarations,
 	
 	/// The location in the sheet where it was found.
 	pub source_location: SourceLocation,
@@ -28,11 +28,10 @@ impl ToCss for StyleRule
 		dest.write_str(" { ")?;
 		
 		// Step 3
-		let declaration_block = self.block.read_with(guard);
-		declaration_block.to_css(dest)?;
+		self.property_declarations.to_css(dest)?;
 		
 		// Step 4
-		if !declaration_block.declarations().is_empty()
+		if !self.property_declarations.is_empty()
 		{
 			dest.write_str(" ")?;
 		}

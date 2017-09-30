@@ -4,7 +4,7 @@
 
 /// A computed percentage.
 #[derive(Clone, Copy, Debug, Default, PartialEq, PartialOrd)]
-pub struct Percentage(pub CSSFloat);
+pub struct Percentage(pub CssFloat);
 
 impl Percentage
 {

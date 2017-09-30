@@ -19,16 +19,16 @@ impl<'a, 'b, 'i, T> AtRuleParser<'i> for FontFeatureValuesDeclarationsParser<'a,
 	
 	type AtRule = ();
 	
-	type Error = SelectorParseError<'i, StyleParseError<'i>>;
+	type Error = CustomParseError<'i>;
 }
 
 impl<'a, 'b, 'i, T: 'a + Parse> DeclarationParser<'i> for FontFeatureValuesDeclarationsParser<'a, 'b, T>
 {
 	type Declaration = ();
 	
-	type Error = SelectorParseError<'i, StyleParseError<'i>>;
+	type Error = CustomParseError<'i>;
 	
-	fn parse_value<'t>(&mut self, name: CowRcStr<'i>, input: &mut Parser<'i, 't>) -> Result<(), ParseError<'i>>
+	fn parse_value<'t>(&mut self, name: CowRcStr<'i>, input: &mut Parser<'i, 't>) -> Result<(), ParseError<'i, CustomParseError<'i>>>
 	{
 		let fontFeatureValuesDeclaration = FontFeatureValuesDeclaration
 		{
@@ -44,7 +44,7 @@ impl<'a, 'b, 'i, T: 'a + Parse> DeclarationParser<'i> for FontFeatureValuesDecla
 
 impl<'a, 'b: 'a, T: 'a + Parse> FontFeatureValuesDeclarationsParser<'a, 'b, T>
 {
-	pub(crate) fn parseBlock<'i, 't, T>(input: &mut Parser<'i, 't>, context: &'a ParserContext<'b>, declarations: &'a mut Vec<FontFeatureValuesDeclaration<T>>) -> Result<(), ParseError<'i>>
+	pub(crate) fn parseBlock<'i, 't, T>(input: &mut Parser<'i, 't>, context: &'a ParserContext<'b>, declarations: &'a mut Vec<FontFeatureValuesDeclaration<T>>) -> Result<(), ParseError<'i, CustomParseError<'i>>>
 	{
 		let parser = Self
 		{

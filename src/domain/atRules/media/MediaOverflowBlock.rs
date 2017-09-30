@@ -2,13 +2,8 @@
 // Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
 
 
-use super::*;
-
-
-include!("Comma.rs");
-include!("CommaWithSpace.rs");
-include!("OneOrMoreSeparated.rs");
-include!("Separator.rs");
-include!("skip_whitespace_even_though_it_is_unnecessary_for_correctness_as_it_may_help_try_rewind_less.rs");
-include!("Space.rs");
-include!("UnicodeRange.OneOrMoreSeparated.rs");
+define_css_keyword_enum!(MediaOverflowBlock:
+                         "none" => none,
+                         "scroll" => scroll,
+                         "optional-paged" => optional_paged,
+                         "paged" => paged);

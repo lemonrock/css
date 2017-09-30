@@ -28,15 +28,24 @@ impl ToCss for FamilyName
 // `FamilyName::parse` is based on `FontFamily::parse` and not the other way around because we want to exclude generic family keywords.
 impl Parse for FamilyName
 {
-	fn parse<'i, 't>(_: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i>>
+	fn parse<'i, 't>(_: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
 	{
 		use self::FontFamily::*;
 		
 		match FontFamily::parse(input)
 		{
 			Ok(FamilyName(name)) => Ok(name),
-			Ok(Generic(_)) => Err(StyleParseError::UnspecifiedError.into()),
+			Ok(Generic(_)) => Err(ParseError::Custom(CustomParseError::FontFaceAtRuleFontFamilyCanNotBeGeneric)),
 			Err(error) => Err(error)
 		}
+	}
+}
+
+impl FamilyName
+{
+	/// Parses a list of `FamilyName`s.
+	pub(crate) fn parse_family_name_list<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Vec<Self>, ParseError<'i, CustomParseError<'i>>>
+	{
+		input.parse_comma_separated(|i| Self::parse(context, i)).map_err(|e| e.into())
 	}
 }

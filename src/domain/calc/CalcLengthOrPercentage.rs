@@ -9,14 +9,14 @@ pub struct CalcLengthOrPercentage
 {
 	pub clamping_mode: AllowedNumericType,
 	pub absolute: Option<AbsoluteLength>,
-	pub vw: Option<CSSFloat>,
-	pub vh: Option<CSSFloat>,
-	pub vmin: Option<CSSFloat>,
-	pub vmax: Option<CSSFloat>,
-	pub em: Option<CSSFloat>,
-	pub ex: Option<CSSFloat>,
-	pub ch: Option<CSSFloat>,
-	pub rem: Option<CSSFloat>,
+	pub vw: Option<CssFloat>,
+	pub vh: Option<CssFloat>,
+	pub vmin: Option<CssFloat>,
+	pub vmax: Option<CssFloat>,
+	pub em: Option<CssFloat>,
+	pub ex: Option<CssFloat>,
+	pub ch: Option<CssFloat>,
+	pub rem: Option<CssFloat>,
 	pub percentage: Option<Percentage>,
 }
 
@@ -31,7 +31,8 @@ impl ToCss for CalcLengthOrPercentage
 		let mut first_value = true;
 		macro_rules! first_value_check
 		{
-            ($val:expr) => {
+            ($val:expr) =>
+            {
                 if !first_value
                 {
                     dest.write_str(if $val < Zero::zero()
@@ -53,7 +54,8 @@ impl ToCss for CalcLengthOrPercentage
 		
 		macro_rules! serialize
 		{
-            ( $( $val:ident ),* ) => {
+            ( $( $val:ident ),* ) =>
+            {
                 $(
                     if let Some(val) = self.$val
                     {
@@ -67,7 +69,8 @@ impl ToCss for CalcLengthOrPercentage
 		
 		macro_rules! serialize_abs
 		{
-            ( $( $val:ident ),+ ) => {
+            ( $( $val:ident ),+ ) =>
+            {
                 $(
                     if let Some(AbsoluteLength::$val(v)) = self.absolute
                     {

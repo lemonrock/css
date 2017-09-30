@@ -2,21 +2,7 @@
 // Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
 
 
-// NOTE: impl<'a, 'b, 'i> DeclarationParser<'i> for CounterStyleRuleParser<'a, 'b> is in the macro definition 'counter_style_descriptors' in 'CounterStyleAtRule.rs'
-struct CounterStyleRuleParser<'a, 'b: 'a>
-{
-	context: &'a ParserContext<'b>,
-	rule: &'a mutCounterStyleAtRule,
-}
-
-/// Default methods reject all at rules.
-impl<'a, 'b, 'i> AtRuleParser<'i> for CounterStyleRuleParser<'a, 'b>
-{
-	type PreludeNoBlock = ();
-	
-	type PreludeBlock = ();
-	
-	type AtRule = ();
-	
-	type Error = SelectorParseError<'i, StyleParseError<'i>>;
-}
+define_css_keyword_enum!(MediaUpdate:
+                         "none" => none,
+                         "slow" => slow,
+                         "fast" => fast);

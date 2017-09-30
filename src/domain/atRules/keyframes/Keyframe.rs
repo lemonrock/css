@@ -10,7 +10,7 @@ pub struct Keyframe
 	pub selector: KeyframeSelector,
 	
 	/// The declaration block that was declared inside this keyframe.
-	pub propertyDeclarations: Vec<PropertyDeclaration>,
+	pub property_declarations: PropertyDeclarations,
 	
 	/// The line and column of the rule's source code.
 	pub source_location: SourceLocation,
@@ -21,9 +21,9 @@ impl ToCss for Keyframe
 	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
 	{
 		self.selector.to_css(dest)?;
-		dest.write_str(" { ")?;
-		self.block.to_css(dest)?;
-		dest.write_str(" }")?;
+		dest.write_char('{')?;
+		self.property_declarations.to_css(dest)?;
+		dest.write_char('}')?;
 		Ok(())
 	}
 }

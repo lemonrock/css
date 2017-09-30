@@ -16,10 +16,10 @@ pub enum CalcNode
 	Time(Time),
 	
 	/// `<percentage>`
-	Percentage(CSSFloat),
+	Percentage(CssFloat),
 	
 	/// `<number>`
-	Number(CSSFloat),
+	Number(CssFloat),
 	
 	/// An expression of the form `x + y`
 	Sum(Box<CalcNode>, Box<CalcNode>),
@@ -37,51 +37,51 @@ pub enum CalcNode
 impl CalcNode
 {
 	/// Convenience parsing function for integers.
-	pub(crate) fn parse_integer<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<CSSInteger, ParseError<'i>>
+	pub(crate) fn parse_integer<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<CssInteger, ParseError<'i, CustomParseError<'i>>>
 	{
-		Self::parse(context, input, CalcUnit::Integer)?.to_number().map(|n| n as CSSInteger)	.map_err(|()| StyleParseError::UnspecifiedError.into())
+		Self::parse(context, input, CalcUnit::Integer)?.to_number().map(|n| n as CssInteger)	.map_err(|()| ParseError::Custom(CustomParseError::CouldNotParseInteger))
 	}
 	
 	/// Convenience parsing function for `<length> | <percentage>`.
-	pub(crate) fn parse_length_or_percentage<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>, clamping_mode: AllowedNumericType) -> Result<CalcLengthOrPercentage, ParseError<'i>>
+	pub(crate) fn parse_length_or_percentage<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>, clamping_mode: AllowedNumericType) -> Result<CalcLengthOrPercentage, ParseError<'i, CustomParseError<'i>>>
 	{
-		Self::parse(context, input, CalcUnit::LengthOrPercentage)?.to_length_or_percentage(clamping_mode).map_err(|()| StyleParseError::UnspecifiedError.into())
+		Self::parse(context, input, CalcUnit::LengthOrPercentage)?.to_length_or_percentage(clamping_mode).map_err(|()| ParseError::Custom(CustomParseError::CouldNotParseLengthDimensionOrPercentage))
 	}
 	
 	/// Convenience parsing function for percentages.
-	pub(crate) fn parse_percentage<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<CSSFloat, ParseError<'i>>
+	pub(crate) fn parse_percentage<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<CssFloat, ParseError<'i, CustomParseError<'i>>>
 	{
-		Self::parse(context, input, CalcUnit::Percentage)?.to_percentage().map_err(|()| StyleParseError::UnspecifiedError.into())
+		Self::parse(context, input, CalcUnit::Percentage)?.to_percentage().map_err(|()| ParseError::Custom(CustomParseError::CouldNotParsePercentage).into())
 	}
 	
 	/// Convenience parsing function for `<length>`.
-	pub(crate) fn parse_length<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>, clamping_mode: AllowedNumericType) -> Result<CalcLengthOrPercentage, ParseError<'i>>
+	pub(crate) fn parse_length<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>, clamping_mode: AllowedNumericType) -> Result<CalcLengthOrPercentage, ParseError<'i, CustomParseError<'i>>>
 	{
-		Self::parse(context, input, CalcUnit::Length)?.to_length_or_percentage(clamping_mode).map_err(|()| StyleParseError::UnspecifiedError.into())
+		Self::parse(context, input, CalcUnit::Length)?.to_length_or_percentage(clamping_mode).map_err(|()| ParseError::Custom(CustomParseError::CouldNotParseLengthDimension))
 	}
 	
 	/// Convenience parsing function for `<number>`.
-	pub(crate) fn parse_number<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<CSSFloat, ParseError<'i>>
+	pub(crate) fn parse_number<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<CssFloat, ParseError<'i, CustomParseError<'i>>>
 	{
-		Self::parse(context, input, CalcUnit::Number)?.to_number().map_err(|()| StyleParseError::UnspecifiedError.into())
+		Self::parse(context, input, CalcUnit::Number)?.to_number().map_err(|()| ParseError::Custom(CustomParseError::CouldNotParseNumber))
 	}
 	
 	/// Convenience parsing function for `<angle>`.
-	pub(crate) fn parse_angle<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Angle, ParseError<'i>>
+	pub(crate) fn parse_angle<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Angle, ParseError<'i, CustomParseError<'i>>>
 	{
-		Self::parse(context, input, CalcUnit::Angle)?.to_angle().map_err(|()| StyleParseError::UnspecifiedError.into())
+		Self::parse(context, input, CalcUnit::Angle)?.to_angle().map_err(|()| ParseError::Custom(CustomParseError::CouldNotParseAngleDimension))
 	}
 	
 	/// Convenience parsing function for `<time>`.
-	pub(crate) fn parse_time<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Time, ParseError<'i>>
+	pub(crate) fn parse_time<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Time, ParseError<'i, CustomParseError<'i>>>
 	{
-		Self::parse(context, input, CalcUnit::Time)?.to_time().map_err(|()| StyleParseError::UnspecifiedError.into())
+		Self::parse(context, input, CalcUnit::Time)?.to_time().map_err(|()| ParseError::Custom(CustomParseError::CouldNotParseTimeDimension))
 	}
 	
 	/// Parse a top-level `calc` expression, with all nested sub-expressions.
 	///
 	/// This is in charge of parsing, for example, `2 + 3 * 100%`.
-	fn parse<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>, expected_unit: CalcUnit) -> Result<Self, ParseError<'i>>
+	fn parse<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>, expected_unit: CalcUnit) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
 	{
 		use self::CalcNode::*;
 		
@@ -138,7 +138,7 @@ impl CalcNode
 	/// * `2 * 2`
 	/// * `2 * 2 + 2` (but will leave the `+ 2` unparsed).
 	///
-	fn parse_product<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>, expected_unit: CalcUnit) -> Result<Self, ParseError<'i>>
+	fn parse_product<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>, expected_unit: CalcUnit) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
 	{
 		use self::CalcNode::*;
 		
@@ -178,16 +178,16 @@ impl CalcNode
 	/// Tries to parse a single element in the expression, that is, a `<length>`, `<angle>`, `<time>`, `<percentage>`, according to an `expected_unit`.
 	///
 	/// May return a "complex" `CalcNode`, in the presence of a parenthesized expression, for example.
-	fn parse_one<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>, expected_unit: CalcUnit) -> Result<Self, ParseError<'i>>
+	fn parse_one<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>, expected_unit: CalcUnit) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
 	{
 		const IsFromCalc: bool = true;
 		
 		match (input.next()?, expected_unit)
 		{
 			(&Token::Number { value, .. }, _) => return Ok(CalcNode::Number(value)),
-			(&Token::Dimension { value, ref unit, .. }, CalcUnit::Length) |	(&Token::Dimension { value, ref unit, .. }, CalcUnit::LengthOrPercentage) => return NoCalcLength::parse_dimension(context, value, unit).map(CalcNode::Length).map_err(|()| StyleParseError::UnspecifiedError.into()),
-			(&Token::Dimension { value, ref unit, .. }, CalcUnit::Angle) => return Angle::parse_dimension(value, unit, IsFromCalc).map(CalcNode::Angle).map_err(|()| StyleParseError::UnspecifiedError.into()),
-			(&Token::Dimension { value, ref unit, .. }, CalcUnit::Time) => return Time::parse_dimension(value, unit, IsFromCalc).map(CalcNode::Time).map_err(|()| StyleParseError::UnspecifiedError.into()),
+			(&Token::Dimension { value, ref unit, .. }, CalcUnit::Length) |	(&Token::Dimension { value, ref unit, .. }, CalcUnit::LengthOrPercentage) => return NoCalcLength::parse_dimension(context, value, unit).map(CalcNode::Length).map_err(|()| CustomParseError::CouldNotParseLengthDimensionInCalcFunction),
+			(&Token::Dimension { value, ref unit, .. }, CalcUnit::Angle) => return Angle::parse_dimension(value, unit, IsFromCalc).map(CalcNode::Angle).map_err(|()| ParseError::Custom(CustomParseError::CouldNotParseAngleDimensionInCalcFunction)),
+			(&Token::Dimension { value, ref unit, .. }, CalcUnit::Time) => return Time::parse_dimension(value, unit, IsFromCalc).map(CalcNode::Time).map_err(|()| ParseError::Custom(CustomParseError::CouldNotParseTimeDimensionInCalcFunction)),
 			(&Token::Percentage { unit_value, .. }, CalcUnit::LengthOrPercentage) |	(&Token::Percentage { unit_value, .. }, CalcUnit::Percentage) => return Ok(CalcNode::Percentage(unit_value)),
 			(&Token::ParenthesisBlock, _) => {}
 			(&Token::Function(ref name), _) if name.eq_ignore_ascii_case("calc") => {}
@@ -209,7 +209,7 @@ impl CalcNode
 	}
 	
 	/// Tries to simplify this expression into a `<percentage>` value.
-	fn to_percentage(&self) -> Result<CSSFloat, ()>
+	fn to_percentage(&self) -> Result<CssFloat, ()>
 	{
 		use self::CalcNode::*;
 		
@@ -266,7 +266,7 @@ impl CalcNode
 	/// Puts this `<length>` or `<percentage>` into `result`, or error.
 	///
 	/// `factor` is the sign or multiplicative factor to account for the sign (this allows adding and subtracting into the return value).
-	fn add_length_or_percentage_to(&self, result: &mut CalcLengthOrPercentage, factor: CSSFloat) -> Result<(), ()>
+	fn add_length_or_percentage_to(&self, result: &mut CalcLengthOrPercentage, factor: CssFloat) -> Result<(), ()>
 	{
 		use self::FontRelativeLength::*;
 		use self::ViewportPercentageLength::*;
@@ -417,12 +417,16 @@ impl CalcNode
 				
 				CalcNode::Mul(ref a, ref b) =>
 				{
-					match b.to_number() {
-						Ok(rhs) => {
+					match b.to_number()
+					{
+						Ok(rhs) =>
+						{
 							let lhs = a.to_time()?;
 							Time::from_calc(lhs.seconds() * rhs)
 						}
-						Err(()) => {
+						
+						Err(()) =>
+						{
 							let lhs = a.to_number()?;
 							let rhs = b.to_time()?;
 							Time::from_calc(lhs * rhs.seconds())
@@ -434,7 +438,8 @@ impl CalcNode
 				{
 					let lhs = a.to_time()?;
 					let rhs = b.to_number()?;
-					if rhs == 0. {
+					if rhs == 0.
+					{
 						return Err(())
 					}
 					Time::from_calc(lhs.seconds() / rhs)
@@ -503,7 +508,7 @@ impl CalcNode
 	}
 	
 	/// Tries to simplify this expression into a `<number>` value.
-	fn to_number(&self) -> Result<CSSFloat, ()>
+	fn to_number(&self) -> Result<CssFloat, ()>
 	{
 		Ok
 		(

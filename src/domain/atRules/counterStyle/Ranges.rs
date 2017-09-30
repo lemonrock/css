@@ -6,15 +6,15 @@
 ///
 /// Empty Vec represents 'auto'
 #[derive(Clone, Debug)]
-pub struct Ranges(pub Vec<Range<Option<i32>>>);
+pub struct Ranges(pub Vec<::std::ops::Range<Option<i32>>>);
 
 impl Parse for Ranges
 {
-	fn parse<'i, 't>(_context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i>>
+	fn parse<'i, 't>(_context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
 	{
 		if input.try(|input| input.expect_ident_matching("auto")).is_ok()
 		{
-			Ok(Ranges(Vec::new()))
+			Ok(Self::empty())
 		}
 		else
 		{
@@ -26,10 +26,10 @@ impl Parse for Ranges
 				{
 					if start > end
 					{
-						return Err(StyleParseError::UnspecifiedError.into())
+						return Err(ParseError::Custom(CustomParseError::CounterStyleRangesCanNotHaveStartGreaterThanEnd(start, end)))
 					}
 				}
-				Ok(opt_start..opt_end)
+				Ok(opt_start .. opt_end)
 			}).map(Ranges)
 		}
 	}
@@ -45,7 +45,7 @@ impl ToCss for Ranges
 			Self::range_to_css(first, dest)?;
 			for item in iter
 			{
-				dest.write_str(", ")?;
+				dest.write_str(",")?;
 				Self::range_to_css(item, dest)?;
 			}
 			Ok(())
@@ -59,7 +59,19 @@ impl ToCss for Ranges
 
 impl Ranges
 {
-	fn parse_bound<'i, 't>(input: &mut Parser<'i, 't>) -> Result<Option<i32>, ParseError<'i>>
+	#[inline(always)]
+	pub fn empty() -> Self
+	{
+		Ranges(Vec::new())
+	}
+	
+	#[inline(always)]
+	pub fn is_auto(&self) -> bool
+	{
+		self.0.is_empty()
+	}
+	
+	fn parse_bound<'i, 't>(input: &mut Parser<'i, 't>) -> Result<Option<i32>, ParseError<'i, CustomParseError<'i>>>
 	{
 		use self::Token::*;
 		
@@ -75,7 +87,7 @@ impl Ranges
 		}
 	}
 	
-	fn range_to_css<W: fmt::Write>(range: &Range<Option<i32>>, dest: &mut W) -> fmt::Result
+	fn range_to_css<W: fmt::Write>(range: &::std::ops::Range<Option<i32>>, dest: &mut W) -> fmt::Result
 	{
 		Self::bound_to_css(range.start, dest)?;
 		dest.write_char(' ')?;

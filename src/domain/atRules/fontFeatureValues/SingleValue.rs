@@ -8,7 +8,7 @@ pub struct SingleValue(pub u32);
 
 impl Parse for SingleValue
 {
-	fn parse<'i, 't>(_context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<SingleValue, ParseError<'i>>
+	fn parse<'i, 't>(_context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<SingleValue, ParseError<'i, CustomParseError<'i>>>
 	{
 		match *input.next()?
 		{

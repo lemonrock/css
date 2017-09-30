@@ -35,7 +35,7 @@ pub struct FontFeatureValuesAtRule
 	pub source_location: SourceLocation,
 }
 
-impl ToCss for FontFeatureValuesRule
+impl ToCss for FontFeatureValuesAtRule
 {
 	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
 	{
@@ -47,7 +47,7 @@ impl ToCss for FontFeatureValuesRule
 	}
 }
 
-impl FontFeatureValuesRule
+impl FontFeatureValuesAtRule
 {
 	fn new(family_names: Vec<FamilyName>, source_location: SourceLocation) -> Self
 	{
@@ -64,24 +64,20 @@ impl FontFeatureValuesRule
 		}
 	}
 	
-	pub(crate) fn parse_body<R: ParseErrorReporter>(context: &ParserContext, error_context: &ParserErrorContext<R>, input: &mut Parser, family_names: Vec<FamilyName>, source_location: SourceLocation) -> Result<Self, ParseError>
+	pub(crate) fn parse_body<'i>(context: &ParserContext, input: &mut Parser, family_names: Vec<FamilyName>, source_location: SourceLocation) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
 	{
-		let mut fontFeatureValuesRule = Self::new(family_names, location);
+		let mut fontFeatureValuesRule = Self::new(family_names, source_location);
 		
+		let mut iterator = RuleListParser::new_for_nested_rule(input, FontFeatureValuesAtRuleParser
 		{
-			let mut iter = RuleListParser::new_for_nested_rule(input, FontFeatureValuesAtRuleParser
+			context,
+			fontFeatureValuesRule: &mut fontFeatureValuesRule,
+		});
+		while let Some(result) = iterator.next()
+		{
+			if result.is_err()
 			{
-				context,
-				error_context,
-				fontFeatureValuesRule: &mut fontFeatureValuesRule,
-			});
-			
-			while let Some(result) = iter.next()
-			{
-				if result.is_err()
-				{
-					return result;
-				}
+				return result;
 			}
 		}
 		

@@ -14,10 +14,21 @@ impl ToCss for KeyframeSelector
 		iter.next().unwrap().to_css(dest)?;
 		for percentage in iter
 		{
-			dest.write_str(", ")?;
+			dest.write_char(',')?;
 			percentage.to_css(dest)?;
 		}
 		Ok(())
+	}
+}
+
+impl<'i> FromStr for KeyframeSelector
+{
+	type Err = ParseError<'i, CustomParseError<'i>>;
+	
+	fn from_str(selector: &str) -> Result<Self, Self::Err>
+	{
+		let mut input = ParserInput::new(selector);
+		Parser::new(&mut input).parse_entirely(KeyframeSelector::parse)
 	}
 }
 
@@ -31,7 +42,7 @@ impl KeyframeSelector
 	}
 	
 	/// Parse a keyframe selector from CSS input.
-	pub(crate) fn parse<'i, 't>(input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i>>
+	pub(crate) fn parse<'i, 't>(input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
 	{
 		input.parse_comma_separated(KeyframePercentage::parse).map(KeyframeSelector)
 	}

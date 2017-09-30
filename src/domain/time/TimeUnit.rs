@@ -2,10 +2,13 @@
 // Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
 
 
-// From https://github.com/servo/servo/blob/faf5b1f797c243c5036973a191d3abae36de4138/components/style/str.rs
-
-/// Returns true if a given string has a given prefix with case-insensitive match.
-pub(crate) fn starts_with_ignore_ascii_case(string: &str, prefix: &str) -> bool
+/// A time unit.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum TimeUnit
 {
-	string.len() >= prefix.len() && string.as_bytes()[0..prefix.len()].eq_ignore_ascii_case(prefix.as_bytes())
+	/// `s`
+	Second,
+	
+	/// `ms`
+	Millisecond,
 }

@@ -7,25 +7,25 @@
 pub enum AbsoluteLength
 {
 	/// An absolute length in pixels (px)
-	Px(CSSFloat),
+	Px(CssFloat),
 	
 	/// An absolute length in inches (in)
-	In(CSSFloat),
+	In(CssFloat),
 	
 	/// An absolute length in centimeters (cm)
-	Cm(CSSFloat),
+	Cm(CssFloat),
 	
 	/// An absolute length in millimeters (mm)
-	Mm(CSSFloat),
+	Mm(CssFloat),
 	
 	/// An absolute length in quarter-millimeters (q)
-	Q(CSSFloat),
+	Q(CssFloat),
 	
 	/// An absolute length in points (pt)
-	Pt(CSSFloat),
+	Pt(CssFloat),
 	
 	/// An absolute length in pica (pc)
-	Pc(CSSFloat),
+	Pc(CssFloat),
 }
 
 impl AbsoluteLength
@@ -42,7 +42,7 @@ impl AbsoluteLength
 	
 	/// Convert this into a pixel value.
 	#[inline]
-	pub fn to_px(&self) -> CSSFloat
+	pub fn to_px(&self) -> CssFloat
 	{
 		use ::std::f32;
 		use self::AbsoluteLength::*;
@@ -81,12 +81,12 @@ impl ToCss for AbsoluteLength
 	}
 }
 
-impl Mul<CSSFloat> for AbsoluteLength
+impl Mul<CssFloat> for AbsoluteLength
 {
 	type Output = Self;
 	
 	#[inline]
-	fn mul(self, scalar: CSSFloat) -> Self
+	fn mul(self, scalar: CssFloat) -> Self
 	{
 		use self::AbsoluteLength::*;
 		

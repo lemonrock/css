@@ -2,24 +2,7 @@
 // Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
 
 
-/// Marker trait on T to automatically implement ToCss for Vec<T> when T's are separated by some delimiter `delim`.
-pub trait OneOrMoreSeparated
-{
-	/// Associated type indicating which separator is used.
-	type S: Separator;
-}
-
-impl<T> ToCss for Vec<T> where T: ToCss + OneOrMoreSeparated
-{
-	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
-	{
-		let mut iter = self.iter();
-		iter.next().unwrap().to_css(dest)?;
-		for item in iter
-		{
-			dest.write_str(<T as OneOrMoreSeparated>::S::separator())?;
-			item.to_css(dest)?;
-		}
-		Ok(())
-	}
-}
+define_css_keyword_enum!(MediaColorGamut:
+                         "srgb" => srgb,
+                         "p3" => p3,
+                         "rec2020" => rec2020);

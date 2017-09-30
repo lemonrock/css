@@ -6,9 +6,25 @@
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Symbols(pub Vec<Symbol>);
 
+impl ToCss for Symbols
+{
+	fn to_css<W: Write>(&self, dest: &mut W) -> fmt::Result
+	{
+		let mut iter = self.0.iter();
+		let first = iter.next().unwrap();
+		first.to_css(dest)?;
+		for item in iter
+		{
+			dest.write_char(' ')?;
+			item.to_css(dest)?;
+		}
+		Ok(())
+	}
+}
+
 impl Parse for Symbols
 {
-	fn parse<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i>>
+	fn parse<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
 	{
 		let mut symbols = Vec::new();
 		loop
@@ -21,7 +37,7 @@ impl Parse for Symbols
 			{
 				if symbols.is_empty()
 				{
-					return Err(StyleParseError::UnspecifiedError.into())
+					return Err(ParseError::Custom(CustomParseError::CounterStyleSymbolsCanNotBeEmpty))
 				}
 				else
 				{
@@ -29,21 +45,5 @@ impl Parse for Symbols
 				}
 			}
 		}
-	}
-}
-
-impl ToCss for Symbols
-{
-	fn to_css<W: Write>(&self, dest: &mut W) -> fmt::Result
-	{
-		let mut iter = self.0.iter();
-		let first = iter.next().expect("expected at least one symbol");
-		first.to_css(dest)?;
-		for item in iter
-		{
-			dest.write_char(' ')?;
-			item.to_css(dest)?;
-		}
-		Ok(())
 	}
 }

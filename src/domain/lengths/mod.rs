@@ -3,7 +3,6 @@
 
 
 use super::*;
-use super::super::parsers::AllowQuirks;
 use ::std::mem::replace;
 use ::std::ops::Add;
 use ::std::ops::Mul;
@@ -13,6 +12,7 @@ include!("AbsoluteLength.rs");
 include!("AppUnitsPer.rs");
 include!("appUnitsToIntPx.rs");
 include!("FontRelativeLength.rs");
+include!("Length.rs");
 include!("LengthOrPercentageOrAuto.rs");
 include!("NoCalcLength.rs");
 include!("ViewportPercentageLength.rs");

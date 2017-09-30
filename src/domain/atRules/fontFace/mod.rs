@@ -3,6 +3,8 @@
 
 
 use super::*;
+use super::parsers::FontFaceAtRuleParser;
+use ::std::collections::BTreeMap;
 
 
 include!("FamilyName.rs");
@@ -11,6 +13,7 @@ include!("FontDisplay.rs");
 include!("FontFace.rs");
 include!("FontFaceAtRule.rs");
 include!("FontFamily.rs");
+include!("FontFeatureSetting.rs");
 include!("FontFeatureSettings.rs");
 include!("FontLanguageOverride.rs");
 include!("FontStretch.rs");

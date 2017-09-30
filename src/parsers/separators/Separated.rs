@@ -2,5 +2,24 @@
 // Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
 
 
-/// A CSS float value.
-pub type CSSFloat = f32;
+/// Marker trait on T to automatically implement ToCss for Vec<T> when values of T are separated by some delimiter `delim`.
+pub trait Separated
+{
+	/// Associated type indicating which separator is used.
+	type Delimiter: Separator;
+}
+
+impl<T> ToCss for Vec<T> where T: ToCss + Separated
+{
+	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
+	{
+		let mut iter = self.iter();
+		iter.next().unwrap().to_css(dest)?;
+		for item in iter
+		{
+			dest.write_str(<T as Separated>::Delimiter::separator())?;
+			item.to_css(dest)?;
+		}
+		Ok(())
+	}
+}

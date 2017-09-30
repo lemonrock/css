@@ -19,7 +19,7 @@ pub enum Symbol
 
 impl Parse for Symbol
 {
-	fn parse<'i, 't>(_context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i>>
+	fn parse<'i, 't>(_context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
 	{
 		use self::Symbol::*;
 		
@@ -44,8 +44,8 @@ impl ToCss for Symbol
 		
 		match *self
 		{
-			String(ref s) => s.to_css(dest),
-			Ident(ref s) => serialize_identifier(s, dest),
+			String(ref string) => serialize_string(string, dest),
+			Ident(ref string) => serialize_identifier(string, dest),
 		}
 	}
 }

@@ -10,13 +10,13 @@
 /// 40%, 60%, 100% {
 ///     width: 100%;
 /// }
-pub(crate) struct KeyframeListParser<'a, R: 'a>
+pub(crate) struct KeyframeListParser<'a>
 {
 	context: &'a ParserContext<'a>,
 }
 
 // Default methods reject all @ rules.
-impl<'a, 'i, R> AtRuleParser<'i> for KeyframeListParser<'a, R>
+impl<'a, 'i> AtRuleParser<'i> for KeyframeListParser<'a>
 {
 	type PreludeNoBlock = ();
 	
@@ -27,15 +27,15 @@ impl<'a, 'i, R> AtRuleParser<'i> for KeyframeListParser<'a, R>
 	type Error = CustomParseError<'a>;
 }
 
-impl<'a, 'i, R: ParseErrorReporter> QualifiedRuleParser<'i> for KeyframeListParser<'a, R>
+impl<'a, 'i> QualifiedRuleParser<'i> for KeyframeListParser<'a>
 {
 	type Prelude = KeyframeSelectorParserPrelude;
 	
 	type QualifiedRule = Keyframe;
 	
-	type Error = SelectorParseError<'i, StyleParseError<'i>>;
+	type Error = CustomParseError<'i>;
 	
-	fn parse_prelude<'t>(&mut self, input: &mut Parser<'i, 't>) -> Result<Self::Prelude, ParseError<'i>>
+	fn parse_prelude<'t>(&mut self, input: &mut Parser<'i, 't>) -> Result<Self::Prelude, ParseError<'i, CustomParseError<'i>>>
 	{
 		let source_location = input.current_source_location();
 		match KeyframeSelector::parse(input)
@@ -53,7 +53,7 @@ impl<'a, 'i, R: ParseErrorReporter> QualifiedRuleParser<'i> for KeyframeListPars
 		}
 	}
 	
-	fn parse_block<'t>(&mut self, prelude: Self::Prelude, input: &mut Parser<'i, 't>) -> Result<Self::QualifiedRule, ParseError<'i>>
+	fn parse_block<'t>(&mut self, prelude: Self::Prelude, input: &mut Parser<'i, 't>) -> Result<Self::QualifiedRule, ParseError<'i, CustomParseError<'i>>>
 	{
 		let context = ParserContext::new_with_rule_type(self.context, CssRuleType::Keyframe);
 		
@@ -62,17 +62,17 @@ impl<'a, 'i, R: ParseErrorReporter> QualifiedRuleParser<'i> for KeyframeListPars
 			Keyframe
 			{
 				selector: prelude.selector,
-				propertyDeclarations: PropertyDeclarationParser::parse_property_declaration_list(&context, input, true)?,
+				property_declarations: PropertyDeclarations::parse_property_declaration_list(&context, input, true)?,
 				source_location: prelude.source_location,
 			}
 		)
 	}
 }
 
-impl<'a, R: 'a> KeyframeListParser<'a, R>
+impl<'a> KeyframeListParser<'a>
 {
 	/// Parses a keyframe list from CSS input.
-	pub(crate) fn parse_keyframe_list<'i>(context: &ParserContext, input: &mut Parser) -> Result<Vec<Keyframe>, ParseError<'i>>
+	pub(crate) fn parse_keyframe_list<'i>(context: &ParserContext, input: &mut Parser) -> Result<Vec<Keyframe>, ParseError<'i, CustomParseError<'i>>>
 	{
 		let mut iter = RuleListParser::new_for_nested_rule(input, KeyframeListParser
 		{

@@ -2,13 +2,18 @@
 // Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
 
 
-/// Whether quirks are allowed in this context.
-#[derive(Clone, Copy, PartialEq)]
-pub enum AllowQuirks
+/// Type used as the associated type in the `Separated` trait on a type to indicate that a serialized list of elements of this type is separated by commas.
+pub(crate) struct Comma;
+
+impl Separator for Comma
 {
-	/// Quirks are allowed.
-	Yes,
+	fn separator() -> &'static str
+	{
+		","
+	}
 	
-	/// Quirks are not allowed.
-	No,
+	fn parse<'i, 't, F, T, E>(input: &mut Parser<'i, 't>, parse_one: F) -> Result<Vec<T>, ParseError<'i, E>> where F: for<'tt> FnMut(&mut Parser<'i, 'tt>) -> Result<T, ParseError<'i, E>>
+	{
+		input.parse_comma_separated(parse_one)
+	}
 }

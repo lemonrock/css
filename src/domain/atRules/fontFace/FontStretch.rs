@@ -18,7 +18,7 @@ define_css_keyword_enum!
 
 impl Parse for FontStretch
 {
-	fn parse<'i, 't>(_: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i>>
+	fn parse<'i, 't>(_: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
 	{
 		FontStretch::parse(input)
 	}

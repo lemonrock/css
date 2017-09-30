@@ -3,7 +3,7 @@
 
 
 /// https://drafts.csswg.org/mediaqueries/#mq-prefix
-#[derive(Clone, Copy, Debug, Eq, PartialEq, ToCss)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum Qualifier
 {
 	/// Hide a media query from legacy UAs:
@@ -13,4 +13,21 @@ pub enum Qualifier
 	/// Negate a media query:
 	/// https://drafts.csswg.org/mediaqueries/#mq-not
 	Not,
+}
+
+impl ToCss for Qualifier
+{
+	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
+	{
+		use self::Qualifier::*;
+		
+		let ident = match *self
+		{
+			Only => "only",
+			
+			Not => "not",
+		};
+		
+		dest.write_str(ident)
+	}
 }

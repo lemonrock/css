@@ -3,7 +3,7 @@
 
 
 /// A struct to parse property declarations.
-struct PropertyDeclarationParser<'a, 'b: 'a>
+pub(crate) struct PropertyDeclarationParser<'a, 'b: 'a>
 {
 	context: &'a ParserContext<'b>,
 	isImportantDisallowed: bool,
@@ -18,14 +18,14 @@ impl<'a, 'b, 'i> AtRuleParser<'i> for PropertyDeclarationParser<'a, 'b>
 	
 	type AtRule = Importance;
 	
-	type Error = SelectorParseError<'i, StyleParseError<'i>>;
+	type Error = CustomParseError<'i>;
 }
 
 impl<'a, 'b, 'i> DeclarationParser<'i> for PropertyDeclarationParser<'a, 'b>
 {
 	type Declaration = PropertyDeclaration;
 	
-	type Error = CustomParseError;
+	type Error = CustomParseError<'i>;
 	
 	fn parse_value<'t>(&mut self, name: CowRcStr<'i>, input: &mut Parser<'i, 't>) -> Result<Self::Declaration, ParseError<'i, Self::Error>>
 	{
@@ -63,26 +63,5 @@ impl<'a, 'b, 'i> DeclarationParser<'i> for PropertyDeclarationParser<'a, 'b>
 				importance,
 			}
 		)
-	}
-}
-
-impl<'a, 'b> PropertyDeclarationParser<'a, 'b>
-{
-	/// Parse a list of property declarations and return a property declaration block.
-	pub (crate) fn parse_property_declaration_list(context: &ParserContext, input: &mut Parser, isImportantDisallowed: bool) -> Result<Vec<PropertyDeclaration>, ParseError>
-	{
-		let mut propertyDeclarations = Vec::new();
-		let mut parsedPropertyDeclarations = DeclarationListParser::new(input, PropertyDeclarationParser
-		{
-			context,
-			isImportantDisallowed,
-		});
-		
-		while let Some(propertyDeclaration) = parsedPropertyDeclarations.next()
-		{
-			propertyDeclarations.push(propertyDeclaration?);
-		}
-		
-		Ok(propertyDeclarations)
 	}
 }

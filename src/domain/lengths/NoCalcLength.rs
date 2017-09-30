@@ -32,19 +32,19 @@ impl ToCss for NoCalcLength
 		
 		match *self
 		{
-			Absolute(length) => length.to_css(dest),
-			FontRelative(length) => length.to_css(dest),
-			ViewportPercentage(length) => length.to_css(dest),
+			Absolute(ref length) => length.to_css(dest),
+			FontRelative(ref length) => length.to_css(dest),
+			ViewportPercentage(ref length) => length.to_css(dest),
 		}
 	}
 }
 
-impl Mul<CSSFloat> for NoCalcLength
+impl Mul<CssFloat> for NoCalcLength
 {
 	type Output = Self;
 	
 	#[inline]
-	fn mul(self, scalar: CSSFloat) -> Self
+	fn mul(self, scalar: CssFloat) -> Self
 	{
 		use self::NoCalcLength::*;
 		
@@ -60,7 +60,7 @@ impl Mul<CSSFloat> for NoCalcLength
 impl NoCalcLength
 {
 	/// Parse a given absolute or relative dimension.
-	pub(crate) fn parse_dimension(context: &ParserContext, value: CSSFloat, unit: &str) -> Result<Self, ()>
+	pub(crate) fn parse_dimension(context: &ParserContext, value: CssFloat, unit: &str) -> Result<Self, ()>
 	{
 		use self::NoCalcLength::*;
 		use self::AbsoluteLength::*;
@@ -159,7 +159,7 @@ impl NoCalcLength
 	
 	/// Get an absolute length from a px value.
 	#[inline]
-	pub fn from_px(px_value: CSSFloat) -> Self
+	pub fn from_px(px_value: CssFloat) -> Self
 	{
 		use self::NoCalcLength::Absolute;
 		use self::AbsoluteLength::Px;

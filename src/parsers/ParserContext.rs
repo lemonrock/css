@@ -10,9 +10,6 @@ pub struct ParserContext<'a>
 	
 	/// The mode to use when parsing.
 	pub(crate) parsing_mode: ParsingMode,
-	
-	/// Whether to permit parsing quirky implementations of CSS
-	pub(crate) quirks_mode: QuirksMode,
 }
 
 impl<'a> ParserContext<'a>
@@ -29,7 +26,8 @@ impl<'a> ParserContext<'a>
 	}
 	
 	/// Get the rule type, which assumes that one is available.
-	pub(crate) fn rule_type(&self) -> CssRuleType {
+	pub(crate) fn rule_type(&self) -> CssRuleType
+	{
 		self.rule_type.expect("Rule type expected, but none was found.")
 	}
 	

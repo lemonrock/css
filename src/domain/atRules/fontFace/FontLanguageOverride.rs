@@ -17,7 +17,7 @@ impl ToCss for FontLanguageOverride
 		match *self
 		{
 			normal => serialize_identifier("normal", dest),
-			Override(openTypeLanguageTag) => OpenTypeLanguageTag.to_css(dest),
+			Override(openTypeLanguageTag) => openTypeLanguageTag.to_css(dest),
 		}
 	}
 }
@@ -25,13 +25,13 @@ impl ToCss for FontLanguageOverride
 impl FontLanguageOverride
 {
 	/// Parse a font-family value
-	pub(crate) fn parse<'i, 't>(input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i>>
+	pub(crate) fn parse<'i, 't>(input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
 	{
 		use self::FontLanguageOverride::*;;
 		
 		if let Ok(value) = input.try(|i| i.expect_string())
 		{
-			return Ok(Custom(OpenTypeLanguageTag::parse(value)?))
+			return Ok(Override(OpenTypeLanguageTag::parse(value)?))
 		}
 		
 		let identifier = input.expect_ident()?.clone();

@@ -3,8 +3,7 @@
 
 
 /// http://dev.w3.org/csswg/mediaqueries-3/#media0
-#[derive(Clone, Debug, Eq, PartialEq)]
-#[cfg_attr(feature = "servo", derive(HeapSizeOf))]
+#[derive(Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub enum MediaQueryType
 {
 	/// A media type that matches every device.
@@ -16,19 +15,18 @@ pub enum MediaQueryType
 
 impl MediaQueryType
 {
-	fn parse(ident: &str) -> Result<Self, ()>
+	fn parse<'i>(ident: &str) -> Result<Self, CustomParseError<'i>>
 	{
 		use self::MediaQueryType::*;
 		
 		match_ignore_ascii_case!
 		{
 			ident,
-            "all" => return Ok(All),
-            _ => (),
+			
+            "all" => Ok(All),
+            
+            _ => MediaType::parse(ident).map(Concrete),
         };
-		
-		// If parsable then accept this type as a concrete type.
-		MediaType::parse(ident).map(Concrete)
 	}
 	
 	fn matches(&self, other: MediaType) -> bool

@@ -2,9 +2,10 @@
 // Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
 
 
-/// The context required to report a parse error.
-pub struct ParserErrorContext<'a, R: 'a>
-{
-	/// An error reporter to report syntax errors.
-	pub error_reporter: &'a R,
-}
+use super::*;
+use super::parsers::ParsingMode;
+use self::TimeUnit::*;
+
+
+include!("Time.rs");
+include!("TimeUnit.rs");

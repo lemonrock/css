@@ -8,7 +8,7 @@ pub struct VectorValues(pub Vec<u32>);
 
 impl Parse for VectorValues
 {
-	fn parse<'i, 't>(_context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<VectorValues, ParseError<'i>>
+	fn parse<'i, 't>(_context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<VectorValues, ParseError<'i, CustomParseError<'i>>>
 	{
 		let mut vec = vec![];
 		loop

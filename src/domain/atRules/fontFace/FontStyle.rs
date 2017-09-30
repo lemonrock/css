@@ -12,7 +12,7 @@ define_css_keyword_enum!
 
 impl Parse for FontStyle
 {
-	fn parse<'i, 't>(_: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i>>
+	fn parse<'i, 't>(_: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
 	{
 		FontStyle::parse(input)
 	}

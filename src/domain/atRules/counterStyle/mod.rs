@@ -3,7 +3,10 @@
 
 
 use super::*;
-use ::std::cow::Cow;
+use super::parsers::CounterStyleAtRuleParser;
+use ::std::borrow::Cow;
+use ::std::fmt;
+use ::std::fmt::Write;
 
 
 include!("AdditiveSymbols.rs");

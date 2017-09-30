@@ -10,7 +10,7 @@ impl ToCss for SpecifiedUrl
 	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
 	{
 		dest.write_str("url(")?;
-		string.to_css(&self.0)?;
+		dest.write_str(&self.0)?;
 		dest.write_str(")")
 	}
 }

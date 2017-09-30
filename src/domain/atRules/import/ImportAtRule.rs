@@ -6,7 +6,7 @@
 ///
 /// [import]: https://drafts.csswg.org/css-cascade-3/#at-import
 #[derive(Debug)]
-pub struct ImportRule
+pub struct ImportAtRule
 {
 	/// The `<url>` this `@import` rule is loading.
 	pub url: SpecifiedUrl,
@@ -17,7 +17,7 @@ pub struct ImportRule
 	pub source_location: SourceLocation,
 }
 
-impl ToCss for ImportRule
+impl ToCss for ImportAtRule
 {
 	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
 	{

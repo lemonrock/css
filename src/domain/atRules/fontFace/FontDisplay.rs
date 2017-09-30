@@ -18,7 +18,7 @@ define_css_keyword_enum!
 impl Parse for FontDisplay
 {
 	#[inline]
-	fn parse<'i, 't>(_context: ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i>>
+	fn parse<'i, 't>(_context: ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
 	{
 		FontDisplay::parse(input)
 	}

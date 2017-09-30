@@ -18,6 +18,11 @@ pub struct MediaQuery
 	pub expressions: Vec<Expression>,
 }
 
+impl Separated for MediaQuery
+{
+	type Delimiter = Comma;
+}
+
 impl ToCss for MediaQuery
 {
 	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
@@ -35,7 +40,6 @@ impl ToCss for MediaQuery
 			All =>
 			{
 				// We need to print "all" if there's a qualifier, or there's just an empty list of expressions.
-				//
 				// Otherwise, we'd serialize media queries like "(min-width: 40px)" in "all (min-width: 40px)", which is unexpected.
 				if self.qualifier.is_some() || self.expressions.is_empty()
 				{
@@ -43,7 +47,7 @@ impl ToCss for MediaQuery
 				}
 			}
 			
-			Concrete(MediaType(ref desc)) => desc.to_css(dest)?,
+			Concrete(ref value) => value.to_css(dest)?,
 		}
 		
 		if self.expressions.is_empty()
@@ -51,17 +55,16 @@ impl ToCss for MediaQuery
 			return Ok(());
 		}
 		
-		if self.media_type != MediaQueryType::All || self.qualifier.is_some()
+		if self.media_type != All || self.qualifier.is_some()
 		{
 			dest.write_str(" and ")?;
 		}
 		
 		self.expressions[0].to_css(dest)?;
-		
-		for expr in self.expressions.iter().skip(1)
+		for expression in self.expressions.iter().skip(1)
 		{
 			dest.write_str(" and ")?;
-			expr.to_css(dest)?;
+			expression.to_css(dest)?;
 		}
 		
 		Ok(())
@@ -77,22 +80,10 @@ impl MediaQuery
 		Self::new(Some(Qualifier::Not), MediaQueryType::All, vec![])
 	}
 	
-	/// Trivially constructs a new media query.
-	#[inline(always)]
-	pub fn new(qualifier: Option<Qualifier>, media_type: MediaQueryType, expressions: Vec<Expression>) -> Self
-	{
-		Self
-		{
-			qualifier,
-			media_type,
-			expressions,
-		}
-	}
-	
 	/// Parse a media query given css input.
 	///
 	/// Returns an error if any of the expressions is unknown.
-	pub(crate) fn parse<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<MediaQuery, ParseError<'i>>
+	pub(crate) fn parse<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
 	{
 		let mut expressions = vec![];
 		
@@ -115,7 +106,7 @@ impl MediaQuery
 		{
 			Ok(ident) =>
 			{
-				let result: Result<_, ParseError> = MediaQueryType::parse(&*ident).map_err(|()| SelectorParseError::UnexpectedIdent(ident.clone()).into());
+				let result: Result<_, ParseError> = MediaQueryType::parse(&*ident).map_err(|error| ParseError::Custom(error));
 				result?
 			}
 			
@@ -124,7 +115,7 @@ impl MediaQuery
 				// Media type is only optional if qualifier is not specified.
 				if qualifier.is_some()
 				{
-					return Err(StyleParseError::UnspecifiedError.into())
+					return Err(ParseError::Custom(CustomParseError::MediaTypeIsOnlyOptionalIfQualifiedIsNotSpecified))
 				}
 				
 				// Without a media type, require at least one expression.

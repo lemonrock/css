@@ -41,7 +41,7 @@ impl ToCss for FontWeight
 
 impl Parse for FontWeight
 {
-	fn parse<'i, 't>(_: &ParserContext, input: &mut Parser<'i, 't>) -> Result<FontWeight, ParseError<'i>>
+	fn parse<'i, 't>(_: &ParserContext, input: &mut Parser<'i, 't>) -> Result<FontWeight, ParseError<'i, CustomParseError<'i>>>
 	{
 		let result = input.try(|input|
 		{
@@ -55,7 +55,7 @@ impl Parse for FontWeight
             }
 		});
 		
-		result.or_else(|_| Self::from_int(input.expect_integer()?).map_err(|()| StyleParseError::UnspecifiedError.into()))
+		result.or_else(|_| Self::from_int(input.expect_integer()?).map_err(|()| ParseError::Custom(CustomParseError::FontFaceAtRuleFontWeightWasNotAValidIdentifierOrInteger)))
 	}
 }
 

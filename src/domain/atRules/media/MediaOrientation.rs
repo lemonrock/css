@@ -2,12 +2,6 @@
 // Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
 
 
-/// A generic trait for an error reporter.
-pub trait ParseErrorReporter
-{
-	/// Called when the style engine detects an error.
-	///
-	/// Returns the current input being parsed, the source location it was reported from, and a message.
-	/// was ContextualParseError
-	fn report_error(&self, location: SourceLocation, error: ());
-}
+define_css_keyword_enum!(MediaOrientation:
+                         "portrait" => portrait,
+                         "landscape" => landscape);

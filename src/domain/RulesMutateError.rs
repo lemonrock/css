@@ -9,17 +9,3 @@ pub enum RulesMutateError
 	HierarchyRequest,
 	InvalidState,
 }
-
-//impl From<SingleRuleParseError> for RulesMutateError
-//{
-//	fn from(other: SingleRuleParseError) -> Self
-//	{
-//		use self::RulesMutateError::*;
-//
-//		match other
-//		{
-//			SingleRuleParseError::Syntax => Syntax,
-//			SingleRuleParseError::Hierarchy => HierarchyRequest,
-//		}
-//	}
-//}

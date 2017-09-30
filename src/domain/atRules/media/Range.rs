@@ -4,7 +4,7 @@
 
 /// An enumeration that represents a ranged value.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub enum Range<T>
+pub enum Range<T: ToCss>
 {
 	/// At least the inner value.
 	AtLeast(T),

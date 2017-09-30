@@ -13,9 +13,9 @@ pub struct ViewportAtRule
 impl ViewportAtRule
 {
 	/// Parse a single @viewport rule.
-	pub(crate) fn parse_body<'i, 't, R: ParseErrorReporter>(context: &ParserContext, error_context: &ParserErrorContext<R>, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i>>
+	pub(crate) fn parse_body<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
 	{
-		let parser = ViewportRuleParser { context };
+		let parser = ViewportAtRuleParser { context };
 		
 		let mut declarations = Vec::new();
 		let mut parser = DeclarationListParser::new(input, parser);
@@ -31,7 +31,7 @@ impl ViewportAtRule
 					}
 				}
 				
-				Err(preciseParseError) => return Err(CustomParseError::UnsupportedViewportDescriptorDeclaration(preciseParseError)),
+				Err(error) => return Err(error),
 			}
 		}
 		Ok(ViewportAtRule { declarations })
@@ -62,8 +62,9 @@ impl ViewportAtRule
 		
 		macro_rules! start_of_name
 		{
-            ($iter:ident) => {
-                $iter.by_ref().skip_while(|&(_, c)| is_whitespace_separator_or_equals(&c)).next()
+            ($iter:ident) =>
+            {
+                $iter.by_ref().skip_while(|&(_, c)| Self::is_whitespace_separator_or_equals(&c)).next()
             }
         }
 		
@@ -75,7 +76,8 @@ impl ViewportAtRule
 			{
 				macro_rules! push
 				{
-                    ($descriptor:ident($translate:path)) => {
+                    ($descriptor:ident($translate:path)) =>
+                    {
                         if let Some(value) = $translate(value)
                         {
                             push_descriptor!($descriptor(value));
@@ -114,7 +116,7 @@ impl ViewportAtRule
 						}
 					}
 					
-					minimumScale if minimumScale.eq_ignore_ascii_case("minimum-scale") =>	push!(MinZoom(Zoom::from_meta)),
+					minimumScale if minimumScale.eq_ignore_ascii_case("minimum-scale") => push!(MinZoom(Zoom::from_meta)),
 					
 					maximumScale if maximumScale.eq_ignore_ascii_case("maximum-scale") => push!(MaxZoom(Zoom::from_meta)),
 					
@@ -158,16 +160,12 @@ impl ViewportAtRule
 	{
 		fn end_of_token(iter: &mut Enumerate<Chars>) -> Option<(usize, char)>
 		{
-			iter.by_ref()
-			.skip_while(|&(_, c)| !Self::is_whitespace_separator_or_equals(&c))
-			.next()
+			iter.by_ref().skip_while(|&(_, c)| !ViewportAtRule::is_whitespace_separator_or_equals(&c)).next()
 		}
 		
 		fn skip_whitespace(iter: &mut Enumerate<Chars>) -> Option<(usize, char)>
 		{
-			iter.by_ref()
-			.skip_while(|&(_, c)| Self::WHITESPACE.contains(&c))
-			.next()
+			iter.by_ref().skip_while(|&(_, c)| ViewportAtRule::WHITESPACE.contains(&c)).next()
 		}
 		
 		// <name> <whitespace>* '='
@@ -206,7 +204,6 @@ impl ViewportAtRule
 	}
 	
 	/// Whitespace as defined by DEVICE-ADAPT § 9.2
-	// TODO: should we just use whitespace as defined by HTML5?
 	const WHITESPACE: &'static [char] = &['\t', '\n', '\r', ' '];
 	
 	/// Separators as defined by DEVICE-ADAPT § 9.2 need to use \x2c instead of ',' due to test-tidy
@@ -215,9 +212,8 @@ impl ViewportAtRule
 	#[inline]
 	fn is_whitespace_separator_or_equals(c: &char) -> bool
 	{
-		WHITESPACE.contains(c) || SEPARATOR.contains(c) || *c == '='
+		Self::WHITESPACE.contains(c) || Self::SEPARATOR.contains(c) || *c == '='
 	}
-
 }
 
 impl ToCss for ViewportAtRule

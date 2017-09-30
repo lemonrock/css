@@ -7,20 +7,20 @@ pub trait Parse: Sized
 	/// Parse a value of this type.
 	///
 	/// Returns an error on failure.
-	fn parse<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i>>;
+	fn parse<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>;
 }
 
-impl<T> Parse for Vec<T> where T: Parse + OneOrMoreSeparated, <T as OneOrMoreSeparated>::S: Separator,
+impl<T> Parse for Vec<T> where T: Parse + Separated, <T as Separated>::Delimiter: Separator,
 {
-	fn parse<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i>>
+	fn parse<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
 	{
-		<T as OneOrMoreSeparated>::S::parse(input, |i| T::parse(context, i))
+		<T as Separated>::Delimiter::parse(input, |i| T::parse(context, i))
 	}
 }
 
 impl Parse for ::cssparser::UnicodeRange
 {
-	fn parse<'i, 't>(_context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i>>
+	fn parse<'i, 't>(_context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
 	{
 		UnicodeRange::parse(input).map_err(|e| e.into())
 	}

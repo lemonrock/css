@@ -3,7 +3,7 @@
 
 
 /// Serialize a normalized value into percentage.
-pub(crate) fn serialize_percentage<W: fmt::Write>(value: CSSFloat, dest: &mut W) -> fmt::Result
+pub(crate) fn serialize_percentage<W: fmt::Write>(value: CssFloat, dest: &mut W) -> fmt::Result
 {
 	(value * 100.).to_css(dest)?;
 	dest.write_str("%")

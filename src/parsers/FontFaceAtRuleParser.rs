@@ -2,7 +2,7 @@
 // Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
 
 
-struct FontFaceAtRuleParser<'a, 'b: 'a>
+pub(crate) struct FontFaceAtRuleParser<'a, 'b: 'a>
 {
 	context: &'a ParserContext<'b>,
 	rule: &'a mut FontFaceAtRule,
@@ -17,16 +17,16 @@ impl<'a, 'b, 'i> AtRuleParser<'i> for FontFaceAtRuleParser<'a, 'b>
 	
 	type AtRule = ();
 	
-	type Error = SelectorParseError<'i, StyleParseError<'i>>;
+	type Error = CustomParseError<'i>;
 }
 
 impl<'a, 'b, 'i> DeclarationParser<'i> for FontFaceAtRuleParser<'a, 'b>
 {
 	type Declaration = ();
 	
-	type Error = SelectorParseError<'i, StyleParseError<'i>>;
+	type Error = CustomParseError<'i>;
 	
-	fn parse_value<'t>(&mut self, name: CowRcStr<'i>, input: &mut Parser<'i, 't>) -> Result<Self::Declaration, ParseError<'i>>
+	fn parse_value<'t>(&mut self, name: CowRcStr<'i>, input: &mut Parser<'i, 't>) -> Result<Self::Declaration, ParseError<'i, CustomParseError<'i>>>
 	{
 		// DeclarationParser also calls parse_entirely so we’d normally not need to, but in these cases we do because we set the value as a side effect rather than returning it.
 		
@@ -52,7 +52,7 @@ impl<'a, 'b, 'i> DeclarationParser<'i> for FontFaceAtRuleParser<'a, 'b>
 			
 			"font-language-override" => self.rule.language_override = Some(input.parse_entirely(|i| Parse::parse(self.context, i))?),
 			
-			_ => return Err(SelectorParseError::UnexpectedIdent(name.clone()).into())
+			_ => return Err(ParseError::Custom(CustomParseError::UnsupportedFontFaceProperty(name.to_owned())))
 		}
 		
 		Ok(())

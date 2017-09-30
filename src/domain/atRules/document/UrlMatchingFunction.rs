@@ -86,7 +86,7 @@ impl ToCss for UrlMatchingFunction
 impl UrlMatchingFunction
 {
 	/// Parse a URL matching function for a `@document` rule's condition.
-	pub(crate) fn parse<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<UrlMatchingFunction, ParseError<'i>>
+	pub(crate) fn parse<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<UrlMatchingFunction, ParseError<'i, CustomParseError<'i>>>
 	{
 		if input.try(|input| input.expect_function_matching("url-prefix")).is_ok()
 		{
@@ -109,7 +109,7 @@ impl UrlMatchingFunction
 		}
 		else
 		{
-			Err(StyleParseError::UnspecifiedError.into())
+			Err(ParseError::Custom(CustomParseError::DocumentAtRuleUrlMatchingFunctionWasInvalid))
 		}
 	}
 	

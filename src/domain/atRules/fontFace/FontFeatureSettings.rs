@@ -31,7 +31,7 @@ impl ToCss for FontFeatureSettings
 
 impl Parse for FontFeatureSettings
 {
-	fn parse<'i, 't>(_: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i>>
+	fn parse<'i, 't>(_: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
 	{
 		if input.try(|input| input.expect_ident_matching("normal")).is_ok()
 		{
@@ -42,7 +42,7 @@ impl Parse for FontFeatureSettings
 			let mut settings = BTreeMap::new();
 			for setting in input.parse_comma_separated(|input| FontFeatureSetting::parse(input))?
 			{
-				settings.insert(setting.openTypeFeatureTag, integer)
+				settings.insert(setting.0, setting.1)
 			}
 			Ok(FontFeatureSettings(settings))
 		}
@@ -73,72 +73,5 @@ impl FontFeatureSettings
 	pub fn isNormal(&self) -> bool
 	{
 		self.0.is_none()
-	}
-}
-
-#[derive(Debug, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
-struct FontFeatureSetting
-{
-	pub openTypeFeatureTag: String,
-	pub integer: u32, // default is 1; can be omitted
-}
-
-impl FeatureSetting
-{
-	fn parse<'i, 't>(input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i>>
-	{
-		let openTypeFeatureTag = input.expect_string()?.to_owned();
-		if openTypeFeatureTag.len() != 4
-		{
-			return Err(ParseError::Custom(CustomParseError::FontFeatureSettingOpenTypeFeatureTagMustBeFourCharacters(openTypeFeatureTag)))
-		}
-		
-		for character in openTypeFeatureTag.chars()
-		{
-			if character <= 0x20 || character > 0x7E
-			{
-				return Err(ParseError::Custom(CustomParseError::FontFeatureSettingOpenTypeFeatureTagMustBePrintableAscii(openTypeFeatureTag)))
-			}
-		}
-		
-		let integer = input.try(|input| input.expect_integer());
-		if let Some(integer) = integer
-		{
-			if integer < 0
-			{
-				Err(ParseError::Custom(CustomParseError::FontFeatureSettingIntegerMustBePositive(integer)))
-			}
-			else
-			{
-				Ok(FeatureSetting(openTypeFeatureTag, integer))
-			}
-		}
-		else
-		{
-			let ident = input.expect_ident()?;
-			
-			match_ignore_ascii_case!
-			{
-				&ident,
-				
-				"on" => Ok(FeatureSetting(openTypeFeatureTag, 1)),
-				
-				"off" => Ok(FeatureSetting(openTypeFeatureTag, 0)),
-				
-				_ => Err(ParseError::Custom(CustomParseError::FontFeatureSettingIfNotAnIntegerMustBeOnOrOff(ident.to_owned())))
-			}
-		}
-	}
-	
-	#[inline(always)]
-	pub fn isOff(&self) -> bool
-	{
-		self.integer == 0
-	}
-	
-	#[inline(always)]
-	pub fn isOn(&self) -> bool
-	{
-		self.integer == 1
 	}
 }

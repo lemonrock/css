@@ -9,8 +9,14 @@ pub enum VendorPrefix
 	/// -moz- prefix.
 	moz,
 	
-	/// -webkit- prefix.
+	/// -webkit- prefix (Is sometimes also used by IE, Edge and Blink-based browsers (Chrome and Opera)).
 	webkit,
+	
+	/// -ms- prefix.
+	ms,
+	
+	/// -o- prefix (legacy Opera Presto prefix).
+	o,
 
 	Unrecognised(String),
 }
@@ -19,10 +25,14 @@ impl ToCss for DocumentAtRule
 {
 	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
 	{
+		use self::VendorPrefix::*;
+		
 		let prefix = match *self
 		{
 			moz => "-moz-",
 			webkit => "-webkit-",
+			ms => "-ms-",
+			o => "-o-",
 			Unrecognised(ref prefix) => prefix.as_str(),
 		};
 		

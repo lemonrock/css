@@ -14,7 +14,7 @@ pub struct SpecifiedValue
 	//last_token_type: TokenSerializationType,
 	
 	/// References to property names in var() functions.
-	pub references: HashSet<Name>,
+	pub references: HashSet<Atom>,
 }
 
 impl ToCss for SpecifiedValue
@@ -28,7 +28,7 @@ impl ToCss for SpecifiedValue
 impl SpecifiedValue
 {
 	/// Parse a custom property SpecifiedValue.
-	pub(crate) fn parse<'i, 't>(_context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i>>
+	pub(crate) fn parse<'i, 't>(_context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
 	{
 		let mut references = Some(HashSet::new());
 		let (_first, css, _last) = Self::parse_self_contained_declaration_value(input, &mut references)?;
@@ -44,7 +44,7 @@ impl SpecifiedValue
 		)
 	}
 	
-	fn parse_self_contained_declaration_value<'i, 't>(input: &mut Parser<'i, 't>, references: &mut Option<HashSet<Name>>) -> Result<(TokenSerializationType, Cow<'i, str>, TokenSerializationType), ParseError<'i>>
+	fn parse_self_contained_declaration_value<'i, 't>(input: &mut Parser<'i, 't>, references: &mut Option<HashSet<Atom>>) -> Result<(TokenSerializationType, Cow<'i, str>, TokenSerializationType), ParseError<'i, CustomParseError<'i>>>
 	{
 		let start_position = input.position();
 		let mut missing_closing_characters = String::new();
@@ -53,9 +53,13 @@ impl SpecifiedValue
 		if !missing_closing_characters.is_empty()
 		{
 			// Unescaped backslash at EOF in a quoted string is ignored.
-			if css.ends_with("\\") && matches!(missing_closing_characters.as_bytes()[0], b'"' | b'\'')
+			if css.ends_with("\\")
 			{
-				css.to_mut().pop();
+				let first = missing_closing_characters.as_bytes()[0];
+				if first == b'"' || first == b'\''
+				{
+					css.to_mut().pop();
+				}
 			}
 			css.to_mut().push_str(&missing_closing_characters);
 		}
@@ -63,7 +67,7 @@ impl SpecifiedValue
 	}
 	
 	/// https://drafts.csswg.org/css-syntax-3/#typedef-declaration-value
-	fn parse_declaration_value<'i, 't>(input: &mut Parser<'i, 't>, references: &mut Option<HashSet<Name>>, missing_closing_characters: &mut String) -> Result<(TokenSerializationType, TokenSerializationType), ParseError<'i>>
+	fn parse_declaration_value<'i, 't>(input: &mut Parser<'i, 't>, references: &mut Option<HashSet<Atom>>, missing_closing_characters: &mut String) -> Result<(TokenSerializationType, TokenSerializationType), ParseError<'i, CustomParseError<'i>>>
 	{
 		input.parse_until_before(Delimiter::Bang | Delimiter::Semicolon, |input|
 		{
@@ -76,9 +80,8 @@ impl SpecifiedValue
 		})
 	}
 	
-	/// Like parse_declaration_value, but accept `!` and `;` since they are only
-	/// invalid at the top level
-	fn parse_declaration_value_block<'i, 't>(input: &mut Parser<'i, 't>, references: &mut Option<HashSet<Name>>, missing_closing_characters: &mut String) -> Result<(TokenSerializationType, TokenSerializationType), ParseError<'i>>
+	// Like parse_declaration_value, but accept `!` and `;` since they are only invalid at the top level
+	fn parse_declaration_value_block<'i, 't>(input: &mut Parser<'i, 't>, references: &mut Option<HashSet<Atom>>, missing_closing_characters: &mut String) -> Result<(TokenSerializationType, TokenSerializationType), ParseError<'i, CustomParseError<'i>>>
 	{
 		let mut token_start = input.position();
 		let mut token = match input.next_including_whitespace_and_comments()
@@ -96,7 +99,7 @@ impl SpecifiedValue
             	{
                 	input.parse_nested_block(|input|
                 	{
-                    	parse_declaration_value_block(input, references, missing_closing_characters)
+                    	Self::parse_declaration_value_block(input, references, missing_closing_characters)
                 	})?
             	}
         	}
@@ -126,15 +129,15 @@ impl SpecifiedValue
 					token.serialization_type()
 				}
 				
-				BadUrl(u) => return Err(StyleParseError::BadUrlInDeclarationValueBlock(u).into()),
+				BadUrl(url) => return Err(ParseError::Custom(CustomParseError::BadUrlInDeclarationValueBlock(url.to_owned()))),
 				
-				BadString(s) => return Err(StyleParseError::BadStringInDeclarationValueBlock(s).into()),
+				BadString(string) => return Err(ParseError::Custom(CustomParseError::BadStringInDeclarationValueBlock(string.to_owned()))),
 				
-				CloseParenthesis => return Err(StyleParseError::UnbalancedCloseParenthesisInDeclarationValueBlock.into()),
+				CloseParenthesis => return Err(ParseError::Custom(CustomParseError::UnbalancedCloseParenthesisInDeclarationValueBlock)),
 				
-				CloseSquareBracket => return Err(StyleParseError::UnbalancedCloseSquareBracketInDeclarationValueBlock.into()),
+				CloseSquareBracket => return Err(ParseError::Custom(CustomParseError::UnbalancedCloseSquareBracketInDeclarationValueBlock)),
 				
-				CloseCurlyBracket => return Err(StyleParseError::UnbalancedCloseCurlyBracketInDeclarationValueBlock.into()),
+				CloseCurlyBracket => return Err(ParseError::Custom(CustomParseError::UnbalancedCloseCurlyBracketInDeclarationValueBlock)),
 				
 				Function(ref name) =>
 				{
@@ -174,8 +177,8 @@ impl SpecifiedValue
 				{
 					let token_slice = input.slice_from(token_start);
 					let quote = &token_slice[..1];
-					debug_assert!(matches!(quote, "\"" | "'"));
-					if !(token_slice.ends_with(quote) && token_slice.len() > 1) {
+					if !(token_slice.ends_with(quote) && token_slice.len() > 1)
+					{
 						missing_closing_characters.push_str(quote)
 					}
 					token.serialization_type()
@@ -191,10 +194,15 @@ impl SpecifiedValue
 						// (Unescaped U+FFFD would also work, but removing the backslash is annoying.)
 						missing_closing_characters.push_str("�")
 					}
-					if matches!(token, UnquotedUrl(_))
+					
+					match token
 					{
-						check_closed!(")");
+						UnquotedUrl(_) => check_closed!(")"),
+						_ =>
+						{
+						}
 					}
+					
 					token.serialization_type()
 				}
 				_ =>
@@ -213,7 +221,7 @@ impl SpecifiedValue
 	}
 	
 	// If the var function is valid, return Ok((custom_property_name, fallback))
-	fn parse_var_function<'i, 't>(input: &mut Parser<'i, 't>, references: &mut Option<HashSet<Name>>) -> Result<(), ParseError<'i>>
+	fn parse_var_function<'i, 't>(input: &mut Parser<'i, 't>, references: &mut Option<HashSet<Atom>>) -> Result<(), ParseError<'i, CustomParseError<'i>>>
 	{
 		let name = input.expect_ident_cloned()?;
 		if input.try(|input| input.expect_comma()).is_ok()

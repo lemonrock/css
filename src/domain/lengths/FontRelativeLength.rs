@@ -7,16 +7,16 @@
 pub enum FontRelativeLength
 {
 	/// A "em" value: https://drafts.csswg.org/css-values/#em
-	Em(CSSFloat),
+	Em(CssFloat),
 	
 	/// A "ex" value: https://drafts.csswg.org/css-values/#ex
-	Ex(CSSFloat),
+	Ex(CssFloat),
 	
 	/// A "ch" value: https://drafts.csswg.org/css-values/#ch
-	Ch(CSSFloat),
+	Ch(CssFloat),
 	
 	/// A "rem" value: https://drafts.csswg.org/css-values/#rem
-	Rem(CSSFloat)
+	Rem(CssFloat)
 }
 
 impl ToCss for FontRelativeLength

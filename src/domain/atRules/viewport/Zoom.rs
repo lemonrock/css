@@ -42,7 +42,7 @@ impl Zoom
     /// Parse a zoom value per:
     ///
     /// https://drafts.csswg.org/css-device-adapt/#descdef-viewport-zoom
-    pub fn parse<'i, 't>(input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i>>
+    pub fn parse<'i, 't>(input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
 	{
 		use self::Zoom::*;
 		use AllowedNumericType::NonNegative;

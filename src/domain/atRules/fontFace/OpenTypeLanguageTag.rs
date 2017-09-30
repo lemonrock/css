@@ -1191,14 +1191,12 @@ impl ToCss for OpenTypeLanguageTag
 
 impl OpenTypeLanguageTag
 {
-	pub(crate) fn parse<'i>(tag: &CowRcStr) -> Result<Self, ParseError<'i>>
+	pub(crate) fn parse<'i>(tag: &CowRcStr) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
 	{
 		use self::OpenTypeLanguageTag::*;
 		
-		match_ignore_ascii_case!
+		match tag.as_ref()
 		{
-			tag,
-			
 			"ABA" => Ok(ABA),
 			"ABK" => Ok(ABK),
 			"ACH" => Ok(ACH),

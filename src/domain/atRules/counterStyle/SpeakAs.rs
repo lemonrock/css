@@ -3,7 +3,7 @@
 
 
 /// https://drafts.csswg.org/css-counter-styles/#counter-style-speak-as
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, ToCss)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum SpeakAs
 {
 	/// auto
@@ -24,9 +24,32 @@ pub enum SpeakAs
 	Other(CounterStyleIdent),
 }
 
+impl ToCss for SpeakAs
+{
+	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
+	{
+		use self::SpeakAs::*;
+		
+		match *self
+		{
+			Auto => dest.write_str("auto"),
+			
+			Bullets => dest.write_str("bullets"),
+			
+			Numbers => dest.write_str("numbers"),
+			
+			Words => dest.write_str("words"),
+			
+			SpellOut => dest.write_str("spell-out"),
+			
+			Other(ref ident) => ident.to_css(dest),
+		}
+	}
+}
+
 impl Parse for SpeakAs
 {
-	fn parse<'i, 't>(_context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i>>
+	fn parse<'i, 't>(_context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
 	{
 		use self::SpeakAs::*;
 		

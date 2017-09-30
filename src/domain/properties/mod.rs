@@ -3,18 +3,15 @@
 
 
 use super::*;
-use ::smallbitvec::Iter;
-use ::smallbitvec::Iter;
-use ::smallvec::SmallVec;
-use ::std::fmt::Debug;
-use ::std::fmt::Formatter;
-use ::std::iter::DoubleEndedIterator;
+use super::parsers::PropertyDeclarationParser;
+use ::std::borrow::Cow;
+use ::std::collections::HashSet;
 use ::std::iter::Iterator;
-use ::std::iter::Zip;
 
 
 include!("CssWideKeyword.rs");
 include!("Importance.rs");
 include!("PropertyDeclaration.rs");
+include!("PropertyDeclarations.rs");
 include!("SpecifiedValue.rs");
 include!("UnparsedPropertyValue.rs");

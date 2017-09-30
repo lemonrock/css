@@ -24,7 +24,14 @@ impl ToCss for KeyframePercentage
 {
 	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
 	{
-		serialize_percentage(self.0, dest)
+		if self.0 == 1.
+		{
+			dest.write_str("to")
+		}
+		else
+		{
+			serialize_percentage(self.0, dest)
+		}
 	}
 }
 
@@ -38,7 +45,7 @@ impl KeyframePercentage
 		KeyframePercentage(value)
 	}
 	
-	fn parse<'i, 't>(input: &mut Parser<'i, 't>) -> Result<KeyframePercentage, ParseError<'i>>
+	fn parse<'i, 't>(input: &mut Parser<'i, 't>) -> Result<KeyframePercentage, ParseError<'i, CustomParseError<'i>>>
 	{
 		let percentage = if input.try(|input| input.expect_ident_matching("from")).is_ok()
 		{

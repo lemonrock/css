@@ -17,16 +17,17 @@ impl FromMeta for UserZoom
 			match value
 			{
 				yes if yes.eq_ignore_ascii_case("yes") => Zoom,
+				
 				no if no.eq_ignore_ascii_case("no") => Fixed,
+				
 				deviceWidth if deviceWidth.eq_ignore_ascii_case("device-width") => Zoom,
+				
 				deviceHeight if deviceHeight.eq_ignore_ascii_case("device-height") => Zoom,
-				_ =>
+				
+				_ => match value.parse::<f32>()
 				{
-					match value.parse::<f32>()
-					{
-						Ok(n) if n >= 1. || n <= -1. => Zoom,
-						_ => Fixed
-					}
+					Ok(n) if n >= 1. || n <= -1. => Zoom,
+					_ => Fixed
 				}
 			}
 		)
