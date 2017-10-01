@@ -10,7 +10,7 @@
 /// @character-variant | @swash | @ornaments | @annotation
 pub(crate) struct FontFeatureValuesAtRuleParser<'a>
 {
-	context: &'a ParserContext<'a>,
+	context: &'a ParserContext,
 	rule: &'a mut FontFeatureValuesAtRule,
 }
 

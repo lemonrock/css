@@ -15,7 +15,7 @@ pub struct ParserContext
 impl ParserContext
 {
 	/// Create a parser context based on a previous context, but with a modified rule type.
-	pub(crate) fn new_with_rule_type(context: &'a ParserContext, rule_type: CssRuleType) -> ParserContext
+	pub(crate) fn new_with_rule_type(context: &ParserContext, rule_type: CssRuleType) -> ParserContext
 	{
 		Self
 		{

@@ -41,7 +41,7 @@ impl ToCss for FontFeatureValuesAtRule
 	{
 		dest.write_str("@font-feature-values ")?;
 		self.font_family_to_css(dest)?;
-		dest.write_str(" {\n")?;
+		dest.write_str("{\n")?;
 		self.value_to_css(dest)?;
 		dest.write_str("}")
 	}
@@ -101,21 +101,16 @@ impl FontFeatureValuesAtRule
 	pub(crate) fn value_to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
 	{
 		#[inline(always)]
-		fn writeBlock<W: fmt::Write, T>(dest: &mut W, name: &str, block: &Vec<FontFeatureValuesDeclaration<T>>) -> fmt::Result
+		fn writeBlock<W: fmt::Write, T: ToCss>(dest: &mut W, name: &str, block: &Vec<FontFeatureValuesDeclaration<T>>) -> fmt::Result
 		{
-			looks rather broken
-			
-			
 			if block.len() > 0
 			{
 				dest.write_char('@')?;
 				dest.write_str(name)?;
 				dest.write_char('{')?;
-				let iter = block.iter();
-				for val in iter
+				for declaration in block.iter()
 				{
-					val.to_css(dest)?;
-					dest.write_str("\n")?
+					declaration.to_css(dest)?;
 				}
 				dest.write_char('}')?
 			}

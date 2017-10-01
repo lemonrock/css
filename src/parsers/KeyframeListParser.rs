@@ -12,7 +12,7 @@
 /// }
 pub(crate) struct KeyframeListParser<'a>
 {
-	context: &'a ParserContext<'a>,
+	context: &'a ParserContext,
 }
 
 // Default methods reject all @ rules.
