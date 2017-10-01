@@ -2,8 +2,8 @@
 // Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
 
 
-#[derive(Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
-struct OurSelectorParser
+#[derive(Debug, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
+pub(crate) struct OurSelectorParser
 {
 	namespaces: Rc<Namespaces>,
 }
@@ -19,7 +19,7 @@ impl ::selectors::parser::Parser for OurSelectorParser
 	}
 	
 	#[inline(always)]
-	fn parse_non_ts_functional_pseudo_class(&self, name: Cow<str>, arguments: &mut CssParser) -> Result<<Self::Impl as SelectorImpl>::NonTSPseudoClass, ()>
+	fn parse_non_ts_functional_pseudo_class(&self, name: Cow<str>, arguments: &mut Parser) -> Result<<Self::Impl as SelectorImpl>::NonTSPseudoClass, ()>
 	{
 		NonTreeStructuralPseudoClass::parse_with_arguments(name, arguments, self)
 	}
@@ -46,16 +46,16 @@ impl ::selectors::parser::Parser for OurSelectorParser
 impl OurSelectorParser
 {
 	#[inline(always)]
-	pub(crate) fn parse<'i, 't>(&self, input: &mut Parser<'i, 't>) -> Result<DeduplicatedSelectors, ParseError<'i>>
+	pub(crate) fn parse<'i, 't>(&self, input: &mut Parser<'i, 't>) -> Result<DeduplicatedSelectors, ParseError<'i, CustomParseError>>
 	{
 		self.parse_internal(input, |_| false)
 	}
 	
 	#[inline(always)]
-	fn parse_internal<'i, 't, F: Fn(&OurSelector) -> bool>(&self, input: &mut Parser<'i, 't>, isInvalidSelector: F) -> Result<DeduplicatedSelectors, ParseError<'i>>
+	fn parse_internal<'i, 't, F: Fn(&OurSelector) -> bool>(&self, input: &mut Parser<'i, 't>, isInvalidSelector: F) -> Result<DeduplicatedSelectors, ParseError<'i, CustomParseError>>
 	{
 		let selectors = self.parse_selectors(input)?;
-		debug_assert(!selectors.is_empty());
+		debug_assert!(!selectors.is_empty());
 		
 		let mut deduplicatedSelectors = OrderMap::with_capacity(selectors.len());
 		for selector in selectors
@@ -73,7 +73,7 @@ impl OurSelectorParser
 	}
 	
 	#[inline(always)]
-	fn parse_selectors<'i, 't>(&self, input: &mut Parser<'i, 't>) -> Result<Vec<OurSelector>, ParseError<'i, 't>>
+	fn parse_selectors<'i, 't>(&self, input: &mut Parser<'i, 't>) -> Result<Vec<OurSelector>, ParseError<'i, CustomParseError>>
 	{
 		let selectorList = SelectorList::parse(self, input).map_err(|_| ParseError::Custom(CustomParseError::CouldNotParseSelectors))?;
 		let selectors = selectorList.0;

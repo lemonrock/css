@@ -6,7 +6,7 @@
 #[derive(Clone, Debug)]
 pub struct Pad(pub u32, pub Symbol);
 
-impl ToCss for SpeakAs
+impl ToCss for Pad
 {
 	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
 	{

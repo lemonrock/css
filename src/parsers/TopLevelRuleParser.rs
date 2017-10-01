@@ -68,7 +68,7 @@ impl<'a, 'i> AtRuleParser<'i> for TopLevelRuleParser<'a>
 					Err(error) => return Err(error),
 				};
 				
-				self.namespaces.get_mut().expect("@namespace rules are parsed before css selectors").update(prefix.as_ref(), &url)
+				self.namespaces.get_mut().expect("@namespace rules are parsed before css selectors").update(prefix.as_ref(), &url);
 				
 				Ok(CssRule::Namespace(NamespaceAtRule
 				{

@@ -2,7 +2,7 @@
 // Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
 
 
-impl<T> ToCss for Vec<T> where T: ToCss + Separated
+impl<T: ToCss + Separated> ToCss for Vec<T>
 {
 	fn to_css<W: Write>(&self, dest: &mut W) -> fmt::Result
 	{

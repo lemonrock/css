@@ -24,7 +24,7 @@ pub enum VendorPrefix
 	Unrecognised(String),
 }
 
-impl ToCss for DocumentAtRule
+impl ToCss for VendorPrefix
 {
 	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
 	{

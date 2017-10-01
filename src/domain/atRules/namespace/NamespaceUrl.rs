@@ -5,7 +5,7 @@
 #[derive(Debug, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct NamespaceUrl(pub Atom);
 
-impl ToCss for NamespacePrefix
+impl ToCss for NamespaceUrl
 {
 	// https://drafts.csswg.org/cssom/#serialize-a-css-rule CSSNamespaceRule
 	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result

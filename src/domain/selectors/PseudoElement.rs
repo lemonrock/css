@@ -2,20 +2,15 @@
 // Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
 
 
-/// The number of eager pseudo-elements. Keep this in sync with cascade_type.
-pub const EAGER_PSEUDO_COUNT: usize = 3;
-
-/// The count of simple (non-functional) pseudo-elements (that is, all pseudo-elements for now).
-pub const SIMPLE_PSEUDO_COUNT: usize = PseudoElement::srvo_inline_absolute as usize + 1;
-
 /// A pseudo-element, both public and private.
-#[derive(Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
+#[derive(Debug, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
 #[allow(missing_docs)]
 pub enum PseudoElement
 {
 	after,
 	backdrop(Option<VendorPrefix>),
 	before,
+	cue,
 	first_letter,
 	first_line,
 	placeholder,
@@ -250,67 +245,5 @@ impl PseudoElement
 			
 			_ => Err(()),
 		}
-	}
-	
-	#[inline(always)]
-	pub fn index(&self) -> usize
-	{
-		(*self) as usize
-	}
-	
-	/// Whether the current pseudo element is ::before or ::after.
-	#[inline(always)]
-	pub fn is_before_or_after(&self) -> bool
-	{
-		self.is_before() || self.is_after()
-	}
-	
-	/// Whether this pseudo-element is the ::before pseudo.
-	#[inline(always)]
-	pub fn is_before(&self) -> bool
-	{
-		*self == PseudoElement::before
-	}
-	
-	/// Whether this pseudo-element is the ::after pseudo.
-	#[inline(always)]
-	pub fn is_after(&self) -> bool
-	{
-		*self == PseudoElement::after
-	}
-	
-	/// Whether the current pseudo element is :first-letter
-	#[inline(always)]
-	pub fn is_first_letter(&self) -> bool
-	{
-		*self == PseudoElement::first_letter
-	}
-	
-	/// Whether the current pseudo element is :first-line
-	#[inline(always)]
-	pub fn is_first_line(&self) -> bool
-	{
-		*self == PseudoElement::first_line
-	}
-	
-	/// Whether this pseudo-element is eagerly-cascaded.
-	#[inline]
-	pub fn is_eager(&self) -> bool
-	{
-		self.cascade_type() == PseudoElementCascadeType::Eager
-	}
-	
-	/// Whether this pseudo-element is lazily-cascaded.
-	#[inline]
-	pub fn is_lazy(&self) -> bool
-	{
-		self.cascade_type() == PseudoElementCascadeType::Lazy
-	}
-	
-	/// Whether this pseudo-element is precomputed.
-	#[inline]
-	pub fn is_precomputed(&self) -> bool
-	{
-		self.cascade_type() == PseudoElementCascadeType::Precomputed
 	}
 }

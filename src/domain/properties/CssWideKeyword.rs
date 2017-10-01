@@ -16,7 +16,7 @@ pub enum CssWideKeyword
 	unset,
 }
 
-impl ToCss for UnparsedPropertyValue
+impl ToCss for CssWideKeyword
 {
 	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
 	{

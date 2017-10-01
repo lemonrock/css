@@ -15,9 +15,8 @@ use super::domain::atRules::page::*;
 use super::domain::atRules::supports::*;
 use super::domain::atRules::viewport::*;
 use super::domain::properties::*;
+use super::domain::selectors::*;
 use self::separators::*;
-use ::selectors::SelectorImpl;
-use ::selectors::SelectorList;
 use ::std::rc::Rc;
 
 

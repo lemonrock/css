@@ -22,8 +22,6 @@ use self::lengths::*;
 use self::properties::*;
 use self::selectors::*;
 use self::time::*;
-use ::selectors::SelectorImpl;
-use ::selectors::SelectorList;
 use ::std::ops::Deref;
 
 

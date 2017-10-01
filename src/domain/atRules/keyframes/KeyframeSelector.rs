@@ -21,17 +21,6 @@ impl ToCss for KeyframeSelector
 	}
 }
 
-impl<'i> FromStr for KeyframeSelector
-{
-	type Err = ParseError<'i, CustomParseError<'i>>;
-	
-	fn from_str(selector: &str) -> Result<Self, Self::Err>
-	{
-		let mut input = ParserInput::new(selector);
-		Parser::new(&mut input).parse_entirely(KeyframeSelector::parse)
-	}
-}
-
 impl KeyframeSelector
 {
 	/// Return the list of percentages this selector contains.

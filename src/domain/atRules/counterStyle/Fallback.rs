@@ -6,7 +6,7 @@
 #[derive(Clone, Debug)]
 pub struct Fallback(pub CounterStyleIdent);
 
-impl ToCss for Negative
+impl ToCss for Fallback
 {
 	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
 	{

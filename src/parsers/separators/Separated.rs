@@ -8,18 +8,3 @@ pub trait Separated
 	/// Associated type indicating which separator is used.
 	type Delimiter: Separator;
 }
-
-impl<T> ToCss for Vec<T> where T: ToCss + Separated
-{
-	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
-	{
-		let mut iter = self.iter();
-		iter.next().unwrap().to_css(dest)?;
-		for item in iter
-		{
-			dest.write_str(<T as Separated>::Delimiter::separator())?;
-			item.to_css(dest)?;
-		}
-		Ok(())
-	}
-}

@@ -86,7 +86,7 @@ impl ToCss for NonTreeStructuralPseudoClass
 			
 			any_link(ref vendorPrefix) => write_with_vendor_prefix(dest, vendorPrefix, "any-link"),
 			
-			case_sensitive_type_attr(ref value) => write_with_vendor_prefix_value(dest, vendorPrefix, "case-sensitive-type-attr", value),
+			case_sensitive_type_attr(ref vendorPrefix, ref value) => write_with_vendor_prefix_value(dest, vendorPrefix, "case-sensitive-type-attr", value),
 			
 			checked => write(dest, ":checked"),
 			
@@ -107,12 +107,14 @@ impl ToCss for NonTreeStructuralPseudoClass
 			fullscreen(ref vendorPrefix) =>
 			{
 				dest.write_char(':')?;
-				let name = if let Some(vendorPrefix) = vendorPrefix
+				let name = if let Some(ref vendorPrefix) = vendorPrefix
 				{
 					vendorPrefix.to_css(dest)?;
+					
 					match *vendorPrefix
 					{
-						moz | webkit => "full-screen",
+						moz => "full-screen",
+						webkit => "full-screen",
 						_ => "fullscreen",
 					}
 				}
@@ -243,7 +245,7 @@ impl NonTreeStructuralPseudoClass
 			
 			"link" => Ok(link),
 			
-			"-servo-non-zero-border" => Ok(servo_non_zero_border(Some(servo))),
+			"-servo-non-zero-border" => Ok(non_zero_border(Some(servo))),
 			
 			"optional" => Ok(optional),
 			
@@ -293,7 +295,7 @@ impl NonTreeStructuralPseudoClass
 			
 			"-webkit-any" => Ok(any(Some(webkit), Self::parse_any(input)?)),
 			
-			"-servo-case-sensitive-type-attr" => Ok(Some(servo), servo_case_sensitive_type_attr(Atom::from(input.expect_ident()?.as_ref()))),
+			"-servo-case-sensitive-type-attr" => Ok(Some(servo), case_sensitive_type_attr(Atom::from(input.expect_ident()?.as_ref()))),
 			
 			"dir" => Ok(dir(None, Self::parse_text_directionality(input)?)),
 			
@@ -321,6 +323,6 @@ impl NonTreeStructuralPseudoClass
 	fn parse_lang<'i, 't>(input: Parser<'i, 't>) -> Result<LanguageRanges, ()>
 	{
 		// the :lang() pseudo-class represents an element that is in one of the languages listed in its argument. It accepts a comma-separated list of one or more language ranges as its argument. Each language range in :lang() must be a valid CSS <ident> or <string>. (Language ranges containing asterisks, for example, must be quoted as strings.)
-		input.parse_comma_separated(|input| Ok(Language(Atom::from(input.expect_ident_or_string()?.as_ref())))).map(LanguageRanges).map_err(|_| ())
+		input.parse_comma_separated(|input| Ok(LanguageRange(Atom::from(input.expect_ident_or_string()?.as_ref())))).map(LanguageRanges).map_err(|_| ())
 	}
 }
