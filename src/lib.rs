@@ -12,6 +12,7 @@ extern crate kuchiki;
 extern crate num_traits;
 extern crate ordermap;
 extern crate phf;
+extern crate precomputed_hash;
 extern crate selectors;
 
 

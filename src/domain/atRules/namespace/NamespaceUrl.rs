@@ -13,3 +13,11 @@ impl ToCss for NamespaceUrl
 		self.0.to_css(dest)
 	}
 }
+
+impl PrecomputedHash for NamespaceUrl
+{
+	fn precomputed_hash(&self) -> u32
+	{
+		self.0.precomputed_hash()
+	}
+}

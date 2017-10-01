@@ -3,6 +3,7 @@
 
 
 use super::*;
+use ::precomputed_hash::PrecomputedHash;
 use ::std::collections::HashMap;
 use ::std::rc::Rc;
 

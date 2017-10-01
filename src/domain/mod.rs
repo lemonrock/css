@@ -22,6 +22,12 @@ use self::lengths::*;
 use self::properties::*;
 use self::selectors::*;
 use self::time::*;
+use ::precomputed_hash::PrecomputedHash;
+use ::std::collections::hash_map::DefaultHasher;
+use ::std::convert::From;
+use ::std::fmt;
+use ::std::fmt::Display;
+use ::std::fmt::Formatter;
 use ::std::ops::Deref;
 
 

@@ -24,6 +24,40 @@ impl ToCss for Atom
 	}
 }
 
+impl Display for Atom
+{
+	fn fmt(&self, f: &mut Formatter) -> fmt::Result
+	{
+		self.0.fmt(f)
+	}
+}
+
+impl From<String> for Atom
+{
+	fn from(value: String) -> Self
+	{
+		Atom(value)
+	}
+}
+
+impl<'a> From<&'a str> for Atom
+{
+	fn from(value: &'a str) -> Self
+	{
+		Atom(value.to_owned())
+	}
+}
+
+impl PrecomputedHash for Atom
+{
+	fn precomputed_hash(&self) -> u32
+	{
+		let mut state = DefaultHasher::new();
+		self.0.hash(&mut state);
+		state.finish() as u32
+	}
+}
+
 impl Atom
 {
 	fn from(value: &str) -> Self
