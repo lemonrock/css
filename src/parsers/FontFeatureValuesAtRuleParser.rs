@@ -80,7 +80,7 @@ impl<'a, 'i> AtRuleParser<'i> for FontFeatureValuesAtRuleParser<'a>
 impl<'a> FontFeatureValuesAtRuleParser<'a>
 {
 	#[inline(always)]
-	fn parseBlock<'i, 't, T: 'a>(&self, input: &mut Parser<'i, 't>, declarations: &'a mut Vec<FontFeatureValuesDeclaration<T>>) -> Result<(), ParseError<'i, CustomParseError<'i>>>
+	fn parseBlock<'i, 't, T: 'a + ToCss>(&self, input: &mut Parser<'i, 't>, declarations: &'a mut Vec<FontFeatureValuesDeclaration<T>>) -> Result<(), ParseError<'i, CustomParseError<'i>>>
 	{
 		FontFeatureValuesDeclarationsParser::parseBlock(input, self.context, declarations)
 	}

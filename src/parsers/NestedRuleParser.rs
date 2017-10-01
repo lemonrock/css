@@ -3,13 +3,13 @@
 
 
 #[derive(Clone)]
-pub(crate) struct NestedRuleParser<'a, 'b: 'a>
+pub(crate) struct NestedRuleParser<'a>
 {
-	context: &'a ParserContext<'b>,
+	context: &'a ParserContext,
 	namespaces: Rc<Namespaces>,
 }
 
-impl<'a, 'b, 'i> AtRuleParser<'i> for NestedRuleParser<'a, 'b>
+impl<'a, 'i> AtRuleParser<'i> for NestedRuleParser<'a>
 {
 	type PreludeNoBlock = ();
 	
@@ -114,7 +114,7 @@ impl<'a, 'b, 'i> AtRuleParser<'i> for NestedRuleParser<'a, 'b>
 	}
 }
 
-impl<'a, 'b, 'i> QualifiedRuleParser<'i> for NestedRuleParser<'a, 'b>
+impl<'a, 'i> QualifiedRuleParser<'i> for NestedRuleParser<'a>
 {
 	type Prelude = QualifiedRuleParserPrelude;
 	
@@ -158,7 +158,7 @@ impl<'a, 'b, 'i> QualifiedRuleParser<'i> for NestedRuleParser<'a, 'b>
 	}
 }
 
-impl<'a, 'b> NestedRuleParser<'a, 'b>
+impl<'a> NestedRuleParser<'a>
 {
 	#[inline(always)]
 	pub(crate) fn context_new_with_rule_type(&self, cssRuleType: CssRuleType) -> ParserContext

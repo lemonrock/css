@@ -3,7 +3,7 @@
 
 
 /// NOTE: At some future point, Atom may become a wrapper around a string cache value
-#[derive(Debug, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
+#[derive(Default, Debug, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct Atom(String);
 
 impl Deref for Atom
@@ -24,7 +24,7 @@ impl ToCss for Atom
 	}
 }
 
-impl  Atom
+impl Atom
 {
 	fn from(value: &str) -> Self
 	{

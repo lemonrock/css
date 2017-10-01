@@ -3,14 +3,14 @@
 
 
 // NOTE: impl<'a, 'b, 'i> DeclarationParser<'i> for CounterStyleRuleParser<'a, 'b> is in the macro definition 'counter_style_descriptors' in 'CounterStyleAtRule.rs'
-pub(crate) struct CounterStyleAtRuleParser<'a, 'b: 'a>
+pub(crate) struct CounterStyleAtRuleParser<'a>
 {
-	context: &'a ParserContext<'b>,
+	context: &'a ParserContext,
 	rule: &'a mut CounterStyleAtRule,
 }
 
 /// Default methods reject all at rules.
-impl<'a, 'b, 'i> AtRuleParser<'i> for CounterStyleAtRuleParser<'a, 'b>
+impl<'a, 'i> AtRuleParser<'i> for CounterStyleAtRuleParser<'a>
 {
 	type PreludeNoBlock = ();
 	
@@ -21,7 +21,7 @@ impl<'a, 'b, 'i> AtRuleParser<'i> for CounterStyleAtRuleParser<'a, 'b>
 	type Error = CustomParseError<'i>;
 }
 
-impl<'a, 'b, 'i> DeclarationParser<'i> for CounterStyleAtRuleParser<'a, 'b>
+impl<'a, 'i> DeclarationParser<'i> for CounterStyleAtRuleParser<'a>
 {
 	type Declaration = ();
 	

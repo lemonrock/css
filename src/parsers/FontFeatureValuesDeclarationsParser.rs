@@ -4,14 +4,14 @@
 
 /// @font-feature-values inside block parser. Parses a list of `FontFeatureValuesDeclaration`.
 /// (`<ident>: <integer>+`)
-struct FontFeatureValuesDeclarationsParser<'a, 'b: 'a, T: 'a + Parse>
+struct FontFeatureValuesDeclarationsParser<'a, T: 'a + Parse + ToCss>
 {
-	context: &'a ParserContext<'b>,
+	context: &'a ParserContext,
 	declarations: &'a mut Vec<FontFeatureValuesDeclaration<T>>,
 }
 
 /// Default methods reject all at rules.
-impl<'a, 'b, 'i, T> AtRuleParser<'i> for FontFeatureValuesDeclarationsParser<'a, 'b, T>
+impl<'a, 'i, T: 'a + Parse + ToCss> AtRuleParser<'i> for FontFeatureValuesDeclarationsParser<'a, T>
 {
 	type PreludeNoBlock = ();
 	
@@ -22,7 +22,7 @@ impl<'a, 'b, 'i, T> AtRuleParser<'i> for FontFeatureValuesDeclarationsParser<'a,
 	type Error = CustomParseError<'i>;
 }
 
-impl<'a, 'b, 'i, T: 'a + Parse> DeclarationParser<'i> for FontFeatureValuesDeclarationsParser<'a, 'b, T>
+impl<'a, 'i, T: 'a + Parse + ToCss> DeclarationParser<'i> for FontFeatureValuesDeclarationsParser<'a, T>
 {
 	type Declaration = ();
 	
@@ -42,9 +42,9 @@ impl<'a, 'b, 'i, T: 'a + Parse> DeclarationParser<'i> for FontFeatureValuesDecla
 	}
 }
 
-impl<'a, 'b: 'a, T: 'a + Parse> FontFeatureValuesDeclarationsParser<'a, 'b, T>
+impl<'a, 'b: 'a, T: 'a + Parse + ToCss> FontFeatureValuesDeclarationsParser<'a, T>
 {
-	pub(crate) fn parseBlock<'i, 't, T>(input: &mut Parser<'i, 't>, context: &'a ParserContext<'b>, declarations: &'a mut Vec<FontFeatureValuesDeclaration<T>>) -> Result<(), ParseError<'i, CustomParseError<'i>>>
+	pub(crate) fn parseBlock<'i, 't>(input: &mut Parser<'i, 't>, context: &'a ParserContext, declarations: &'a mut Vec<FontFeatureValuesDeclaration<T>>) -> Result<(), ParseError<'i, CustomParseError<'i>>>
 	{
 		let parser = Self
 		{
@@ -63,7 +63,7 @@ impl<'a, 'b: 'a, T: 'a + Parse> FontFeatureValuesDeclarationsParser<'a, 'b, T>
 	}
 	
 	/// Updates with new value if same `ident` exists, otherwise pushes to the vector.
-	fn update_or_push<T>(&self, newDeclaration: FontFeatureValuesDeclaration<T>)
+	fn update_or_push(&self, newDeclaration: FontFeatureValuesDeclaration<T>)
 	{
 		let declarations = self.declarations;
 		

@@ -2,12 +2,12 @@
 // Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
 
 
-pub(crate) struct ViewportAtRuleParser<'a, 'b: 'a>
+pub(crate) struct ViewportAtRuleParser<'a>
 {
-	context: &'a ParserContext<'b>
+	context: &'a ParserContext
 }
 
-impl<'a, 'b, 'i> AtRuleParser<'i> for ViewportAtRuleParser<'a, 'b>
+impl<'a, 'i> AtRuleParser<'i> for ViewportAtRuleParser<'a>
 {
 	type PreludeNoBlock = ();
 	
@@ -18,7 +18,7 @@ impl<'a, 'b, 'i> AtRuleParser<'i> for ViewportAtRuleParser<'a, 'b>
 	type Error = CustomParseError<'i>;
 }
 
-impl<'a, 'b, 'i> DeclarationParser<'i> for ViewportAtRuleParser<'a, 'b>
+impl<'a, 'i> DeclarationParser<'i> for ViewportAtRuleParser<'a>
 {
 	type Declaration = Vec<ViewportDescriptorDeclaration>;
 	
@@ -86,7 +86,7 @@ impl<'a, 'b, 'i> DeclarationParser<'i> for ViewportAtRuleParser<'a, 'b>
 	}
 }
 
-impl<'a, 'b: 'a> ViewportAtRuleParser<'a, 'b>
+impl<'a: 'a> ViewportAtRuleParser<'a>
 {
 	fn parse_shorthand<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<(ViewportLength, ViewportLength), ParseError<'i, CustomParseError<'i>>>
 	{

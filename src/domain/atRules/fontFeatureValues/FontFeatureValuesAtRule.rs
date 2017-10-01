@@ -103,19 +103,21 @@ impl FontFeatureValuesAtRule
 		#[inline(always)]
 		fn writeBlock<W: fmt::Write, T>(dest: &mut W, name: &str, block: &Vec<FontFeatureValuesDeclaration<T>>) -> fmt::Result
 		{
+			looks rather broken
+			
+			
 			if block.len() > 0
 			{
-				dest.write_str("@")?;
-				//dest.write_str(concat!("@", $name, " {\n"))?;
+				dest.write_char('@')?;
 				dest.write_str(name)?;
-				dest.write_str(" {\n")?;
+				dest.write_char('{')?;
 				let iter = block.iter();
 				for val in iter
 				{
 					val.to_css(dest)?;
 					dest.write_str("\n")?
 				}
-				dest.write_str("}\n")?
+				dest.write_char('}')?
 			}
 		}
 		

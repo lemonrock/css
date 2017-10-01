@@ -3,7 +3,7 @@
 
 
 /// The data that the parser needs from outside in order to parse a stylesheet.
-pub struct ParserContext<'a>
+pub struct ParserContext
 {
 	/// The current rule type, if any.
 	pub(crate) rule_type: Option<CssRuleType>,
@@ -12,10 +12,10 @@ pub struct ParserContext<'a>
 	pub(crate) parsing_mode: ParsingMode,
 }
 
-impl<'a> ParserContext<'a>
+impl ParserContext
 {
 	/// Create a parser context based on a previous context, but with a modified rule type.
-	pub(crate) fn new_with_rule_type(context: &'a ParserContext, rule_type: CssRuleType) -> ParserContext<'a>
+	pub(crate) fn new_with_rule_type(context: &'a ParserContext, rule_type: CssRuleType) -> ParserContext
 	{
 		Self
 		{

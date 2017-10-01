@@ -3,10 +3,10 @@
 
 
 /// The parser for the top-level rules in a stylesheet.
-pub(crate) struct TopLevelRuleParser<'a>
+pub(crate) struct TopLevelRuleParser
 {
 	/// This won't contain any namespaces, and only nested parsers created with `ParserContext::new_with_rule_type` will.
-	pub(crate) context: ParserContext<'a>,
+	pub(crate) context: ParserContext,
 	
 	/// The current state of the parser.
 	pub(crate) state: State,
@@ -14,7 +14,7 @@ pub(crate) struct TopLevelRuleParser<'a>
 	pub(crate) namespaces: Namespaces,
 }
 
-impl<'a, 'i> AtRuleParser<'i> for TopLevelRuleParser<'a>
+impl<'i> AtRuleParser<'i> for TopLevelRuleParser
 {
 	type PreludeNoBlock = CssRule;
 	
@@ -141,7 +141,7 @@ impl<'a, 'i> AtRuleParser<'i> for TopLevelRuleParser<'a>
 	}
 }
 
-impl<'a, 'i> QualifiedRuleParser<'i> for TopLevelRuleParser<'a>
+impl<'i> QualifiedRuleParser<'i> for TopLevelRuleParser
 {
 	type Prelude = QualifiedRuleParserPrelude;
 	
@@ -164,9 +164,9 @@ impl<'a, 'i> QualifiedRuleParser<'i> for TopLevelRuleParser<'a>
 	}
 }
 
-impl<'b> TopLevelRuleParser<'b>
+impl TopLevelRuleParser
 {
-	fn nested<'a: 'b>(&'a self) -> NestedRuleParser<'a, 'b>
+	fn nested<'a>(&'a self) -> NestedRuleParser<'a>
 	{
 		NestedRuleParser
 		{

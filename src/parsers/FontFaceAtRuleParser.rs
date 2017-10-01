@@ -2,14 +2,14 @@
 // Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
 
 
-pub(crate) struct FontFaceAtRuleParser<'a, 'b: 'a>
+pub(crate) struct FontFaceAtRuleParser<'a>
 {
-	context: &'a ParserContext<'b>,
+	context: &'a ParserContext,
 	rule: &'a mut FontFaceAtRule,
 }
 
 /// Default methods reject all at rules.
-impl<'a, 'b, 'i> AtRuleParser<'i> for FontFaceAtRuleParser<'a, 'b>
+impl<'a, 'i> AtRuleParser<'i> for FontFaceAtRuleParser<'a>
 {
 	type PreludeNoBlock = ();
 	
@@ -20,7 +20,7 @@ impl<'a, 'b, 'i> AtRuleParser<'i> for FontFaceAtRuleParser<'a, 'b>
 	type Error = CustomParseError<'i>;
 }
 
-impl<'a, 'b, 'i> DeclarationParser<'i> for FontFaceAtRuleParser<'a, 'b>
+impl<'a, 'i> DeclarationParser<'i> for FontFaceAtRuleParser<'a>
 {
 	type Declaration = ();
 	

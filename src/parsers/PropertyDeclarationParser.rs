@@ -3,14 +3,14 @@
 
 
 /// A struct to parse property declarations.
-pub(crate) struct PropertyDeclarationParser<'a, 'b: 'a>
+pub(crate) struct PropertyDeclarationParser<'a>
 {
-	context: &'a ParserContext<'b>,
+	context: &'a ParserContext,
 	isImportantDisallowed: bool,
 }
 
 /// In theory, @rules may be present. In practice, none are currently defined (Sep 2017)
-impl<'a, 'b, 'i> AtRuleParser<'i> for PropertyDeclarationParser<'a, 'b>
+impl<'a, 'i> AtRuleParser<'i> for PropertyDeclarationParser<'a>
 {
 	type PreludeNoBlock = ();
 	
@@ -21,7 +21,7 @@ impl<'a, 'b, 'i> AtRuleParser<'i> for PropertyDeclarationParser<'a, 'b>
 	type Error = CustomParseError<'i>;
 }
 
-impl<'a, 'b, 'i> DeclarationParser<'i> for PropertyDeclarationParser<'a, 'b>
+impl<'a, 'i> DeclarationParser<'i> for PropertyDeclarationParser<'a>
 {
 	type Declaration = PropertyDeclaration;
 	

@@ -24,7 +24,7 @@ impl<'a, 'i> AtRuleParser<'i> for KeyframeListParser<'a>
 	
 	type AtRule = Keyframe;
 	
-	type Error = CustomParseError<'a>;
+	type Error = CustomParseError<'i>;
 }
 
 impl<'a, 'i> QualifiedRuleParser<'i> for KeyframeListParser<'a>
