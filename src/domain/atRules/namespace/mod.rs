@@ -3,8 +3,10 @@
 
 
 use super::*;
+use ::std::rc::Rc;
 
 
 include!("NamespaceAtRule.rs");
 include!("NamespacePrefix.rs");
+include!("Namespaces.rs");
 include!("NamespaceUrl.rs");

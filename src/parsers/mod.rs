@@ -18,6 +18,7 @@ use super::domain::properties::*;
 use self::separators::*;
 use ::selectors::SelectorImpl;
 use ::selectors::SelectorList;
+use ::std::rc::Rc;
 
 
 pub(crate) mod separators;

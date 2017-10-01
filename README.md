@@ -11,6 +11,11 @@ The license for this project is Mozilla Public License 2.0 (MPL-2.0). The code f
 ## CSS Simplifications for Size
 
 
+### Selectors
+
+* Deduplicates lists of selectors
+
+
 ### @media
 
 * calc() nodes are reduced to simple assignments except for lengths

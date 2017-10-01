@@ -6,7 +6,7 @@
 #[derive(Clone, Debug)]
 pub enum CssRule
 {
-	/// No Charset here, CSSCharsetRule has been removed from CSSOM (https://drafts.csswg.org/cssom/#changes-from-5-december-2013)
+	/// No Charset here, CSSCharsetRule has been removed from CSSOM (https://drafts.csswg.org/cssom/#changes-from-5-december-2013) and Edge doesn't support it
 	// Charset(xxx),
 	Namespace(NamespaceAtRule),
 	Import(ImportAtRule),

@@ -2,8 +2,9 @@
 // Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
 
 
-struct QualifiedRuleParserPrelude
+define_css_keyword_enum!
 {
-	selectors: DeduplicatedSelectors,
-	source_location: SourceLocation,
+	TextDirectionality:
+	"ltr" => ltr,
+	"rtl" => rtl,
 }

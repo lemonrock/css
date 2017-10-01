@@ -2,8 +2,28 @@
 // Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
 
 
-struct QualifiedRuleParserPrelude
+#[derive(Debug, Clone)]
+pub struct OurSelectorImpl;
+
+impl SelectorImpl for OurSelectorImpl
 {
-	selectors: DeduplicatedSelectors,
-	source_location: SourceLocation,
+	type AttrValue = String;
+	
+	type Identifier = Atom;
+	
+	type ClassName = Atom;
+	
+	type LocalName = Atom;
+	
+	type NamespacePrefix = Atom;
+	
+	type NamespaceUrl = NamespaceUrl;
+	
+	type BorrowedNamespaceUrl = NamespaceUrl;
+	
+	type BorrowedLocalName = Atom;
+	
+	type NonTSPseudoClass = NonTreeStructuralPseudoClass;
+	
+	type PseudoElement = PseudoElement;
 }

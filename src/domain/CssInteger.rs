@@ -2,8 +2,5 @@
 // Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
 
 
-struct QualifiedRuleParserPrelude
-{
-	selectors: DeduplicatedSelectors,
-	source_location: SourceLocation,
-}
+/// A CSS integer value.
+pub type CssInteger = i32;

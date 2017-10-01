@@ -8,7 +8,9 @@
 
 #[macro_use] extern crate bitflags;
 extern crate cssparser;
+extern crate kuchiki;
 extern crate num_traits;
+extern crate ordermap;
 extern crate phf;
 extern crate selectors;
 

@@ -2,8 +2,20 @@
 // Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
 
 
-struct QualifiedRuleParserPrelude
+#[derive(Debug, Clone)]
+pub struct DeduplicatedSelectors(OrderMap<String, Selector<OurSelectorImpl>>);
+
+impl ToCss for DeduplicatedSelectors
 {
-	selectors: DeduplicatedSelectors,
-	source_location: SourceLocation,
+	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
+	{
+		let mut iter = self.0.keys();
+		dest.write_str(iter.next().unwrap())?;
+		for selectorCss in iter.next()
+		{
+			dest.write_char(',')?;
+			dest.write_string(selectorCss)?;
+		}
+		Ok(())
+	}
 }

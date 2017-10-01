@@ -20,6 +20,7 @@ use self::atRules::viewport::*;
 use self::calc::*;
 use self::lengths::*;
 use self::properties::*;
+use self::selectors::*;
 use self::time::*;
 use ::selectors::SelectorImpl;
 use ::selectors::SelectorList;
@@ -34,6 +35,7 @@ pub mod calc;
 pub mod lengths;
 pub mod time;
 pub mod properties;
+pub mod selectors;
 
 
 include!("Angle.rs");

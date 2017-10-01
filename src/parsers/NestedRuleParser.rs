@@ -6,6 +6,7 @@
 pub(crate) struct NestedRuleParser<'a, 'b: 'a>
 {
 	context: &'a ParserContext<'b>,
+	namespaces: Rc<Namespaces>,
 }
 
 impl<'a, 'b, 'i> AtRuleParser<'i> for NestedRuleParser<'a, 'b>
@@ -123,10 +124,14 @@ impl<'a, 'b, 'i> QualifiedRuleParser<'i> for NestedRuleParser<'a, 'b>
 	
 	fn parse_prelude<'t>(&mut self, input: &mut Parser<'i, 't>) -> Result<Self::Prelude, ParseError<'i, Self::Error>>
 	{
-		let selector_parser = SelectorParser;
-		
 		let source_location = input.current_source_location();
-		let selectors = SelectorList::parse(&selector_parser, input)?;
+		
+		let ourSelectorParser = OurSelectorParser
+		{
+			namespaces: self.namespaces.clone(),
+		};
+		
+		let selectors = ourSelectorParser.parse(input)?;
 		
 		Ok
 		(
@@ -138,7 +143,7 @@ impl<'a, 'b, 'i> QualifiedRuleParser<'i> for NestedRuleParser<'a, 'b>
 		)
 	}
 	
-	fn parse_block<'t>(&mut self, prelude: QualifiedRuleParserPrelude, input: &mut Parser<'i, 't>) -> Result<Self::QualifiedRule, ParseError<'i, Self::Error>>
+	fn parse_block<'t>(&mut self, prelude: Self::Prelude, input: &mut Parser<'i, 't>) -> Result<Self::QualifiedRule, ParseError<'i, Self::Error>>
 	{
 		let context = ParserContext::new_with_rule_type(self.context, CssRuleType::Style);
 		
@@ -168,6 +173,7 @@ impl<'a, 'b> NestedRuleParser<'a, 'b>
 		let nested_parser = NestedRuleParser
 		{
 			context: &context,
+			namespaces: self.namespaces.clone(),
 		};
 		
 		let mut iter = RuleListParser::new_for_nested_rule(input, nested_parser);

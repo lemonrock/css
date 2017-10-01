@@ -17,7 +17,10 @@ pub enum VendorPrefix
 	
 	/// -o- prefix (legacy Opera Presto prefix).
 	o,
-
+	
+	/// -servo- prefix
+	servo,
+	
 	Unrecognised(String),
 }
 
@@ -33,6 +36,7 @@ impl ToCss for DocumentAtRule
 			webkit => "-webkit-",
 			ms => "-ms-",
 			o => "-o-",
+			servo => "-servo-",
 			Unrecognised(ref prefix) => prefix.as_str(),
 		};
 		

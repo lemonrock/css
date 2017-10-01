@@ -7,7 +7,7 @@
 pub struct StyleRule
 {
 	/// The list of selectors in this rule.
-	pub selectors: SelectorList<SelectorImpl>,
+	pub selectors: DeduplicatedSelectors,
 	
 	/// The declaration block with the properties it contains.
 	pub property_declarations: PropertyDeclarations,
@@ -18,25 +18,15 @@ pub struct StyleRule
 
 impl ToCss for StyleRule
 {
-	/// https://drafts.csswg.org/cssom/#serialize-a-css-rule CSSStyleRule
+	/// https://drafts.csswg.org/cssom/#serialize-a-css-rule
 	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
 	{
-		// Step 1
 		self.selectors.to_css(dest)?;
 		
-		// Step 2
-		dest.write_str(" { ")?;
+		dest.write_char('{')?;
 		
-		// Step 3
 		self.property_declarations.to_css(dest)?;
 		
-		// Step 4
-		if !self.property_declarations.is_empty()
-		{
-			dest.write_str(" ")?;
-		}
-		
-		// Step 5
-		dest.write_str("}")
+		dest.write_char('}')
 	}
 }

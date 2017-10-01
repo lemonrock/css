@@ -9,13 +9,16 @@
       <w>chrono</w>
       <w>chunksize</w>
       <w>cloexec</w>
+      <w>combinators</w>
       <w>comrak</w>
       <w>cpus</w>
+      <w>cssom</w>
       <w>cssparser</w>
       <w>cvlan</w>
       <w>daemonize</w>
       <w>datagrams</w>
       <w>datatype</w>
+      <w>deduplicated</w>
       <w>deflaters</w>
       <w>deserialise</w>
       <w>deserialiser</w>
@@ -49,6 +52,7 @@
       <w>iovec</w>
       <w>ipoib</w>
       <w>isystem</w>
+      <w>kuchiki</w>
       <w>languagetool</w>
       <w>libfabric</w>
       <w>libibverbs</w>
@@ -102,6 +106,7 @@
       <w>rdma</w>
       <w>recv</w>
       <w>refcnt</w>
+      <w>revalidation</w>
       <w>rkey</w>
       <w>rustls</w>
       <w>rwlock</w>

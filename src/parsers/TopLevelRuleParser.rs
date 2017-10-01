@@ -10,6 +10,8 @@ pub(crate) struct TopLevelRuleParser<'a>
 	
 	/// The current state of the parser.
 	pub(crate) state: State,
+	
+	pub(crate) namespaces: Namespaces,
 }
 
 impl<'a, 'i> AtRuleParser<'i> for TopLevelRuleParser<'a>
@@ -65,6 +67,8 @@ impl<'a, 'i> AtRuleParser<'i> for TopLevelRuleParser<'a>
 					
 					Err(error) => return Err(error),
 				};
+				
+				self.namespaces.get_mut().expect("@namespace rules are parsed before css selectors").update(prefix.as_ref(), &url)
 				
 				Ok(CssRule::Namespace(NamespaceAtRule
 				{
@@ -167,7 +171,7 @@ impl<'b> TopLevelRuleParser<'b>
 		NestedRuleParser
 		{
 			context: &self.context,
-			error_context: &self.error_context,
+			namespaces: self.namespaces.clone(),
 		}
 	}
 	
