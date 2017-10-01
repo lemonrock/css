@@ -16,7 +16,7 @@ impl OurSelectorExt for OurSelector
 		use self::Component::*;
 		use self::Combinator::*;
 		
-		for component in self.inner.complex.iter_raw()
+		for component in self.iter_raw_match_order()
 		{
 			match *component
 			{

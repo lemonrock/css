@@ -62,7 +62,7 @@ impl FromMeta for ViewportLength
 
 impl ViewportLength
 {
-	fn parse<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
+	pub(crate) fn parse<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
 	{
 		LengthOrPercentageOrAuto::parse_non_negative(context, input).map(Specified)
 	}

@@ -14,14 +14,17 @@ extern crate ordermap;
 extern crate phf;
 extern crate precomputed_hash;
 extern crate selectors;
+extern crate smallvec;
 
 
 use self::domain::*;
 use self::domain::atRules::counterStyle::System;
 use self::domain::atRules::namespace::Namespaces;
+use self::domain::selectors::CustomSelectorParseError;
 use self::parsers::*;
 use self::serializers::*;
 use ::cssparser::*;
+use ::selectors::parser::SelectorParseError;
 use ::std::fmt;
 
 

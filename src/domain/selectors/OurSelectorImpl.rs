@@ -26,4 +26,17 @@ impl SelectorImpl for OurSelectorImpl
 	type NonTSPseudoClass = NonTreeStructuralPseudoClass;
 	
 	type PseudoElement = PseudoElement;
+	
+	#[inline(always)]
+	fn is_active_or_hover(pseudo_class: &Self::NonTSPseudoClass) -> bool
+	{
+		use self::NonTreeStructuralPseudoClass::*;
+		
+		match *pseudo_class
+		{
+			active => true,
+			hover => true,
+			_ => false,
+		}
+	}
 }

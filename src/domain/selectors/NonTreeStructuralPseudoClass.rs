@@ -193,8 +193,23 @@ impl NonTreeStructuralPseudoClass
 		}
 	}
 	
+	/// https://drafts.csswg.org/selectors-4/#useraction-pseudos
+	///
+	/// We intentionally skip the link-related ones.
+	pub fn is_safe_user_action_state(&self) -> bool
+	{
+		use self::NonTreeStructuralPseudoClass::*;
+		
+		match *self
+		{
+			active => true,
+			focus => true,
+			hover => true,
+		}
+	}
+	
 	#[inline(always)]
-	fn parse_without_arguments(&self, name: Cow<str>) -> Result<Self, ()>
+	fn parse_without_arguments<'i>(&self, name: CowRcStr<'i>) -> Result<Self, ParseError<'i, SelectorParseError<'i, CustomSelectorParseError>>>
 	{
 		use self::NonTreeStructuralPseudoClass::*;
 		use self::VendorPrefix::*;
@@ -267,7 +282,7 @@ impl NonTreeStructuralPseudoClass
 			
 			"right" => Ok(right),
 			
-			"scope" => Err(()), // scope is obsolete as of Firefox 55
+			"scope" => Err(ParseError::Custom(SelectorParseError::Custom(CustomSelectorParseError::NonTreeStructuralPseudoClassScopeIsObsoleteAsOfFirefox55))),
 			
 			"target" => Ok(target),
 			
@@ -275,12 +290,12 @@ impl NonTreeStructuralPseudoClass
 			
 			"visited" => Ok(visited),
 			
-			_ => Err(()),
+			_ => Err(ParseError::Custom(SelectorParseError::UnsupportedPseudoClassOrElement(name))),
 		}
 	}
 	
 	#[inline(always)]
-	fn parse_with_arguments<'i, 't>(&self, name: Cow<str>, input: &mut Parser<'i, 't>, ourSelectorParser: &OurSelectorParser) -> Result<Self, ()>
+	fn parse_with_arguments<'i, 't>(&self, name: CowRcStr<'i>, input: &mut Parser<'i, 't>, ourSelectorParser: &OurSelectorParser) -> Result<Self, ParseError<'i, SelectorParseError<'i, CustomSelectorParseError>>>
 	{
 		use self::NonTreeStructuralPseudoClass::*;
 		use self::VendorPrefix::*;
@@ -303,26 +318,26 @@ impl NonTreeStructuralPseudoClass
 			
 			"lang" => Ok(lang(Self::parse_lang(input)?)),
 			
-			_ => Err(()),
+			_ => Err(ParseError::Custom(SelectorParseError::UnsupportedPseudoClassOrElement(name))),
 		}
 	}
 	
 	#[inline(always)]
-	fn parse_any<'i, 't>(input: &mut Parser<'i, 't>, ourSelectorParser: &OurSelectorParser) -> Result<DeduplicatedSelectors, ()>
+	fn parse_any<'i, 't>(input: &mut Parser<'i, 't>, ourSelectorParser: &OurSelectorParser) -> Result<DeduplicatedSelectors, ParseError<'i, SelectorParseError<'i, CustomSelectorParseError>>>
 	{
-		ourSelectorParser.parse_internal(input, OurSelectorExt::is_false_if_any_selector_is_simple_and_only_uses_the_descendant_combinator).map_err(|_| ())
+		ourSelectorParser.parse_internal(input, OurSelectorExt::is_false_if_any_selector_is_simple_and_only_uses_the_descendant_combinator)
 	}
 	
 	#[inline(always)]
-	fn parse_text_directionality<'i, 't>(input: &mut Parser<'i, 't>) -> Result<TextDirectionality, ()>
+	fn parse_text_directionality<'i, 't>(input: &mut Parser<'i, 't>) -> Result<TextDirectionality, ParseError<'i, SelectorParseError<'i, CustomSelectorParseError>>>
 	{
-		TextDirectionality::parse(input).map_err(|_| ())
+		TextDirectionality::parse(input)
 	}
 	
 	#[inline(always)]
-	fn parse_lang<'i, 't>(input: Parser<'i, 't>) -> Result<LanguageRanges, ()>
+	fn parse_lang<'i, 't>(input: Parser<'i, 't>) -> Result<LanguageRanges, ParseError<'i, SelectorParseError<'i, CustomSelectorParseError>>>
 	{
 		// the :lang() pseudo-class represents an element that is in one of the languages listed in its argument. It accepts a comma-separated list of one or more language ranges as its argument. Each language range in :lang() must be a valid CSS <ident> or <string>. (Language ranges containing asterisks, for example, must be quoted as strings.)
-		input.parse_comma_separated(|input| Ok(LanguageRange(Atom::from(input.expect_ident_or_string()?.as_ref())))).map(LanguageRanges).map_err(|_| ())
+		input.parse_comma_separated(|input| Ok(LanguageRange(Atom::from(input.expect_ident_or_string()?.as_ref())))).map(LanguageRanges)
 	}
 }

@@ -25,12 +25,13 @@ use ::selectors::parser::SelectorImpl;
 use ::selectors::parser::SelectorList;
 use ::selectors::parser::SelectorMethods;
 use ::selectors::visitor::SelectorVisitor;
-use ::std::borrow::Cow;
+use ::smallvec::SmallVec;
 use ::std::fmt;
 use ::std::fmt::Write;
 use ::std::rc::Rc;
 
 
+include!("CustomSelectorParseError.rs");
 include!("DeduplicatedSelectors.rs");
 include!("LanguageRange.rs");
 include!("LanguageRanges.rs");

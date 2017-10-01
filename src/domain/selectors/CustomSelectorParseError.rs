@@ -2,24 +2,8 @@
 // Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
 
 
-/// A font-display value for a @font-face rule.
-/// The font-display descriptor determines how a font face is displayed based on whether and when it is downloaded and ready to use.
-define_css_keyword_enum!
-(
-	FontDisplay:
-	"auto" => auto,
-	"block" => block,
-	"swap" => swap,
-	"fallback" => fallback,
-	"optional" => optional
-);
-
-
-impl Parse for FontDisplay
+#[derive(Debug)]
+pub enum CustomSelectorParseError
 {
-	#[inline]
-	fn parse<'i, 't>(_context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
-	{
-		FontDisplay::parse(input)
-	}
+	NonTreeStructuralPseudoClassScopeIsObsoleteAsOfFirefox55,
 }

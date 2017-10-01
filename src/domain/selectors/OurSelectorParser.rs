@@ -8,26 +8,34 @@ pub(crate) struct OurSelectorParser
 	namespaces: Rc<Namespaces>,
 }
 
-impl ::selectors::parser::Parser for OurSelectorParser
+impl<'i> ::selectors::parser::Parser<'i> for OurSelectorParser
 {
 	type Impl = OurSelectorImpl;
 	
+	type Error = CustomParseError<'i>;
+	
 	#[inline(always)]
-	fn parse_non_ts_pseudo_class(&self, name: Cow<str>) -> Result<<Self::Impl as SelectorImpl>::NonTSPseudoClass, ()>
+	fn parse_non_ts_pseudo_class(&self, name: CowRcStr<'i>) -> Result<<Self::Impl as SelectorImpl>::NonTSPseudoClass, ParseError<'i, SelectorParseError<'i, Self::Error>>>
 	{
 		NonTreeStructuralPseudoClass::parse_without_arguments(name)
 	}
 	
 	#[inline(always)]
-	fn parse_non_ts_functional_pseudo_class(&self, name: Cow<str>, arguments: &mut Parser) -> Result<<Self::Impl as SelectorImpl>::NonTSPseudoClass, ()>
+	fn parse_non_ts_functional_pseudo_class<'t>(&self, name: CowRcStr<'i>, arguments: &mut Parser<'i, 't>) -> Result<<Self::Impl as SelectorImpl>::NonTSPseudoClass, ParseError<'i, SelectorParseError<'i, Self::Error>>>
 	{
 		NonTreeStructuralPseudoClass::parse_with_arguments(name, arguments, self)
 	}
 	
 	#[inline(always)]
-	fn parse_pseudo_element(&self, name: Cow<str>) -> Result<<Self::Impl as SelectorImpl>::PseudoElement, ()>
+	fn parse_pseudo_element(&self, name: CowRcStr<'i>) -> Result<<Self::Impl as SelectorImpl>::PseudoElement, ParseError<'i, SelectorParseError<'i, Self::Error>>>
 	{
 		PseudoElement::parse_without_arguments(name)
+	}
+	
+	#[inline(always)]
+	fn parse_functional_pseudo_element<'t>(&self, name: CowRcStr<'i>, arguments: &mut Parser<'i, 't>) -> Result<<Self::Impl as SelectorImpl>::PseudoElement, ParseError<'i, SelectorParseError<'i, Self::Error>>>
+	{
+		PseudoElement::parse_with_arguments(name, arguments, self)
 	}
 	
 	#[inline(always)]
@@ -46,16 +54,28 @@ impl ::selectors::parser::Parser for OurSelectorParser
 impl OurSelectorParser
 {
 	#[inline(always)]
-	pub(crate) fn parse<'i, 't>(&self, input: &mut Parser<'i, 't>) -> Result<DeduplicatedSelectors, ParseError<'i, CustomParseError>>
+	pub(crate) fn parse<'i, 't>(&self, input: &mut Parser<'i, 't>) -> Result<DeduplicatedSelectors, ParseError<'i, CustomParseError<'i>>>
 	{
 		self.parse_internal(input, |_| false)
 	}
 	
 	#[inline(always)]
-	fn parse_internal<'i, 't, F: Fn(&OurSelector) -> bool>(&self, input: &mut Parser<'i, 't>, isInvalidSelector: F) -> Result<DeduplicatedSelectors, ParseError<'i, CustomParseError>>
+	fn parse_internal<'i, 't, F: Fn(&OurSelector) -> bool>(&self, input: &mut Parser<'i, 't>, isInvalidSelector: F) -> Result<DeduplicatedSelectors, ParseError<'i, CustomParseError<'i>>>
 	{
-		let selectors = self.parse_selectors(input)?;
-		debug_assert!(!selectors.is_empty());
+		let selectors = self.parse_selectors(input).map_err(|parseError|
+		{
+			match parseError
+			{
+				// We are changing from a ParseError<SelectorParseError> to a ParseError<CustomParseError>, hence this superficially looking redundant code
+				ParseError::Basic(basicParseError) => ParseError::Basic(basicParseError),
+				ParseError::Custom(selectorParseError) => ParseError::Custom(CustomParseError::SpecificSelectorParseError(selectorParseError)),
+			}
+		})?;
+		
+		if selectors.is_empty()
+		{
+			return Err(ParseError::Custom(CustomParseError::ThereAreNoSelectors));
+		}
 		
 		let mut deduplicatedSelectors = OrderMap::with_capacity(selectors.len());
 		for selector in selectors
@@ -73,17 +93,9 @@ impl OurSelectorParser
 	}
 	
 	#[inline(always)]
-	fn parse_selectors<'i, 't>(&self, input: &mut Parser<'i, 't>) -> Result<Vec<OurSelector>, ParseError<'i, CustomParseError>>
+	fn parse_selectors<'i, 't>(&self, input: &mut Parser<'i, 't>) -> Result<SmallVec<[OurSelector; 1]>, ParseError<'i, SelectorParseError<'i, CustomSelectorParseError>>>
 	{
-		let selectorList = SelectorList::parse(self, input).map_err(|_| ParseError::Custom(CustomParseError::CouldNotParseSelectors))?;
-		let selectors = selectorList.0;
-		if selectors.is_empty()
-		{
-			Err(ParseError::Custom(CustomParseError::ThereAreNoSelectors))
-		}
-		else
-		{
-			Ok(selectors)
-		}
+		let selectorList = SelectorList::parse(self, input)?;
+		Ok(selectorList.0)
 	}
 }

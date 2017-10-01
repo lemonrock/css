@@ -117,6 +117,7 @@
       <w>sigmask</w>
       <w>sigs</w>
       <w>sitemap</w>
+      <w>smallvec</w>
       <w>sockaddr</w>
       <w>srcset</w>
       <w>strdup</w>

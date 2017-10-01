@@ -75,7 +75,7 @@ impl ToCss for PseudoElement
 			
 			progress_bar(ref vendorPrefix) =>
 			{
-				match vendorPrefix
+				match *vendorPrefix
 				{
 					Some(moz) => write(dest, "::-moz-progress-bar"),
 					Some(webkit) => write(dest, "::-webkit-progress-bar"),
@@ -86,7 +86,7 @@ impl ToCss for PseudoElement
 			
 			range_progress(ref vendorPrefix) =>
 			{
-				match vendorPrefix
+				match *vendorPrefix
 				{
 					Some(moz) => write(dest, "::-moz-range-progress"),
 					Some(ms) => write(dest, "::-ms-fill-upper"),
@@ -96,7 +96,7 @@ impl ToCss for PseudoElement
 			
 			range_thumb(ref vendorPrefix) =>
 			{
-				match vendorPrefix
+				match *vendorPrefix
 				{
 					Some(moz) => write(dest, "::-moz-range-thumb"),
 					Some(webkit) => write(dest, "::-webkit-slider-thumb"),
@@ -107,7 +107,7 @@ impl ToCss for PseudoElement
 			
 			range_track(ref vendorPrefix) =>
 			{
-				match vendorPrefix
+				match *vendorPrefix
 				{
 					Some(moz) => write(dest, "::-moz-range-track"),
 					Some(webkit) => write(dest, "::-webkit-slider-runnable-track"),
@@ -147,16 +147,43 @@ impl ::selectors::parser::PseudoElement for PseudoElement
 {
 	type Impl = OurSelectorImpl;
 	
-	fn supports_pseudo_class(&self, _pseudo_class: &<Self::Impl as SelectorImpl>::NonTSPseudoClass) -> bool
+	fn supports_pseudo_class(&self, pseudo_class: &<Self::Impl as SelectorImpl>::NonTSPseudoClass) -> bool
 	{
-		false
+		if !self.supports_user_action_state()
+		{
+			return false;
+		}
+		
+		pseudo_class.is_safe_user_action_state()
 	}
 }
 
 impl PseudoElement
 {
+	/// Whether this pseudo-element supports user action selectors.
+	pub fn supports_user_action_state(&self) -> bool
+	{
+		use self::PseudoElement::*;
+		
+		match *self
+		{
+			after => false,
+			before => false,
+			backdrop(..) => false,
+			cue => false,
+			first_letter => false,
+			first_line => false,
+			progress_bar(..) => true,
+			range_track(..) => true,
+			range_progress(..) => true,
+			range_thumb(..) => true,
+			placeholder => true,
+			_ => false,
+		}
+	}
+	
 	#[inline(always)]
-	fn parse_without_arguments(name: Cow<str>) -> Result<Self, ()>
+	fn parse_without_arguments<'i>(name: CowRcStr<'i>) -> Result<Self, ParseError<'i, SelectorParseError<'i, CustomSelectorParseError>>>
 	{
 		use self::PseudoElement::*;
 		use self::VendorPrefix::*;
@@ -243,7 +270,13 @@ impl PseudoElement
 			
 			"-servo-inline-absolute" => Ok(inline_absolute(Some(servo))),
 			
-			_ => Err(()),
+			_ => Err(ParseError::Custom(SelectorParseError::UnsupportedPseudoClassOrElement(name))),
 		}
+	}
+	
+	#[inline(always)]
+	fn parse_with_arguments<'i, 't>(&self, name: CowRcStr<'i>, arguments: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, SelectorParseError<'i, CustomSelectorParseError>>>
+	{
+		Err(ParseError::Custom(SelectorParseError::UnsupportedPseudoClassOrElement(name)))
 	}
 }

@@ -21,10 +21,9 @@ impl Stylesheet
 			{
 				rule_type: None,
 				parsing_mode: ParsingMode::PARSING_MODE_DEFAULT,
-				namespaces: Namespaces::empty(),
 			},
 			state: State::Start,
-			had_hierarchy_error: false,
+			namespaces: Namespaces::empty(),
 		};
 		
 		{

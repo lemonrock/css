@@ -11,7 +11,7 @@ pub(crate) struct TopLevelRuleParser
 	/// The current state of the parser.
 	pub(crate) state: State,
 	
-	pub(crate) namespaces: Namespaces,
+	pub(crate) namespaces: Rc<Namespaces>,
 }
 
 impl<'i> AtRuleParser<'i> for TopLevelRuleParser

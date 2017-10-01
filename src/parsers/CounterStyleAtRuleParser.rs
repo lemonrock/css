@@ -27,7 +27,7 @@ impl<'a, 'i> DeclarationParser<'i> for CounterStyleAtRuleParser<'a>
 	
 	type Error = CustomParseError<'i>;
 	
-	fn parse_value<'t>(&mut self, name: CowRcStr<'i>, input: &mut Parser<'i, 't>) -> Result<Self::Declaration, Self::Error>
+	fn parse_value<'t>(&mut self, name: CowRcStr<'i>, input: &mut Parser<'i, 't>) -> Result<Self::Declaration, ParseError<'i, Self::Error>>
 	{
 		match_ignore_ascii_case!
 		{

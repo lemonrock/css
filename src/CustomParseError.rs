@@ -5,9 +5,10 @@
 #[derive(Debug)]
 pub enum CustomParseError<'i>
 {
-	CouldNotParseSelectors,
+	SpecificSelectorParseError(SelectorParseError<'i, CustomSelectorParseError>),
 	ThereAreNoSelectors,
 	SelectorIsInvalidInContext(String),
+	UnsupportedPseudoClassOrElement(String),
 	
 	UnexpectedTokenForAtNamespaceRuleNamespaceValue(Token<'i>),
 	
