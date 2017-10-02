@@ -104,17 +104,12 @@ impl LengthOrPercentageOrAuto
 			let token = input.next()?;
 			match *token
 			{
-				Token::Dimension { value, ref unit, .. } if num_context.is_ok(context.parsing_mode, value) =>
-				{
-					return NoCalcLength::parse_dimension(context, value, unit)
-					.map(Length)
-					.map_err(|()| BasicParseError::UnexpectedToken(token.clone()).into())
-				}
+				Token::Dimension { value, ref unit, .. } if num_context.is_ok(context.parsing_mode, value) => return NoCalcLength::parse_dimension(context, value, unit).map(Length).map_err(|()| BasicParseError::UnexpectedToken(token.clone()).into()),
 				
 				Token::Percentage { unit_value, .. } if num_context.is_ok(context.parsing_mode, unit_value) => return Ok(Percentage(domain::Percentage(unit_value))),
 				
 				// A little lenient
-				Token::Number { value, .. } if num_context.is_ok(context.parsing_mode, value) => Ok(Length(Absolute(Px(value)))),
+				Token::Number { value, .. } if num_context.is_ok(context.parsing_mode, value) => return Ok(Length(Absolute(Px(value)))),
 				
 				Token::Ident(ref value) if value.eq_ignore_ascii_case("auto") => return Ok(Auto),
 				

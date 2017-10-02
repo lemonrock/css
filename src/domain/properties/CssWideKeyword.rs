@@ -3,7 +3,7 @@
 
 
 /// An enum to represent a CSS-wide keyword.
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[derive(Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub enum CssWideKeyword
 {
 	/// The `initial` keyword.

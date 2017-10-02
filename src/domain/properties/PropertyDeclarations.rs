@@ -38,7 +38,11 @@ impl PropertyDeclarations
 		
 		while let Some(propertyDeclaration) = parsedPropertyDeclarations.next()
 		{
-			propertyDeclarations.push(propertyDeclaration?);
+			match propertyDeclaration
+			{
+				Ok(propertyDeclaration) => propertyDeclarations.push(propertyDeclaration),
+				Err(preciseParseError) => return Err(preciseParseError.error),
+			}
 		}
 		
 		Ok(PropertyDeclarations(propertyDeclarations))

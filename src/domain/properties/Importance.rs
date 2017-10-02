@@ -4,7 +4,7 @@
 /// A declaration [importance][importance].
 ///
 /// [importance]: https://drafts.csswg.org/css-cascade/#importance
-#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
+#[derive(Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub enum Importance
 {
 	/// Indicates a declaration without `!important`.
@@ -12,6 +12,15 @@ pub enum Importance
 	
 	/// Indicates a declaration with `!important`.
 	Important,
+}
+
+impl Default for Importance
+{
+	#[inline(always)]
+	fn default() -> Self
+	{
+		Importance::Normal
+	}
 }
 
 impl Importance

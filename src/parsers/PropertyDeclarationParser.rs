@@ -5,8 +5,8 @@
 /// A struct to parse property declarations.
 pub(crate) struct PropertyDeclarationParser<'a>
 {
-	context: &'a ParserContext,
-	isImportantDisallowed: bool,
+	pub(crate) context: &'a ParserContext,
+	pub(crate) isImportantDisallowed: bool,
 }
 
 /// In theory, @rules may be present. In practice, none are currently defined (Sep 2017)
@@ -16,7 +16,7 @@ impl<'a, 'i> AtRuleParser<'i> for PropertyDeclarationParser<'a>
 	
 	type PreludeBlock = ();
 	
-	type AtRule = Importance;
+	type AtRule = PropertyDeclaration;
 	
 	type Error = CustomParseError<'i>;
 }
@@ -31,7 +31,7 @@ impl<'a, 'i> DeclarationParser<'i> for PropertyDeclarationParser<'a>
 	{
 		let sourceLocation = input.current_source_location();
 		
-		let name = name.to_ascii_lowercase();
+		let name = Atom::from(name.to_ascii_lowercase());
 		
 		let value = input.parse_until_before(Delimiter::Bang, |input|
 		{

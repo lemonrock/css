@@ -9,7 +9,18 @@ impl ToCss for LanguageRanges
 {
 	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
 	{
-		self.0.to_css(dest)
+		if self.0.is_empty()
+		{
+			return Ok(());
+		}
+		
+		let mut iterator = self.0.iter();
+		iterator.next().unwrap().to_css(dest)?;
+		for languageRange in iterator
+		{
+			languageRange.to_css(dest)?;
+		}
+		Ok(())
 	}
 }
 

@@ -20,7 +20,6 @@ extern crate smallvec;
 use self::domain::*;
 use self::domain::atRules::counterStyle::System;
 use self::domain::atRules::namespace::Namespaces;
-use self::domain::selectors::CustomSelectorParseError;
 use self::parsers::*;
 use self::serializers::*;
 use ::cssparser::*;

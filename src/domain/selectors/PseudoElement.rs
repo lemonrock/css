@@ -183,7 +183,7 @@ impl PseudoElement
 	}
 	
 	#[inline(always)]
-	fn parse_without_arguments<'i>(name: CowRcStr<'i>) -> Result<Self, ParseError<'i, SelectorParseError<'i, CustomSelectorParseError>>>
+	fn parse_without_arguments<'i>(name: CowRcStr<'i>) -> Result<Self, ParseError<'i, SelectorParseError<'i, CustomParseError>>>
 	{
 		use self::PseudoElement::*;
 		use self::VendorPrefix::*;
@@ -275,7 +275,7 @@ impl PseudoElement
 	}
 	
 	#[inline(always)]
-	fn parse_with_arguments<'i, 't>(&self, name: CowRcStr<'i>, arguments: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, SelectorParseError<'i, CustomSelectorParseError>>>
+	fn parse_with_arguments<'i, 't>(name: CowRcStr<'i>, _arguments: &mut Parser<'i, 't>, _ourSelectorParser: &OurSelectorParser) -> Result<Self, ParseError<'i, SelectorParseError<'i, CustomParseError<'i>>>>
 	{
 		Err(ParseError::Custom(SelectorParseError::UnsupportedPseudoClassOrElement(name)))
 	}

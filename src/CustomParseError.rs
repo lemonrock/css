@@ -5,10 +5,11 @@
 #[derive(Debug)]
 pub enum CustomParseError<'i>
 {
-	SpecificSelectorParseError(SelectorParseError<'i, CustomSelectorParseError>),
+	SpecificSelectorParseError(Box<SelectorParseError<'i, CustomParseError<'i>>>),
 	ThereAreNoSelectors,
 	SelectorIsInvalidInContext(String),
 	UnsupportedPseudoClassOrElement(String),
+	NonTreeStructuralPseudoClassScopeIsObsoleteAsOfFirefox55,
 	
 	UnexpectedTokenForAtNamespaceRuleNamespaceValue(Token<'i>),
 	
@@ -80,8 +81,8 @@ pub enum CustomParseError<'i>
 	
 	DocumentAtRuleUrlMatchingFunctionWasInvalid,
 	
-	BadUrlInDeclarationValueBlock(String),
-	BadStringInDeclarationValueBlock(String),
+	BadUrlInDeclarationValueBlock(CowRcStr<'i>),
+	BadStringInDeclarationValueBlock(CowRcStr<'i>),
 	UnbalancedCloseParenthesisInDeclarationValueBlock,
 	UnbalancedCloseSquareBracketInDeclarationValueBlock,
 	UnbalancedCloseCurlyBracketInDeclarationValueBlock,

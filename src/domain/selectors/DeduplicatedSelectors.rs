@@ -2,7 +2,7 @@
 // Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
 
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub struct DeduplicatedSelectors(OrderMap<String, Selector<OurSelectorImpl>>);
 
 impl ToCss for DeduplicatedSelectors
@@ -14,7 +14,7 @@ impl ToCss for DeduplicatedSelectors
 		for selectorCss in iter.next()
 		{
 			dest.write_char(',')?;
-			dest.write_string(selectorCss)?;
+			dest.write_str(selectorCss)?;
 		}
 		Ok(())
 	}

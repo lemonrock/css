@@ -126,7 +126,7 @@ impl Length
 				}
 				
 				// This is a bit lenient
-				Token::Number { value, .. } if num_context.is_ok(context.parsing_mode, value) => Ok(NoCalc(Absolute(Px(value)))),
+				Token::Number { value, .. } if num_context.is_ok(context.parsing_mode, value) => return Ok(NoCalc(Absolute(Px(value)))),
 				
 				Token::Function(ref name) if name.eq_ignore_ascii_case("calc") =>
 				{

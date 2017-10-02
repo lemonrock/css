@@ -3,7 +3,7 @@
 
 
 #[derive(Debug, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
-pub struct LanguageRange(String);
+pub struct LanguageRange(Atom);
 
 impl Separated for LanguageRange
 {
@@ -22,12 +22,14 @@ impl ToCss for LanguageRange
 		}
 		else
 		{
-			match value[0]
+			let characters = value.chars();
+			
+			match characters.next().unwrap()
 			{
 				'a' ... 'z' | 'A' ... 'Z' | '-' =>
 				{
 					let mut isCssIdentifier = true;
-					for character in value.chars().skip(1)
+					for character in characters
 					{
 						match character
 						{
@@ -47,11 +49,11 @@ impl ToCss for LanguageRange
 		
 		if isCssIdentifier
 		{
-			serialize_identifier(value)
+			serialize_identifier(value, dest)
 		}
 		else
 		{
-			serialize_string(value)
+			serialize_string(value, dest)
 		}
 	}
 }

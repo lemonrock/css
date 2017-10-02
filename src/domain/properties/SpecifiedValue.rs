@@ -5,23 +5,22 @@
 /// A specified value for a property is just a set of tokens.
 ///
 /// The original CSS is preserved for serialization, as are variable references to other property names.
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Debug, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct SpecifiedValue
 {
 	pub originalCss: String,
 	
 	//first_token_type: TokenSerializationType,
 	//last_token_type: TokenSerializationType,
-	
-	/// References to property names in var() functions.
-	pub references: HashSet<Atom>,
+	// References to property names in var() functions.
+	//pub references: HashSet<Atom>,
 }
 
 impl ToCss for SpecifiedValue
 {
 	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
 	{
-		dest.write_str(&self.css)
+		dest.write_str(&self.originalCss)
 	}
 }
 
@@ -39,7 +38,7 @@ impl SpecifiedValue
 				originalCss: css.into_owned(),
 				//first_token_type: first,
 				//last_token_type: last,
-				references: references.unwrap(),
+				//references: references.unwrap(),
 			}
 		)
 	}
@@ -129,9 +128,9 @@ impl SpecifiedValue
 					token.serialization_type()
 				}
 				
-				BadUrl(url) => return Err(ParseError::Custom(CustomParseError::BadUrlInDeclarationValueBlock(url.to_owned()))),
+				BadUrl(url) => return Err(ParseError::Custom(CustomParseError::BadUrlInDeclarationValueBlock(url))),
 				
-				BadString(string) => return Err(ParseError::Custom(CustomParseError::BadStringInDeclarationValueBlock(string.to_owned()))),
+				BadString(string) => return Err(ParseError::Custom(CustomParseError::BadStringInDeclarationValueBlock(string))),
 				
 				CloseParenthesis => return Err(ParseError::Custom(CustomParseError::UnbalancedCloseParenthesisInDeclarationValueBlock)),
 				
@@ -243,7 +242,7 @@ impl SpecifiedValue
 		}
 		if let Some(ref mut refs) = *references
 		{
-			refs.insert(Atom(name.to_owned()));
+			refs.insert(Atom::from(name));
 		}
 		Ok(())
 	}

@@ -5,7 +5,7 @@
 /// A `@font-face` rule.
 ///
 /// https://drafts.csswg.org/css-fonts/#font-face-rule
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Debug)]
 pub struct FontFaceAtRule
 {
 	/// The name of this font face

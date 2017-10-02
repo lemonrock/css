@@ -68,7 +68,7 @@ impl OurSelectorParser
 			{
 				// We are changing from a ParseError<SelectorParseError> to a ParseError<CustomParseError>, hence this superficially looking redundant code
 				ParseError::Basic(basicParseError) => ParseError::Basic(basicParseError),
-				ParseError::Custom(selectorParseError) => ParseError::Custom(CustomParseError::SpecificSelectorParseError(selectorParseError)),
+				ParseError::Custom(selectorParseError) => ParseError::Custom(CustomParseError::SpecificSelectorParseError(Box::new(selectorParseError))),
 			}
 		})?;
 		
@@ -94,7 +94,7 @@ impl OurSelectorParser
 	}
 	
 	#[inline(always)]
-	fn parse_selectors<'i, 't>(&self, input: &mut Parser<'i, 't>) -> Result<SmallVec<[OurSelector; 1]>, ParseError<'i, SelectorParseError<'i, CustomSelectorParseError>>>
+	fn parse_selectors<'i, 't>(&self, input: &mut Parser<'i, 't>) -> Result<SmallVec<[OurSelector; 1]>, ParseError<'i, SelectorParseError<'i, CustomParseError<'i>>>>
 	{
 		let selectorList = SelectorList::parse(self, input)?;
 		Ok(selectorList.0)

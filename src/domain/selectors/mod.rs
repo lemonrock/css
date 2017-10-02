@@ -31,7 +31,6 @@ use ::std::fmt::Write;
 use ::std::rc::Rc;
 
 
-include!("CustomSelectorParseError.rs");
 include!("DeduplicatedSelectors.rs");
 include!("LanguageRange.rs");
 include!("LanguageRanges.rs");

@@ -21,7 +21,7 @@ impl OurSelectorExt for OurSelector
 			match *component
 			{
 				// Combinators are not allowed except for descendant
-				Combinator(ref combinator) => if combinator != Descendant
+				Combinator(ref combinator) => if combinator != &Descendant
 				{
 					return true;
 				}
@@ -34,5 +34,7 @@ impl OurSelectorExt for OurSelector
 				}
 			}
 		}
+		
+		false
 	}
 }

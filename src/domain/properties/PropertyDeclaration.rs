@@ -5,7 +5,7 @@
 #[derive(Debug, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct PropertyDeclaration
 {
-	name: String,
+	name: Atom,
 	value: UnparsedPropertyValue,
 	importance: Importance,
 }
@@ -14,7 +14,7 @@ impl ToCss for PropertyDeclaration
 {
 	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
 	{
-		serialize_identifier(&self.name)?;
+		self.name.to_css(dest)?;
 		dest.write_str(":")?;
 		
 		self.value.to_css(dest)?;

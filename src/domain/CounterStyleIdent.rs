@@ -169,7 +169,7 @@ impl CounterStyleIdent
 	{
 		use self::CounterStyleIdent::*;
 		
-		let lowerCaseIdent = anyCaseIdent.to_ascii_lowercase();
+		let lowerCaseIdent: String = anyCaseIdent.to_ascii_lowercase();
 		
 		static KnownCounterStyleNames: phf::Map<&'static str, CounterStyleIdent> = phf_map!
 		{
@@ -230,7 +230,7 @@ impl CounterStyleIdent
 			"ethiopic-numeric" => ethiopic_numeric,
 		};
 		
-		match KnownCounterStyleNames.get(&lowerCaseIdent)
+		match KnownCounterStyleNames.get(&lowerCaseIdent[..])
 		{
 			Some(value) => Ok(value.clone()),
 			None => if lowerCaseIdent == "none"
@@ -239,7 +239,7 @@ impl CounterStyleIdent
 			}
 			else
 			{
-				Ok(Custom(lowerCaseIdent.to_owned()))
+				Ok(Custom(lowerCaseIdent))
 			}
 		}
 	}

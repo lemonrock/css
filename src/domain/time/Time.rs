@@ -76,7 +76,7 @@ impl Time
 	
 	/// Parses a time according to CSS-VALUES § 6.2.
 	#[inline(always)]
-	pub(crate) fn parse_dimension(value: CssFloat, unit: &str, was_calc: bool) -> Result<Self, ()>
+	pub(crate) fn parse_dimension(value: CssFloat, unit: &str, _was_calc: bool) -> Result<Self, ()>
 	{
 		let (seconds, unit) = match_ignore_ascii_case!
 		{
@@ -95,7 +95,6 @@ impl Time
 			{
 				seconds,
 				unit,
-				was_calc
 			}
 		)
 	}

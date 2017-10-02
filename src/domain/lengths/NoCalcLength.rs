@@ -50,9 +50,9 @@ impl Mul<CssFloat> for NoCalcLength
 		
 		match self
 		{
-			Absolute(v) => Absolute(v * scalar),
-			FontRelative(v) => FontRelative(v * scalar),
-			ViewportPercentage(v) => ViewportPercentage(v * scalar),
+			Absolute(value) => Absolute(value * scalar),
+			FontRelative(value) => FontRelative(value * scalar),
+			ViewportPercentage(value) => ViewportPercentage(value * scalar),
 		}
 	}
 }

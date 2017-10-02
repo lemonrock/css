@@ -34,3 +34,22 @@ impl ToCss for FontRelativeLength
 		}
 	}
 }
+
+impl Mul<CssFloat> for FontRelativeLength
+{
+	type Output = Self;
+	
+	#[inline]
+	fn mul(self, scalar: CssFloat) -> Self
+	{
+		use self::FontRelativeLength::*;
+		
+		match self
+		{
+			Em(value) => Em(value * scalar),
+			Ex(value) => Ex(value * scalar),
+			Ch(value) => Ch(value * scalar),
+			Rem(value) => Rem(value * scalar),
+		}
+	}
+}

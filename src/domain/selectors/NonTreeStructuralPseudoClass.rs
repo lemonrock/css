@@ -4,7 +4,7 @@
 
 /// A non tree-structural pseudo-class.
 /// See https://drafts.csswg.org/selectors-4/#structural-pseudos
-#[derive(Clone, Debug, Eq, Hash, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 #[allow(missing_docs)]
 pub enum NonTreeStructuralPseudoClass
 {
@@ -55,7 +55,7 @@ impl ToCss for NonTreeStructuralPseudoClass
 		fn write_with_vendor_prefix<W: fmt::Write>(dest: &mut W, vendorPrefix: &Option<VendorPrefix>, classWithoutColon: &str) -> fmt::Result
 		{
 			dest.write_char(':')?;
-			if let Some(vendorPrefix) = vendorPrefix
+			if let &Some(ref vendorPrefix) = vendorPrefix
 			{
 				vendorPrefix.to_css(dest)?;
 			}
@@ -66,7 +66,7 @@ impl ToCss for NonTreeStructuralPseudoClass
 		fn write_with_vendor_prefix_value<W: fmt::Write, T: ToCss>(dest: &mut W, vendorPrefix: &Option<VendorPrefix>, classWithoutColon: &str, value: &T) -> fmt::Result
 		{
 			dest.write_char(':')?;
-			if let Some(vendorPrefix) = vendorPrefix
+			if let &Some(ref vendorPrefix) = vendorPrefix
 			{
 				vendorPrefix.to_css(dest)?;
 			}
@@ -107,7 +107,7 @@ impl ToCss for NonTreeStructuralPseudoClass
 			fullscreen(ref vendorPrefix) =>
 			{
 				dest.write_char(':')?;
-				let name = if let Some(ref vendorPrefix) = vendorPrefix
+				let name = if let &Some(ref vendorPrefix) = vendorPrefix
 				{
 					vendorPrefix.to_css(dest)?;
 					
@@ -122,7 +122,7 @@ impl ToCss for NonTreeStructuralPseudoClass
 				{
 					"fullscreen"
 				};
-				dest.write_str(name)?;
+				dest.write_str(name)
 			}
 			
 			hover => write(dest, ":hover"),
@@ -209,7 +209,7 @@ impl NonTreeStructuralPseudoClass
 	}
 	
 	#[inline(always)]
-	fn parse_without_arguments<'i>(&self, name: CowRcStr<'i>) -> Result<Self, ParseError<'i, SelectorParseError<'i, CustomSelectorParseError>>>
+	fn parse_without_arguments<'i>(name: CowRcStr<'i>) -> Result<Self, ParseError<'i, SelectorParseError<'i, CustomParseError>>>
 	{
 		use self::NonTreeStructuralPseudoClass::*;
 		use self::VendorPrefix::*;
@@ -220,11 +220,11 @@ impl NonTreeStructuralPseudoClass
 			
 			"active" => Ok(active),
 			
-			"any-link" => Ok(None, any_link),
+			"any-link" => Ok(any_link(None)),
 			
-			"-moz-any-link" => Ok(Some(moz), any_link),
+			"-moz-any-link" => Ok(any_link(Some(moz))),
 			
-			"-webkit-any-link" => Ok(Some(webkit), any_link),
+			"-webkit-any-link" => Ok(any_link(Some(webkit))),
 			
 			"checked" => Ok(checked),
 			
@@ -282,7 +282,7 @@ impl NonTreeStructuralPseudoClass
 			
 			"right" => Ok(right),
 			
-			"scope" => Err(ParseError::Custom(SelectorParseError::Custom(CustomSelectorParseError::NonTreeStructuralPseudoClassScopeIsObsoleteAsOfFirefox55))),
+			"scope" => Err(ParseError::Custom(SelectorParseError::Custom(CustomParseError::NonTreeStructuralPseudoClassScopeIsObsoleteAsOfFirefox55))),
 			
 			"target" => Ok(target),
 			
@@ -295,7 +295,7 @@ impl NonTreeStructuralPseudoClass
 	}
 	
 	#[inline(always)]
-	fn parse_with_arguments<'i, 't>(&self, name: CowRcStr<'i>, input: &mut Parser<'i, 't>, ourSelectorParser: &OurSelectorParser) -> Result<Self, ParseError<'i, SelectorParseError<'i, CustomSelectorParseError>>>
+	fn parse_with_arguments<'i, 't>(name: CowRcStr<'i>, input: &mut Parser<'i, 't>, ourSelectorParser: &OurSelectorParser) -> Result<Self, ParseError<'i, SelectorParseError<'i, CustomParseError<'i>>>>
 	{
 		use self::NonTreeStructuralPseudoClass::*;
 		use self::VendorPrefix::*;
@@ -304,13 +304,13 @@ impl NonTreeStructuralPseudoClass
 		{
 			&name,
 			
-			"any" => Ok(any(None, Self::parse_any(input)?)),
+			"any" => Ok(any(None, Self::parse_any(input, ourSelectorParser)?)),
 			
 			"-moz-any" => Ok(any(Some(moz), Self::parse_any(input, ourSelectorParser)?)),
 			
-			"-webkit-any" => Ok(any(Some(webkit), Self::parse_any(input)?)),
+			"-webkit-any" => Ok(any(Some(webkit), Self::parse_any(input, ourSelectorParser)?)),
 			
-			"-servo-case-sensitive-type-attr" => Ok(Some(servo), case_sensitive_type_attr(Atom::from(input.expect_ident()?.as_ref()))),
+			"-servo-case-sensitive-type-attr" => Ok(case_sensitive_type_attr(Some(servo), Atom::from(input.expect_ident()?))),
 			
 			"dir" => Ok(dir(None, Self::parse_text_directionality(input)?)),
 			
@@ -323,19 +323,37 @@ impl NonTreeStructuralPseudoClass
 	}
 	
 	#[inline(always)]
-	fn parse_any<'i, 't>(input: &mut Parser<'i, 't>, ourSelectorParser: &OurSelectorParser) -> Result<DeduplicatedSelectors, ParseError<'i, SelectorParseError<'i, CustomSelectorParseError>>>
+	fn parse_any<'i, 't>(input: &mut Parser<'i, 't>, ourSelectorParser: &OurSelectorParser) -> Result<DeduplicatedSelectors, ParseError<'i, SelectorParseError<'i, CustomParseError<'i>>>>
 	{
-		ourSelectorParser.parse_internal(input, OurSelectorExt::is_false_if_any_selector_is_simple_and_only_uses_the_descendant_combinator)
+		use ::cssparser::ParseError::*;
+		
+		ourSelectorParser.parse_internal(input, OurSelectorExt::is_false_if_any_selector_is_simple_and_only_uses_the_descendant_combinator).map_err(|error|
+		{
+			match error
+			{
+				Basic(error) => Basic(error),
+				Custom(customParseError) => Custom(SelectorParseError::Custom(customParseError))
+			}
+		})
 	}
 	
 	#[inline(always)]
-	fn parse_text_directionality<'i, 't>(input: &mut Parser<'i, 't>) -> Result<TextDirectionality, ParseError<'i, SelectorParseError<'i, CustomSelectorParseError>>>
+	fn parse_text_directionality<'i, 't>(input: &mut Parser<'i, 't>) -> Result<TextDirectionality, ParseError<'i, SelectorParseError<'i, CustomParseError<'i>>>>
 	{
-		TextDirectionality::parse(input)
+		use ::cssparser::ParseError::*;
+		
+		TextDirectionality::parse(input).map_err(|error|
+		{
+			match error
+			{
+				Basic(error) => Basic(error),
+				Custom(customParseError) => Custom(SelectorParseError::Custom(customParseError))
+			}
+		})
 	}
 	
 	#[inline(always)]
-	fn parse_lang<'i, 't>(input: Parser<'i, 't>) -> Result<LanguageRanges, ParseError<'i, SelectorParseError<'i, CustomSelectorParseError>>>
+	fn parse_lang<'i, 't>(input: &mut Parser<'i, 't>) -> Result<LanguageRanges, ParseError<'i, SelectorParseError<'i, CustomParseError<'i>>>>
 	{
 		// the :lang() pseudo-class represents an element that is in one of the languages listed in its argument. It accepts a comma-separated list of one or more language ranges as its argument. Each language range in :lang() must be a valid CSS <ident> or <string>. (Language ranges containing asterisks, for example, must be quoted as strings.)
 		input.parse_comma_separated(|input| Ok(LanguageRange(Atom::from(input.expect_ident_or_string()?.as_ref())))).map(LanguageRanges)
