@@ -3,7 +3,7 @@
 
 
 /// A keyframe.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Keyframe
 {
 	/// The selector this keyframe was specified from.

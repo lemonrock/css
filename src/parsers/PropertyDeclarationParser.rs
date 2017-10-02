@@ -29,23 +29,23 @@ impl<'a, 'i> DeclarationParser<'i> for PropertyDeclarationParser<'a>
 	
 	fn parse_value<'t>(&mut self, name: CowRcStr<'i>, input: &mut Parser<'i, 't>) -> Result<Self::Declaration, ParseError<'i, Self::Error>>
 	{
-		let sourceLocation = input.SourceLocation();
+		let sourceLocation = input.current_source_location();
 		
 		let name = name.to_ascii_lowercase();
 		
 		let value = input.parse_until_before(Delimiter::Bang, |input|
 		{
-			if let Some(cssWideKeyword) = input.try(|input| CssWideKeyword::parse(input))
+			if let Ok(cssWideKeyword) = input.try(|input| CssWideKeyword::parse(input))
 			{
 				Ok(UnparsedPropertyValue::CssWideKeyword(cssWideKeyword))
 			}
 			else
 			{
-				SpecifiedValue::parse(self.context, input)
+				Ok(UnparsedPropertyValue::SpecifiedValue(SpecifiedValue::parse(self.context, input)?))
 			}
 		})?;
 		
-		let importance = Importance::from_bool(input.try(parse_important).is_some());
+		let importance = Importance::from_bool(input.try(parse_important).is_ok());
 		if importance.important() && self.isImportantDisallowed
 		{
 			return Err(ParseError::Custom(CustomParseError::ImportantIsNotAllowedInKeyframePropertyDeclarationValues(sourceLocation)));

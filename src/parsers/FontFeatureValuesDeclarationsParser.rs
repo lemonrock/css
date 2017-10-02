@@ -53,13 +53,15 @@ impl<'a, 'b: 'a, T: 'a + Parse + ToCss> FontFeatureValuesDeclarationsParser<'a, 
 		};
 		
 		let mut iter = DeclarationListParser::new(input, parser);
-		while let Some(declaration) = iter.next()
+		while let Some(possiblePreciseParseError) = iter.next()
 		{
-			if declaration.is_err()
+			if possiblePreciseParseError.is_err()
 			{
-				return declaration;
+				return Err(possiblePreciseParseError.unwrap_err().error);
 			}
 		}
+		
+		Ok(())
 	}
 	
 	/// Updates with new value if same `ident` exists, otherwise pushes to the vector.

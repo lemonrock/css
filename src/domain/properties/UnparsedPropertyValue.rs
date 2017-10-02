@@ -11,6 +11,7 @@ pub enum UnparsedPropertyValue
 
 impl ToCss for UnparsedPropertyValue
 {
+	#[inline(always)]
 	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
 	{
 		use self::UnparsedPropertyValue::*;

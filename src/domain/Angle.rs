@@ -60,7 +60,10 @@ impl Angle
 	#[inline(always)]
 	pub fn radians(&self) -> CssFloat
 	{
-		self.radians64().min(f32::MAX as f64).max(f32::MIN as f64) as f32
+		use ::std::f32::MAX;
+		use ::std::f32::MIN;
+		
+		self.radians64().min(MAX as f64).max(MIN as f64) as f32
 	}
 	
 	#[inline(always)]

@@ -10,7 +10,7 @@
 ///
 /// [page]: https://drafts.csswg.org/css2/page.html#page-box
 /// [page-selectors]: https://drafts.csswg.org/css2/page.html#page-selectors
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct PageAtRule
 {
 	/// The declaration block this page rule contains.

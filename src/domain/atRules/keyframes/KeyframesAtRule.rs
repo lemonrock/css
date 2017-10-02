@@ -4,7 +4,7 @@
 
 /// A [`@keyframes`][keyframes] rule.
 /// [keyframes]: https://drafts.csswg.org/css-animations/#keyframes
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct KeyframesAtRule
 {
 	/// Vendor prefix type the @keyframes has.

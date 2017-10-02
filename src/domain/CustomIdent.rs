@@ -14,21 +14,19 @@ impl CustomIdent
 		match_ignore_ascii_case!
 		{
 			ident,
-            "initial" | "inherit" | "unset" | "default" => return Err(ParseError::Custom(CustomParseError::UnexpectedCustomIdent(ident.clone()).into())),
+            "initial" | "inherit" | "unset" | "default" => return Err(ParseError::Custom(CustomParseError::UnexpectedCustomIdent(ident.clone()))),
             _ =>
             {
             }
         };
 		
-		let identAsString = ident.clone().into();
-		
 		if excluding.iter().any(|s| ident.eq_ignore_ascii_case(s))
 		{
-			Err(ParseError::Custom(CustomParseError::CustomIdentWasExcluded(identAsString)))
+			Err(ParseError::Custom(CustomParseError::CustomIdentWasExcluded(ident.clone())))
 		}
 		else
 		{
-			Ok(CustomIdent(Atom(identAsString)))
+			Ok(CustomIdent(Atom::from(ident)))
 		}
 	}
 }

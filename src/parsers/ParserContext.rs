@@ -21,7 +21,6 @@ impl ParserContext
 		{
 			rule_type: Some(rule_type),
 			parsing_mode: context.parsing_mode,
-			quirks_mode: context.quirks_mode,
 		}
 	}
 	

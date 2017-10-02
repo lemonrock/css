@@ -4,7 +4,7 @@
 
 /// The current state of the parser.
 #[derive(Clone, Copy, Eq, Ord, PartialEq, PartialOrd)]
-pub enum State
+pub(crate) enum State
 {
 	/// We haven't started parsing rules.
 	Start = 1,
@@ -17,4 +17,7 @@ pub enum State
 	
 	/// We're parsing the main body of the stylesheet.
 	Body = 4,
+
+	/// An unrecoverable error has occurred in parsing
+	Invalid = 5,
 }

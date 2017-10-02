@@ -49,7 +49,7 @@ impl<'a, 'i> QualifiedRuleParser<'i> for KeyframeListParser<'a>
 				}
 			),
 			
-			Err(error) => Err(ParseError::Custom(CustomParseError::InvalidKeyframeRule)),
+			Err(error) => Err(error),
 		}
 	}
 	
@@ -72,7 +72,7 @@ impl<'a, 'i> QualifiedRuleParser<'i> for KeyframeListParser<'a>
 impl<'a> KeyframeListParser<'a>
 {
 	/// Parses a keyframe list from CSS input.
-	pub(crate) fn parse_keyframe_list<'i>(context: &ParserContext, input: &mut Parser) -> Result<Vec<Keyframe>, ParseError<'i, CustomParseError<'i>>>
+	pub(crate) fn parse_keyframe_list<'i: 't, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Vec<Keyframe>, ParseError<'i, CustomParseError<'i>>>
 	{
 		let mut iter = RuleListParser::new_for_nested_rule(input, KeyframeListParser
 		{
@@ -87,7 +87,7 @@ impl<'a> KeyframeListParser<'a>
 			{
 				Ok(keyframe) => keyframes.push(keyframe),
 				
-				Err(error) => return error,
+				Err(preciseParseError) => return Err(preciseParseError.error),
 			}
 		}
 		

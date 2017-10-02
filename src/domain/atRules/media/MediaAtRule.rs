@@ -5,7 +5,7 @@
 /// An [`@media`][media] url.
 ///
 /// [media]: https://drafts.csswg.org/css-conditional/#at-ruledef-media
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct MediaAtRule
 {
 	/// The list of media queries used by this media rule.

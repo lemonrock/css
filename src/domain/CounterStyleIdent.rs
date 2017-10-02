@@ -230,7 +230,7 @@ impl CounterStyleIdent
 			"ethiopic-numeric" => ethiopic_numeric,
 		};
 		
-		match KnownCounterStyleNames.get(lowerCaseIdent)
+		match KnownCounterStyleNames.get(&lowerCaseIdent)
 		{
 			Some(value) => Ok(value.clone()),
 			None => if lowerCaseIdent == "none"

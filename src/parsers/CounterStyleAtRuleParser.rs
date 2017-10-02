@@ -53,7 +53,7 @@ impl<'a, 'i> DeclarationParser<'i> for CounterStyleAtRuleParser<'a>
 			
 			"speak-as" => self.rule.speak_as = Some(input.parse_entirely(|input| Parse::parse(self.context, input))?),
 			
-			_ => return Err(ParseError::Custom(CustomParseError::UnsupportedCounterStyleProperty(name.to_owned())))
+			_ => return Err(ParseError::Custom(CustomParseError::UnsupportedCounterStyleProperty(name)))
 		}
 		
 		Ok(())

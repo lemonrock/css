@@ -7,11 +7,12 @@ pub struct Stylesheet(pub Vec<CssRule>);
 
 impl Stylesheet
 {
-	pub fn parse<'i>(css: &str) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
+	pub fn parse<'i>(css: &'i str) -> Result<Self, PreciseParseError<CustomParseError<'i>>>
 	{
-		const line_number_offset: u32 = 0;
-		let mut input = ParserInput::new_with_line_number_offset(css, line_number_offset);
-		let mut input = Parser::new(&mut input);
+		const LineNumberingIsZeroBased: u32 = 0;
+		
+		let mut parserInput = ParserInput::new_with_line_number_offset(css, LineNumberingIsZeroBased);
+		let mut input = Parser::new(&mut parserInput);
 		
 		let mut rules = Vec::new();
 		
@@ -34,7 +35,7 @@ impl Stylesheet
 				match result
 				{
 					Ok(rule) => rules.push(rule),
-					Err(parseError) => return Err(parseError),
+					Err(preciseParseError) => return Err(preciseParseError),
 				}
 			}
 		}

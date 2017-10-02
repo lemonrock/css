@@ -9,6 +9,7 @@
       <sourceFolder url="file://$MODULE_DIR$/benches" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/.cargo" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
+      <excludeFolder url="file://$MODULE_DIR$/patches" />
     </content>
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="Rust &lt;css&gt;" level="project" />

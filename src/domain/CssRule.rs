@@ -3,7 +3,7 @@
 
 
 #[allow(missing_docs)]
-#[derive(Clone, Debug)]
+#[derive(Debug, Clone)]
 pub enum CssRule
 {
 	/// No Charset here, CSSCharsetRule has been removed from CSSOM (https://drafts.csswg.org/cssom/#changes-from-5-december-2013) and Edge doesn't support it

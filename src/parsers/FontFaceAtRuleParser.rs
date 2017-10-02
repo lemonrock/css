@@ -50,9 +50,9 @@ impl<'a, 'i> DeclarationParser<'i> for FontFaceAtRuleParser<'a>
 			
 			"font-feature-settings" => self.rule.feature_settings = Some(input.parse_entirely(|i| Parse::parse(self.context, i))?),
 			
-			"font-language-override" => self.rule.language_override = Some(input.parse_entirely(|i| Parse::parse(self.context, i))?),
+			"font-language-override" => self.rule.language_override = Some(input.parse_entirely(|i| FontLanguageOverride::parse(i))?),
 			
-			_ => return Err(ParseError::Custom(CustomParseError::UnsupportedFontFaceProperty(name.to_owned())))
+			_ => return Err(ParseError::Custom(CustomParseError::UnsupportedFontFaceProperty(name)))
 		}
 		
 		Ok(())

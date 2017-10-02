@@ -3,7 +3,7 @@
 
 
 /// Vendor prefix.
-#[derive(Clone, Debug)]
+#[derive(Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub enum VendorPrefix
 {
 	/// -moz- prefix.
@@ -22,6 +22,15 @@ pub enum VendorPrefix
 	servo,
 	
 	Unrecognised(String),
+}
+
+impl Default for VendorPrefix
+{
+	#[inline(always)]
+	fn default() -> Self
+	{
+		VendorPrefix::Unrecognised("".to_owned())
+	}
 }
 
 impl ToCss for VendorPrefix

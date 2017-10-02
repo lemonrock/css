@@ -5,7 +5,7 @@
 /// An [`@supports`][supports] rule.
 ///
 /// [supports]: https://drafts.csswg.org/css-conditional-3/#at-supports
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct SupportsAtRule
 {
 	/// The parsed condition

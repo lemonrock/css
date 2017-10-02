@@ -12,7 +12,7 @@ impl Deref for Atom
 	
 	fn deref(&self) -> &Self::Target
 	{
-		self.0
+		&self.0
 	}
 }
 
@@ -45,6 +45,22 @@ impl<'a> From<&'a str> for Atom
 	fn from(value: &'a str) -> Self
 	{
 		Atom(value.to_owned())
+	}
+}
+
+impl<'i> From<CowRcStr<'i>> for Atom
+{
+	fn from(value: CowRcStr<'i>) -> Self
+	{
+		Atom::from(value.as_ref())
+	}
+}
+
+impl<'a, 'i> From<&'a CowRcStr<'i>> for Atom
+{
+	fn from(value: &'a CowRcStr<'i>) -> Self
+	{
+		Atom::from(value.as_ref())
 	}
 }
 

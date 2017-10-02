@@ -32,20 +32,20 @@ impl<'i> AtRuleParser<'i> for TopLevelRuleParser
 		{
 			&*name,
 			
+			"charset" =>
+			{
+				// @charset is removed by cssparser if it’s the first rule in the stylesheet; anything left is invalid.
+				Err(ParseError::Custom(CustomParseError::UnexpectedCharsetAtRule))
+			}
+			
 			"import" =>
 			{
 				if self.state > State::Imports
 				{
-					self.had_hierarchy_error = true;
 					return Err(ParseError::Custom(CustomParseError::AtRuleImportMustBeBeforeAnyRuleExceptAtRuleCharset));
 				}
 				
-				Ok(CssRule::Import(ImportAtRule
-				{
-					url: SpecifiedUrl(input.expect_url_or_string()?.as_ref().to_owned()),
-					media_list: MediaList::parse_media_query_list(&self.context, input, self.error_context.error_reporter),
-					source_location,
-				}))
+				Ok(WithoutBlock(CssRule::Import(self.parseImportAtRule(input)?)))
 			}
 			
 			"namespace" =>
@@ -53,35 +53,10 @@ impl<'i> AtRuleParser<'i> for TopLevelRuleParser
 				if self.state > State::Namespaces
 				{
 					// "@namespace must be before any rule but @charset and @import"
-					self.had_hierarchy_error = true;
 					return Err(ParseError::Custom(CustomParseError::AtRuleNamespaceMustBeBeforeAnyRuleExceptAtRuleCharsetAndAtRuleImport));
 				}
-
-				let prefix = input.try(|i| i.expect_ident()).map(|prefix| Atom::from(prefix.to_owned())).ok();
 				
-				let url = match input.expect_url_or_string()
-				{
-					Ok(url_or_string) => NamespaceUrl(Atom::from(url_or_string)),
-					
-					Err(BasicParseError::UnexpectedToken(token)) => return Err(ParseError::Custom(CustomParseError::UnexpectedTokenForAtNamespaceRuleNamespaceValue(token.clone()))),
-					
-					Err(error) => return Err(error),
-				};
-				
-				self.namespaces.get_mut().expect("@namespace rules are parsed before css selectors").update(prefix.as_ref(), &url);
-				
-				Ok(CssRule::Namespace(NamespaceAtRule
-				{
-					prefix,
-					url,
-					source_location,
-				}))
-			}
-			
-			"charset" =>
-			{
-				// @charset is removed by cssparser if it’s the first rule in the stylesheet; anything left is invalid.
-				Err(ParseError::Custom(CustomParseError::UnexpectedCharsetAtRule))
+				Ok(WithoutBlock(CssRule::Namespace(self.parseNamespaceAtRule(input)?)))
 			}
 			
 			_ =>
@@ -94,7 +69,8 @@ impl<'i> AtRuleParser<'i> for TopLevelRuleParser
 				}
 				self.state = State::Body;
 				
-				(&mut self.nested()).parse_prelude(name, input)
+				let mut nested = self.nested();
+				<NestedRuleParser as AtRuleParser>::parse_prelude(&mut nested, name, input)
 			}
 		}
 	}
@@ -107,37 +83,19 @@ impl<'i> AtRuleParser<'i> for TopLevelRuleParser
 		
 		match prelude
 		{
-			Import(url, media_list, source_location) =>
-			{
-				self.state = Imports;
-				
-				CssRule::Import(ImportAtRule
-				{
-					url,
-					media_list,
-					source_location,
-				})
-			}
+			Import(..) => { self.state = Imports },
 			
-			Namespace(prefix, url, source_location) =>
-			{
-				self.state = Namespaces;
-				
-				CssRule::Namespace(NamespaceAtRule
-				{
-					prefix,
-					url,
-					source_location,
-				})
-			}
+			Namespace(..) => { self.state = Namespaces },
 		}
+		
+		prelude
 	}
 	
 	#[inline]
 	fn parse_block<'t>(&mut self, prelude: Self::PreludeBlock, input: &mut Parser<'i, 't>) -> Result<Self::AtRule, ParseError<'i, Self::Error>>
 	{
 		let mut nested = self.nested();
-		nested.parse_block(prelude, input).map(|rule| { self.state = State::Body; rule })
+		<NestedRuleParser as AtRuleParser>::parse_block(&mut nested, prelude, input).map(|rule| { self.state = State::Body; rule })
 	}
 }
 
@@ -153,19 +111,20 @@ impl<'i> QualifiedRuleParser<'i> for TopLevelRuleParser
 	fn parse_prelude<'t>(&mut self, input: &mut Parser<'i, 't>) -> Result<Self::Prelude, ParseError<'i, Self::Error>>
 	{
 		let mut nested = self.nested();
-		nested.parse_prelude(input)
+		<NestedRuleParser as QualifiedRuleParser>::parse_prelude(&mut nested, input)
 	}
 	
 	#[inline]
 	fn parse_block<'t>(&mut self, prelude: Self::Prelude, input: &mut Parser<'i, 't>) -> Result<Self::QualifiedRule, ParseError<'i, Self::Error>>
 	{
 		let mut nested = self.nested();
-		nested.parse_block(prelude, input).map(|result| { self.state = State::Body; result })
+		<NestedRuleParser as QualifiedRuleParser>::parse_block(&mut nested, prelude, input).map(|result| { self.state = State::Body; result })
 	}
 }
 
 impl TopLevelRuleParser
 {
+	#[inline(always)]
 	fn nested<'a>(&'a self) -> NestedRuleParser<'a>
 	{
 		NestedRuleParser
@@ -179,5 +138,46 @@ impl TopLevelRuleParser
 	pub(crate) fn state(&self) -> State
 	{
 		self.state
+	}
+	
+	#[inline(always)]
+	fn parseImportAtRule<'i, 't>(&self, input: &mut Parser<'i, 't>) -> Result<ImportAtRule, ParseError<'i, CustomParseError<'i>>>
+	{
+		Ok
+		(
+			ImportAtRule
+			{
+				url: SpecifiedUrl(input.expect_url_or_string()?.as_ref().to_owned()),
+				media_list: MediaList::parse_media_query_list(&self.context, input, false)?,
+				source_location,
+			}
+		)
+	}
+	
+	#[inline(always)]
+	fn parseNamespaceAtRule<'i, 't>(&self, input: &mut Parser<'i, 't>) -> Result<NamespaceAtRule, ParseError<'i, CustomParseError<'i>>>
+	{
+		let prefix = input.try(|i| i.expect_ident()).map(|prefix| NamespacePrefix(Atom::from(prefix))).ok();
+		
+		let url = match input.expect_url_or_string()
+		{
+			Ok(url_or_string) => NamespaceUrl(Atom::from(url_or_string)),
+			
+			Err(BasicParseError::UnexpectedToken(token)) => return Err(ParseError::Custom(CustomParseError::UnexpectedTokenForAtNamespaceRuleNamespaceValue(token.clone()))),
+			
+			Err(error) => return Err(ParseError::Basic(error)),
+		};
+		
+		Rc::get_mut(&mut self.namespaces).expect("@namespace rules are parsed before css selectors so no other references to self.namespaces should exist").update(prefix.as_ref(), &url);
+		
+		Ok
+		(
+			NamespaceAtRule
+			{
+				prefix,
+				url,
+				source_location,
+			}
+		)
 	}
 }

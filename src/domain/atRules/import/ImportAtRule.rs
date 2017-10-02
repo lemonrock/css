@@ -5,7 +5,7 @@
 /// The [`@import`][import] at-rule.
 ///
 /// [import]: https://drafts.csswg.org/css-cascade-3/#at-import
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ImportAtRule
 {
 	/// The `<url>` this `@import` rule is loading.

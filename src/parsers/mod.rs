@@ -17,6 +17,7 @@ use super::domain::atRules::viewport::*;
 use super::domain::properties::*;
 use super::domain::selectors::*;
 use self::separators::*;
+use ::std::ascii::AsciiExt;
 use ::std::rc::Rc;
 
 

@@ -12,12 +12,16 @@ pub enum CustomParseError<'i>
 	
 	UnexpectedTokenForAtNamespaceRuleNamespaceValue(Token<'i>),
 	
-	UnexpectedCustomIdent(String),
-	CustomIdentWasExcluded(String),
+	UnsupportedAtRule(CowRcStr<'i>),
+	
+	UnexpectedCustomIdent(CowRcStr<'i>),
+	CustomIdentWasExcluded(CowRcStr<'i>),
 	
 	KeyframePercentageWasNotBetweenZeroAndOneInclusive(f32),
 	ImportantIsNotAllowedInKeyframePropertyDeclarationValues(SourceLocation),
 	UnexpectedTokenWhenParsingZoom(Token<'i>),
+	
+	UnsupportedFontFaceProperty(CowRcStr<'i>),
 	
 	InvalidFontLanguageOverrideIdentifier(String),
 	InvalidFontLanguageOverrideOpenTypeLanguageTag(String),
@@ -28,7 +32,7 @@ pub enum CustomParseError<'i>
 	FontFaceAtRuleFontWeightWasNotAValidIdentifierOrInteger,
 	FontFaceAtRuleFontFamilyCanNotBeGeneric,
 	
-	UnsupportedCounterStyleProperty(String),
+	UnsupportedCounterStyleProperty(CowRcStr<'i>),
 	InvalidCounterStyleWithoutSymbols(System),
 	InvalidCounterStyleNotEnoughSymbols(System),
 	InvalidCounterStyleWithoutAdditiveSymbols,
@@ -40,6 +44,8 @@ pub enum CustomParseError<'i>
 	CounterStylePadMinLengthCanNotBeNegative(i32),
 	CounterStyleAdditiveTupleWeightCanNotBeNegative(i32),
 	CounterStyleAdditiveSymbolsCanNotHaveASecondWeightEqualToOrGreaterThanTheFirst,
+	DecimalOrDiscIsNotAllowedInACounterStyleIdentInACounterStyleAtRule,
+	NoneIsNotAllowedInACounterStyleIdent,
 	
 	InvalidMediaType(String),
 	DeprecatedMediaType(String),
@@ -62,14 +68,13 @@ pub enum CustomParseError<'i>
 	MonochromeBitDepthMustBeAnInteger(f32),
 	MediaTypeIsOnlyOptionalIfQualifiedIsNotSpecified,
 	
-	UnexpectedViewportProperty(String),
+	UnexpectedViewportProperty(CowRcStr<'i>),
 	
+	AtRuleImportMustBeBeforeAnyRuleExceptAtRuleCharset,
 	AtRuleNamespaceMustBeBeforeAnyRuleExceptAtRuleCharsetAndAtRuleImport,
 	InvalidParseState,
 	UnexpectedCharsetAtRule,
 	UnexpectedAtRule(String),
-	
-	UnsupportedFontFaceProperty(String),
 	
 	InvalidSupportsCondition(String),
 	

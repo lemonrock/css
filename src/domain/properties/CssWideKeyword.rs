@@ -35,6 +35,7 @@ impl ToCss for CssWideKeyword
 
 impl CssWideKeyword
 {
+	#[inline(always)]
 	fn to_str(&self) -> &'static str
 	{
 		use self::CssWideKeyword::*;
@@ -47,6 +48,7 @@ impl CssWideKeyword
 		}
 	}
 	
+	#[inline(always)]
 	fn from_ident<'i>(ident: &str) -> Option<Self>
 	{
 		use self::CssWideKeyword::*;
@@ -65,7 +67,8 @@ impl CssWideKeyword
 		}
 	}
 	
-	fn parse(input: &mut Parser) -> Result<Self, ()>
+	#[inline(always)]
+	pub(crate) fn parse(input: &mut Parser) -> Result<Self, ()>
 	{
 		let ident = input.expect_ident().map_err(|_| ())?.clone();
 		input.expect_exhausted().map_err(|_| ())?;

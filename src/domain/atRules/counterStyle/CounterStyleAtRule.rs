@@ -94,12 +94,14 @@ impl CounterStyleAtRule
 	}
 	
 	/// Get the name of the counter style rule.
+	#[inline(always)]
 	pub fn name(&self) -> &CounterStyleIdent
 	{
 		&self.name
 	}
 	
 	/// https://drafts.csswg.org/css-counter-styles/#counter-style-system
+	#[inline(always)]
 	pub fn system(&self) -> Cow<System>
 	{
 		if let Some(ref value) = self.system
@@ -113,6 +115,7 @@ impl CounterStyleAtRule
 	}
 	
 	/// https://drafts.csswg.org/css-counter-styles/#counter-style-negative
+	#[inline(always)]
 	pub fn negative(&self) -> Cow<Negative>
 	{
 		if let Some(ref value) = self.negative
@@ -126,6 +129,7 @@ impl CounterStyleAtRule
 	}
 	
 	/// https://drafts.csswg.org/css-counter-styles/#counter-style-prefix
+	#[inline(always)]
 	pub fn prefix(&self) -> Cow<Symbol>
 	{
 		if let Some(ref value) = self.prefix
@@ -139,6 +143,7 @@ impl CounterStyleAtRule
 	}
 	
 	/// https://drafts.csswg.org/css-counter-styles/#counter-style-suffix
+	#[inline(always)]
 	pub fn suffix(&self) -> Cow<Symbol>
 	{
 		if let Some(ref value) = self.suffix
@@ -152,6 +157,7 @@ impl CounterStyleAtRule
 	}
 	
 	/// https://drafts.csswg.org/css-counter-styles/#counter-style-range
+	#[inline(always)]
 	pub fn range(&self) -> Cow<Ranges>
 	{
 		if let Some(ref value) = self.range
@@ -165,6 +171,7 @@ impl CounterStyleAtRule
 	}
 	
 	/// https://drafts.csswg.org/css-counter-styles/#counter-style-pad
+	#[inline(always)]
 	pub fn pad(&self) -> Cow<Pad>
 	{
 		if let Some(ref value) = self.pad
@@ -178,6 +185,7 @@ impl CounterStyleAtRule
 	}
 	
 	/// https://drafts.csswg.org/css-counter-styles/#counter-style-fallback
+	#[inline(always)]
 	pub fn fallback(&self) -> Cow<Fallback>
 	{
 		if let Some(ref value) = self.fallback
@@ -191,18 +199,21 @@ impl CounterStyleAtRule
 	}
 	
 	/// https://drafts.csswg.org/css-counter-styles/#descdef-counter-style-symbols
+	#[inline(always)]
 	pub fn symbols(&self) -> Option<&Symbols>
 	{
 		self.symbols.as_ref()
 	}
 	
 	/// https://drafts.csswg.org/css-counter-styles/#descdef-counter-style-additive-symbols
+	#[inline(always)]
 	pub fn additive_symbols(&self) -> Option<&AdditiveSymbols>
 	{
 		self.symbols.as_ref()
 	}
 	
 	/// https://drafts.csswg.org/css-counter-styles/#counter-style-speak-as
+	#[inline(always)]
 	pub fn speak_as(&self) -> Cow<SpeakAs>
 	{
 		if let Some(ref value) = self.speak_as
@@ -216,7 +227,7 @@ impl CounterStyleAtRule
 	}
 	
 	/// Parse the body (inside `{}`) of an @counter-style rule
-	pub(crate) fn parse_body<'i, 't>(name: CustomIdent, context: &ParserContext,input: &mut Parser<'i, 't>) -> Result<CounterStyleAtRule, ParseError<'i, CustomParseError<'i>>>
+	pub(crate) fn parse_body<'i, 't>(name: CounterStyleIdent, context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<CounterStyleAtRule, ParseError<'i, CustomParseError<'i>>>
 	{
 		let mut rule = CounterStyleAtRule::empty(name);
 		

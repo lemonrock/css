@@ -24,7 +24,7 @@ impl Namespaces
 	}
 	
 	#[inline(always)]
-	fn empty() -> Rc<Self>
+	pub(crate) fn empty() -> Rc<Self>
 	{
 		Rc::new
 		(
@@ -37,12 +37,12 @@ impl Namespaces
 	}
 	
 	#[inline(always)]
-	fn update(&mut self, prefix: Option<&NamespaceUrl>, url: &NamespaceUrl)
+	pub(crate) fn update(&mut self, prefix: Option<&NamespacePrefix>, url: &NamespaceUrl)
 	{
 		match prefix
 		{
 			None => self.namespaces.defaultNamespace = url.clone(),
-			Some(ref prefix) => self.namespaces.namespaces.insert(prefix.clone(), url.clone())
+			Some(prefix) => self.namespaces.namespaces.insert(prefix.clone(), url.clone())
 		}
 	}
 }

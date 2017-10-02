@@ -52,7 +52,7 @@ impl ToCss for PseudoElement
 		fn write_with_vendor_prefix<W: fmt::Write>(dest: &mut W, vendorPrefix: &Option<VendorPrefix>, classWithoutColonColon: &str) -> fmt::Result
 		{
 			dest.write_str("::")?;
-			if let Some(vendorPrefix) = vendorPrefix
+			if let &Some(ref vendorPrefix) = vendorPrefix
 			{
 				vendorPrefix.to_css(dest)?;
 			}

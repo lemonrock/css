@@ -3,7 +3,7 @@
 
 
 /// A style rule, with selectors and declarations.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct StyleRule
 {
 	/// The list of selectors in this rule.

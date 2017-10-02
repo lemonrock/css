@@ -6,7 +6,7 @@
 pub enum AtRuleBlockPrelude
 {
 	/// A @counter-style rule prelude, with its counter style name.
-	CounterStyle(CustomIdent),
+	CounterStyle(CounterStyleIdent),
 	
 	/// A @document rule, with its conditional.
 	Document(Option<VendorPrefix>, DocumentCondition, SourceLocation),

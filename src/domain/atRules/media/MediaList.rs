@@ -3,8 +3,7 @@
 
 
 /// A type that encapsulates a media query list.
-#[derive(Clone, Debug)]
-#[cfg_attr(feature = "servo", derive(HeapSizeOf))]
+#[derive(Debug, Clone)]
 pub struct MediaList
 {
 	/// The list of media queries.

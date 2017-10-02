@@ -73,11 +73,11 @@ impl FontFeatureValuesAtRule
 			context,
 			fontFeatureValuesRule: &mut fontFeatureValuesRule,
 		});
-		while let Some(result) = iterator.next()
+		while let Some(possiblePreciseParseError) = iterator.next()
 		{
-			if result.is_err()
+			if possiblePreciseParseError.is_err()
 			{
-				return result;
+				return Err(possiblePreciseParseError.unwrap_err().error);
 			}
 		}
 		

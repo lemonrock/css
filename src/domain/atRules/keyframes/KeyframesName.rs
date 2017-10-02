@@ -3,7 +3,7 @@
 
 
 /// https://drafts.csswg.org/css-animations/#typedef-keyframes-name
-#[derive(Clone, Debug)]
+#[derive(Debug, Clone)]
 pub enum KeyframesName
 {
 	/// <custom-ident>
@@ -37,10 +37,6 @@ impl KeyframesName
 	}
 }
 
-impl Eq for KeyframesName
-{
-}
-
 impl PartialEq for KeyframesName
 {
 	fn eq(&self, other: &Self) -> bool
@@ -49,25 +45,15 @@ impl PartialEq for KeyframesName
 	}
 }
 
+impl Eq for KeyframesName
+{
+}
+
 impl Hash for KeyframesName
 {
 	fn hash<H: Hasher>(&self, state: &mut H)
 	{
 		self.as_atom().hash(state)
-	}
-}
-
-impl Parse for KeyframesName
-{
-	fn parse<'i, 't>(_context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
-	{
-		match input.next()
-		{
-			Ok(&Token::Ident(ref s)) => Ok(KeyframesName::Ident(CustomIdent::from_ident(s, &["none"])?)),
-			Ok(&Token::QuotedString(ref s)) => Ok(KeyframesName::QuotedString(Atom::from(s.as_ref()))),
-			Ok(t) => Err(BasicParseError::UnexpectedToken(t.clone()).into()),
-			Err(e) => Err(e.into()),
-		}
 	}
 }
 
@@ -79,6 +65,20 @@ impl ToCss for KeyframesName
 		{
 			KeyframesName::Ident(ref ident) => ident.to_css(dest),
 			KeyframesName::QuotedString(ref atom) => atom.to_string().to_css(dest),
+		}
+	}
+}
+
+impl KeyframesName
+{
+	pub(crate) fn parse<'i, 't>(input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
+	{
+		match input.next()
+		{
+			Ok(&Token::Ident(ref s)) => Ok(KeyframesName::Ident(CustomIdent::from_ident(s, &["none"])?)),
+			Ok(&Token::QuotedString(ref s)) => Ok(KeyframesName::QuotedString(Atom::from(s.as_ref()))),
+			Ok(t) => Err(BasicParseError::UnexpectedToken(t.clone()).into()),
+			Err(e) => Err(e.into()),
 		}
 	}
 }
