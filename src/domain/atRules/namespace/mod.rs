@@ -5,6 +5,9 @@
 use super::*;
 use ::precomputed_hash::PrecomputedHash;
 use ::std::collections::HashMap;
+use ::std::fmt;
+use ::std::fmt::Display;
+use ::std::fmt::Formatter;
 use ::std::rc::Rc;
 
 

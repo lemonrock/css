@@ -3,7 +3,7 @@
 
 
 /// Vendor prefix.
-#[derive(Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
+#[derive(Debug, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub enum VendorPrefix
 {
 	/// -moz- prefix.

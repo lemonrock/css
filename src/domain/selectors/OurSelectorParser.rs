@@ -80,13 +80,14 @@ impl OurSelectorParser
 		let mut deduplicatedSelectors = OrderMap::with_capacity(selectors.len());
 		for selector in selectors
 		{
-			if isInvalidSelector(selector)
+			let selectorCss = selector.to_css_string();
+			if isInvalidSelector(&selector)
 			{
-				return Err(ParseError::Custom(CustomParseError::SelectorIsInvalidInContext(selector.to_css_string())))
+				return Err(ParseError::Custom(CustomParseError::SelectorIsInvalidInContext(selectorCss)))
 			}
 			
 			// Selector does not implement Eq or Hash... Grrr...
-			deduplicatedSelectors.insert(selector.to_css_string(), selector);
+			deduplicatedSelectors.insert(selectorCss, selector);
 		}
 		
 		Ok(DeduplicatedSelectors(deduplicatedSelectors))

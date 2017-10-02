@@ -18,6 +18,7 @@ impl Deref for Atom
 
 impl ToCss for Atom
 {
+	#[inline(always)]
 	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
 	{
 		serialize_identifier(&self.0, dest)
@@ -26,6 +27,7 @@ impl ToCss for Atom
 
 impl Display for Atom
 {
+	#[inline(always)]
 	fn fmt(&self, f: &mut Formatter) -> fmt::Result
 	{
 		self.0.fmt(f)
@@ -34,6 +36,7 @@ impl Display for Atom
 
 impl From<String> for Atom
 {
+	#[inline(always)]
 	fn from(value: String) -> Self
 	{
 		Atom(value)
@@ -42,6 +45,7 @@ impl From<String> for Atom
 
 impl<'a> From<&'a str> for Atom
 {
+	#[inline(always)]
 	fn from(value: &'a str) -> Self
 	{
 		Atom(value.to_owned())
@@ -50,6 +54,7 @@ impl<'a> From<&'a str> for Atom
 
 impl<'i> From<CowRcStr<'i>> for Atom
 {
+	#[inline(always)]
 	fn from(value: CowRcStr<'i>) -> Self
 	{
 		Atom::from(value.as_ref())
@@ -58,6 +63,7 @@ impl<'i> From<CowRcStr<'i>> for Atom
 
 impl<'a, 'i> From<&'a CowRcStr<'i>> for Atom
 {
+	#[inline(always)]
 	fn from(value: &'a CowRcStr<'i>) -> Self
 	{
 		Atom::from(value.as_ref())
@@ -66,18 +72,11 @@ impl<'a, 'i> From<&'a CowRcStr<'i>> for Atom
 
 impl PrecomputedHash for Atom
 {
+	#[inline(always)]
 	fn precomputed_hash(&self) -> u32
 	{
 		let mut state = DefaultHasher::new();
 		self.0.hash(&mut state);
 		state.finish() as u32
-	}
-}
-
-impl Atom
-{
-	fn from(value: &str) -> Self
-	{
-		Atom(value.to_owned())
 	}
 }

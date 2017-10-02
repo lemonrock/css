@@ -15,7 +15,7 @@ impl SelectorImpl for OurSelectorImpl
 	
 	type LocalName = Atom;
 	
-	type NamespacePrefix = Atom;
+	type NamespacePrefix = NamespacePrefix;
 	
 	type NamespaceUrl = NamespaceUrl;
 	

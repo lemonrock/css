@@ -13,3 +13,39 @@ impl ToCss for NamespacePrefix
 		self.0.to_css(dest)
 	}
 }
+
+impl Default for NamespacePrefix
+{
+	#[inline(always)]
+	fn default() -> Self
+	{
+		NamespacePrefix(Atom::default())
+	}
+}
+
+impl Display for NamespacePrefix
+{
+	#[inline(always)]
+	fn fmt(&self, f: &mut Formatter) -> fmt::Result
+	{
+		self.0.fmt(f)
+	}
+}
+
+impl From<String> for NamespacePrefix
+{
+	#[inline(always)]
+	fn from(value: String) -> Self
+	{
+		NamespacePrefix(Atom::from(value))
+	}
+}
+
+impl<'a> From<&'a str> for NamespacePrefix
+{
+	#[inline(always)]
+	fn from(value: &'a str) -> Self
+	{
+		NamespacePrefix(Atom::from(value))
+	}
+}

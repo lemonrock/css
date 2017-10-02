@@ -26,6 +26,8 @@ impl<'i> AtRuleParser<'i> for TopLevelRuleParser
 	
 	fn parse_prelude<'t>(&mut self, name: CowRcStr<'i>, input: &mut Parser<'i, 't>) -> Result<AtRuleType<Self::PreludeNoBlock, Self::PreludeBlock>, ParseError<'i, Self::Error>>
 	{
+		use ::cssparser::AtRuleType::WithoutBlock;
+		
 		let source_location = input.current_source_location();
 		
 		match_ignore_ascii_case!
@@ -45,7 +47,7 @@ impl<'i> AtRuleParser<'i> for TopLevelRuleParser
 					return Err(ParseError::Custom(CustomParseError::AtRuleImportMustBeBeforeAnyRuleExceptAtRuleCharset));
 				}
 				
-				Ok(WithoutBlock(CssRule::Import(self.parseImportAtRule(input)?)))
+				Ok(WithoutBlock(CssRule::Import(self.parseImportAtRule(input, source_location)?)))
 			}
 			
 			"namespace" =>
@@ -56,7 +58,7 @@ impl<'i> AtRuleParser<'i> for TopLevelRuleParser
 					return Err(ParseError::Custom(CustomParseError::AtRuleNamespaceMustBeBeforeAnyRuleExceptAtRuleCharsetAndAtRuleImport));
 				}
 				
-				Ok(WithoutBlock(CssRule::Namespace(self.parseNamespaceAtRule(input)?)))
+				Ok(WithoutBlock(CssRule::Namespace(self.parseNamespaceAtRule(input, source_location)?)))
 			}
 			
 			_ =>
@@ -141,7 +143,7 @@ impl TopLevelRuleParser
 	}
 	
 	#[inline(always)]
-	fn parseImportAtRule<'i, 't>(&self, input: &mut Parser<'i, 't>) -> Result<ImportAtRule, ParseError<'i, CustomParseError<'i>>>
+	fn parseImportAtRule<'i, 't>(&self, input: &mut Parser<'i, 't>, source_location: SourceLocation) -> Result<ImportAtRule, ParseError<'i, CustomParseError<'i>>>
 	{
 		Ok
 		(
@@ -155,7 +157,7 @@ impl TopLevelRuleParser
 	}
 	
 	#[inline(always)]
-	fn parseNamespaceAtRule<'i, 't>(&self, input: &mut Parser<'i, 't>) -> Result<NamespaceAtRule, ParseError<'i, CustomParseError<'i>>>
+	fn parseNamespaceAtRule<'i, 't>(&self, input: &mut Parser<'i, 't>, source_location: SourceLocation) -> Result<NamespaceAtRule, ParseError<'i, CustomParseError<'i>>>
 	{
 		let prefix = input.try(|i| i.expect_ident()).map(|prefix| NamespacePrefix(Atom::from(prefix))).ok();
 		
