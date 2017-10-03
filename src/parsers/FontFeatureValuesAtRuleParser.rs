@@ -61,8 +61,6 @@ impl<'a, 'i> AtRuleParser<'i> for FontFeatureValuesAtRuleParser<'a>
 	
 	fn parse_block<'t>(&mut self, prelude: Self::PreludeBlock, input: &mut Parser<'i, 't>) -> Result<Self::AtRule, ParseError<'i, CustomParseError<'i>>>
 	{
-		debug_assert_eq!(self.context.rule_type(), CssRuleType::FontFeatureValues);
-		
 		use self::FontFeatureValuesBlockType::*;
 		
 		match prelude

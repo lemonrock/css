@@ -2,7 +2,7 @@
 // Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
 
 
-/// Whether to allow negative lengths or not.
+/// Whether to allow negative units or not.
 #[repr(u8)]
 #[derive(Clone, Copy, Debug, Eq, PartialEq, PartialOrd)]
 pub enum AllowedNumericType

@@ -2,19 +2,19 @@
 // Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
 
 
-/// ViewportLength is a length | percentage | auto | extend-to-zoom
-/// See:
-/// * http://dev.w3.org/csswg/css-device-adapt/#min-max-width-desc
-/// * http://dev.w3.org/csswg/css-device-adapt/#extend-to-zoom
+/// ViewportLength is a length | percentage | auto
+/// See http://dev.w3.org/csswg/css-device-adapt/#min-max-width-desc
+/// extend-to-zoom is explicitly not supported as it does not occur in CSS, only when converting from HTML's meta name="viewport" tag (see http://dev.w3.org/csswg/css-device-adapt/#extend-to-zoom)
 #[derive(Clone, Debug, PartialEq)]
 #[allow(missing_docs)]
 pub enum ViewportLength
 {
-	Specified(LengthOrPercentageOrAuto),
-	ExtendToZoom
+	/// Automatic length
+	auto,
+	
+	/// invariant or calculated non-negative length or non-negative percentage
+	value(InvariantOrCalcFunction<LengthOrPercentage<AbsoluteOrFontRelativeOrViewportPercentage<CssUnsignedNumber>>>),
 }
-
-use self::ViewportLength::*;
 
 impl ToCss for ViewportLength
 {
@@ -22,41 +22,10 @@ impl ToCss for ViewportLength
 	{
 		match *self
 		{
-			Specified(ref length) => length.to_css(dest),
-			ExtendToZoom => dest.write_str("extend-to-zoom"),
-		}
-	}
-}
-
-impl FromMeta for ViewportLength
-{
-	fn from_meta(value: &str) -> Option<ViewportLength>
-	{
-		macro_rules! specified
-		{
-            ($value:expr) =>
-            {
-                Specified(LengthOrPercentageOrAuto::Length($value))
-            }
-        }
-		
-		Some
-		(
-			match value
-			{
-				deviceWidth if deviceWidth.eq_ignore_ascii_case("device-width") => specified!(NoCalcLength::ViewportPercentage(ViewportPercentageLength::Vw(100.))),
-				deviceHeight if deviceHeight.eq_ignore_ascii_case("device-height") => specified!(NoCalcLength::ViewportPercentage(ViewportPercentageLength::Vh(100.))),
-				_ =>
-				{
-					match value.parse::<f32>()
-					{
-						Ok(n) if n >= 0. => specified!(NoCalcLength::from_px(n.max(1.).min(10000.))),
-						Ok(_) => return None,
-						Err(_) => specified!(NoCalcLength::from_px(1.))
-					}
-				}
+			auto => dest.write_str("auto"),
 			
-		})
+			value(ref value) => value.to_css(dest),
+		}
 	}
 }
 
@@ -64,6 +33,43 @@ impl ViewportLength
 {
 	pub(crate) fn parse<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
 	{
-		LengthOrPercentageOrAuto::parse_non_negative(context, input).map(Specified)
+		use ::cssparser::Token::*;
+		use self::ViewportLength::*;
+		use self::InvariantOrCalcFunction::*:
+		
+		match input.next()?
+		{
+			&Ident(ref value) if value.eq_ignore_ascii_case("auto") => Ok(auto),
+			
+			&Dimension { value, ref unit, .. } =>
+			{
+				let number = CssUnsignedNumber::new(value).map_err(|error| ParseError::Custom(CustomParseError::ViewportLengthIsNegative(error)))?;
+				let unit = AbsoluteOrFontRelativeOrViewportPercentage::parse_length_dimension(context, number, unit).map_err(|error| ParseError::Custom(error))?;
+				Ok(value(Invariant(unit)))
+			}
+			
+			&Percentage { unit_value, .. } =>
+			{
+				let number = CssUnsignedNumber::new(value).map_err(|error| ParseError::Custom(CustomParseError::ViewportLengthIsNegative(error)))?;
+				let unit = Percentage(number);
+				Ok(value(Invariant(unit)))
+			}
+			
+			&Number { value, .. } =>
+			{
+				let value = CssUnsignedNumber::new(value).map_err(|error| ParseError::Custom(CustomParseError::ViewportLengthIsNegative(error)))?;
+				let unit = AbsoluteOrFontRelativeOrViewportPercentage::from_px(value);
+				Ok(value(Invariant(unit)))
+			},
+			
+			&Function(ref name) if name.eq_ignore_ascii_case("expressions") =>
+			{
+				let calc = input.parse_nested_block(|i| CalcNode::parse_length_or_percentage(context, i, num_context))?;
+				
+				Ok(value(CalcFunction(unit)))
+			}
+			
+			unexpectedToken @ _ => Err(ParseError::Custom(CustomParseError::UnexpectedTokenForViewportLength(unexpectedToken.clone())))
+		}
 	}
 }

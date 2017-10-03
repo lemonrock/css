@@ -2,5 +2,8 @@
 // Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
 
 
-/// A CSS float value.
-pub type CssFloat = f32;
+pub trait ToUnit<U: Unit>
+{
+	#[inline(always)]
+	fn try_to_canonical_unit(&self) -> Option<U>;
+}

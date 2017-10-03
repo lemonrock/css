@@ -50,19 +50,20 @@ impl Ratio
 		debug_assert!(width != 0, "width can not be zero");
 		debug_assert!(height != 0, "height can not be zero");
 		
+		// Euclid's algorithm for finding the greatest common divisor
 		#[inline(always)]
-		fn greatestCommonDivisorByEuclidsAlgorithm(numerator: u32, divisor: u32) -> u32
+		fn greatestCommonDivisorByEuclidsAlgorithm(nominator: u32, denominator: u32) -> u32
 		{
-			if divisor == 0
+			let mut x = nominator;
+			let mut y = denominator;
+			while y != 0
 			{
-				numerator
+				let t = y;
+				y = x % y;
+				x = t;
 			}
-			else
-			{
-				greatestCommonDivisorByEuclidsAlgorithm(divisor, numerator % divisor)
-			}
+			x
 		}
-		
 		let greatestCommonDivisor = greatestCommonDivisorByEuclidsAlgorithm(width, height);
 		
 		Self

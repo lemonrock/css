@@ -15,13 +15,13 @@ pub enum MediaQueryType
 
 impl MediaQueryType
 {
-	fn parse<'i>(ident: &str) -> Result<Self, CustomParseError<'i>>
+	fn parse<'i>(ident: &CowRcStr<'i>) -> Result<Self, CustomParseError<'i>>
 	{
 		use self::MediaQueryType::*;
 		
 		match_ignore_ascii_case!
 		{
-			ident,
+			&*ident,
 			
             "all" => Ok(All),
             

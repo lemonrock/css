@@ -7,7 +7,7 @@ bitflags!
     /// The mode to use when parsing values.
     pub struct ParsingMode: u8
     {
-        /// In CSS, lengths must have units, except for zero values, where the unit can be omitted.
+        /// In CSS, units must have units, except for zero values, where the unit can be omitted.
         /// https://www.w3.org/TR/css3-values/#lengths
         const PARSING_MODE_DEFAULT = 0x00;
         
@@ -24,7 +24,7 @@ bitflags!
 impl ParsingMode
 {
 	//noinspection SpellCheckingInspection
-	/// Whether the parsing mode allows unit-less lengths for non-zero values to be intpreted as px.
+	/// Whether the parsing mode allows unit-less units for non-zero values to be intpreted as px.
 	pub fn allows_unitless_lengths(&self) -> bool
 	{
 		self.intersects(Self::PARSING_MODE_ALLOW_UNITLESS_LENGTH)

@@ -14,7 +14,6 @@ define_css_keyword_enum!
 	"optional" => optional
 );
 
-
 impl Parse for FontDisplay
 {
 	#[inline]

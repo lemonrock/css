@@ -30,18 +30,14 @@ impl ToCss for MediaType
 
 impl MediaType
 {
-	fn parse<'i>(ident: &str) -> Result<Self, CustomParseError<'i>>
+	fn parse<'i>(ident: &CowRcStr<'i>) -> Result<Self, CustomParseError<'i>>
 	{
 		use self::MediaType::*;
 		
-		// From https://drafts.csswg.org/mediaqueries/#mq-syntax:
-		//
-		//   The <media-type> production does not include the keywords not, or, and, and only.
-		//
-		// Here we also perform the to-ascii-lowercase part of the serialization algorithm: https://drafts.csswg.org/cssom/#serializing-media-queries
+		// From https://drafts.csswg.org/mediaqueries/#mq-syntax: "the <media-type> production does not include the keywords not, or, and, and only".
 		match_ignore_ascii_case!
 		{
-			ident,
+			&*ident,
 			
 			"print" => Ok(print),
 			
@@ -51,11 +47,11 @@ impl MediaType
 			
 			"aural" => Ok(speech),
 			
-			"tty" | "tv" | "projection" | "handheld" | "braille" | "embossed" | "3d-glasses" => Err(CustomParseError::DeprecatedMediaType(ident.to_owned())),
+			"tty" | "tv" | "projection" | "handheld" | "braille" | "embossed" | "3d-glasses" => Err(CustomParseError::DeprecatedMediaType(ident.clone())),
 			
-            "not" | "or" | "and" | "only" => Err(CustomParseError::InvalidMediaType(ident.to_owned())),
+            "not" | "or" | "and" | "only" => Err(CustomParseError::InvalidMediaType(ident.clone())),
             
-            _ => Err(CustomParseError::UnrecognisedMediaType(ident.to_owned())),
+            _ => Err(CustomParseError::UnrecognisedMediaType(ident.clone())),
         }
 	}
 }

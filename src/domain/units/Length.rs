@@ -2,8 +2,19 @@
 // Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
 
 
-/// Converts app units to integer pixel values, rounding during the conversion
-pub(crate) fn appUnitsToIntPx(appUnits: f32) -> i32
+pub trait Length: Sized
++ Copy + Clone
++ PartialEq<Self> + Eq + PartialOrd + Ord + Hash
++ ToCss
++ Default
++ Add<Self, Output=Self> + AddAssign<Self>
++ Sub<Self, Output=Self> + SubAssign<Self>
++ Mul<Self, Output=Self> + MulAssign<Self>
++ Div<Self, Output=Self> + DivAssign<Self>
++ Rem<Self, Output=Self> + RemAssign<Self>
++ Neg<Output=Self>
++ Debug
++ CssNumberNewType + Unit
 {
-	(appUnits / AppUnitsPerPX).round() as i32
+	type Number: CssNumber;
 }

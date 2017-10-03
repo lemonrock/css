@@ -2,8 +2,11 @@
 // Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
 
 
-define_css_keyword_enum!(MediaOverflowBlock:
-                         "none" => none,
-                         "scroll" => scroll,
-                         "optional-paged" => optional_paged,
-                         "paged" => paged);
+define_css_keyword_enum!
+(
+	MediaOverflowBlock:
+	"none" => none,
+	"scroll" => scroll,
+	"optional-paged" => optional_paged,
+	"paged" => paged
+);

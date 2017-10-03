@@ -38,7 +38,7 @@ impl ViewportAtRule
 	}
 	
 	#[allow(missing_docs)]
-	pub(crate) fn from_meta(content: &str) -> Option<ViewportAtRule>
+	pub(crate) fn from_html_meta_viewport_element_value(content: &str) -> Option<ViewportAtRule>
 	{
 		let mut declarations = vec![None; VIEWPORT_DESCRIPTOR_VARIANTS];
 		
@@ -89,7 +89,7 @@ impl ViewportAtRule
 				{
 					width if width.eq_ignore_ascii_case("width") =>
 					{
-						if let Some(value) = ViewportLength::from_meta(value)
+						if let Some(value) = ViewportLength::from_html_meta_viewport_element_value(value)
 						{
 							push_descriptor!(MinWidth(ViewportLength::ExtendToZoom));
 							push_descriptor!(MaxWidth(value));
@@ -99,7 +99,7 @@ impl ViewportAtRule
 					
 					height if height.eq_ignore_ascii_case("height") =>
 					{
-						if let Some(value) = ViewportLength::from_meta(value)
+						if let Some(value) = ViewportLength::from_html_meta_viewport_element_value(value)
 						{
 							push_descriptor!(MinHeight(ViewportLength::ExtendToZoom));
 							push_descriptor!(MaxHeight(value));
@@ -109,18 +109,18 @@ impl ViewportAtRule
 					
 					initialScale if initialScale.eq_ignore_ascii_case("initial-scale") =>
 					{
-						if let Some(value) = Zoom::from_meta(value)
+						if let Some(value) = Zoom::from_html_meta_viewport_element_value(value)
 						{
 							push_descriptor!(Zoom(value));
 							has_zoom = true;
 						}
 					}
 					
-					minimumScale if minimumScale.eq_ignore_ascii_case("minimum-scale") => push!(MinZoom(Zoom::from_meta)),
+					minimumScale if minimumScale.eq_ignore_ascii_case("minimum-scale") => push!(MinZoom(Zoom::from_html_meta_viewport_element_value)),
 					
-					maximumScale if maximumScale.eq_ignore_ascii_case("maximum-scale") => push!(MaxZoom(Zoom::from_meta)),
+					maximumScale if maximumScale.eq_ignore_ascii_case("maximum-scale") => push!(MaxZoom(Zoom::from_html_meta_viewport_element_value)),
 					
-					userScalable if userScalable.eq_ignore_ascii_case("user-scalable") => push!(UserZoom(UserZoom::from_meta)),
+					userScalable if userScalable.eq_ignore_ascii_case("user-scalable") => push!(UserZoom(UserZoom::from_html_meta_viewport_element_value)),
 					
 					_ =>
 					{

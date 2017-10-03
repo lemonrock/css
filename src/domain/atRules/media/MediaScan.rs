@@ -2,6 +2,9 @@
 // Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
 
 
-define_css_keyword_enum!(MediaScan:
-                         "interlace" => interlace,
-                         "progressive" => progressive);
+define_css_keyword_enum!
+(
+	MediaScan:
+	"interlace" => interlace,
+	"progressive" => progressive
+);

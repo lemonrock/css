@@ -2,38 +2,18 @@
 // Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
 
 
-/// A computed percentage.
-#[derive(Clone, Copy, Debug, Default, PartialEq, PartialOrd)]
-pub struct Percentage(pub CssFloat);
-
-impl Percentage
+#[derive(Default, Debug, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
+pub trait FontRelativeLengthConversion<Number: CssNumber>
 {
-	/// 0%
-	#[inline]
-	pub fn zero() -> Self
-	{
-		Percentage(0.)
-	}
+	#[inline(always)]
+	fn em(&self) -> Number;
 	
-	/// 100%
-	#[inline]
-	pub fn hundred() -> Self
-	{
-		Percentage(1.)
-	}
+	#[inline(always)]
+	fn ex(&self) -> Number;
 	
-	/// Returns the absolute value for this percentage.
-	#[inline]
-	pub fn abs(&self) -> Self
-	{
-		Percentage(self.0.abs())
-	}
-}
-
-impl ToCss for Percentage
-{
-	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
-	{
-		serialize_percentage(self.0, dest)
-	}
+	#[inline(always)]
+	fn ch(&self) -> Number;
+	
+	#[inline(always)]
+	fn rem(&self) -> Number;
 }

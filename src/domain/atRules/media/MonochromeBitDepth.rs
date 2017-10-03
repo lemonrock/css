@@ -25,7 +25,7 @@ impl Parse for MonochromeBitDepth
 		{
 			Ok(&Number { value, int_value, .. }) => Self::fromRawNumber(value, int_value),
 			
-			Ok(&Function(ref name)) if name.eq_ignore_ascii_case("calc") =>
+			Ok(&Function(ref name)) if name.eq_ignore_ascii_case("expressions") =>
 			{
 			}
 			

@@ -2,9 +2,13 @@
 // Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
 
 
-use super::*;
-
-
-include!("CalcLengthOrPercentage.rs");
-include!("CalcNode.rs");
-include!("CalcUnit.rs");
+pub trait Unit: ToCss + Default
+{
+	type Number: CssNumber;
+	
+	#[inline(always)]
+	fn parse_one<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>;
+	
+	#[inline(always)]
+	fn to_canonical_dimension(self) -> Self;
+}

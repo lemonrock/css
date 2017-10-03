@@ -5,22 +5,25 @@
 #[derive(Debug, Clone)]
 pub struct CssRules(pub Vec<CssRule>);
 
+impl ToCss for CssRules
+{
+	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
+	{
+		for cssRule in self.0.iter()
+		{
+			cssRule.to_css(dest)?;
+		}
+		
+		Ok(())
+	}
+}
+
 impl CssRules
 {
 	/// Whether this CSS rules is empty.
 	pub fn is_empty(&self) -> bool
 	{
 		self.0.is_empty()
-	}
-}
-
-impl CssRules
-{
-	/// Trivially construct a new set of CSS rules.
-	#[inline(always)]
-	pub fn new(rules: Vec<CssRule>) -> Self
-	{
-		CssRules(rules)
 	}
 	
 	/// Returns whether all the rules in this list are namespace or import rules.

@@ -70,15 +70,15 @@ macro_rules! declare_viewport_descriptor_inner
                 match *self
                 {
                     $(
-                        ViewportDescriptor::$assigned_variant(ref val) =>
+                        ViewportDescriptor::$assigned_variant(ref value) =>
                         {
                             dest.write_str($assigned_variant_name)?;
-                            dest.write_str(": ")?;
-                            val.to_css(dest)?;
+                            dest.write_char(':')?;
+                            value.to_css(dest)?;
                         },
                     )*
                 }
-                dest.write_str(";")
+                dest.write_char(';')
             }
         }
     };

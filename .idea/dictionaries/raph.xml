@@ -39,6 +39,7 @@
       <w>funcs</w>
       <w>getinfo</w>
       <w>gradian</w>
+      <w>gradians</w>
       <w>grayscale</w>
       <w>guetzli</w>
       <w>guid</w>
@@ -120,6 +121,7 @@
       <w>smallvec</w>
       <w>sockaddr</w>
       <w>srcset</w>
+      <w>srgb</w>
       <w>strdup</w>
       <w>styleset</w>
       <w>substep</w>
@@ -132,11 +134,14 @@
       <w>uncanonicalized</w>
       <w>unextended</w>
       <w>unicase</w>
+      <w>unitless</w>
       <w>unparsed</w>
       <w>unprefixed</w>
       <w>unsharpen</w>
       <w>unsubscribes</w>
       <w>unversioned</w>
+      <w>vmax</w>
+      <w>vmin</w>
       <w>webfeeds</w>
       <w>webserver</w>
       <w>werror</w>

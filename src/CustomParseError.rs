@@ -48,9 +48,9 @@ pub enum CustomParseError<'i>
 	DecimalOrDiscIsNotAllowedInACounterStyleIdentInACounterStyleAtRule,
 	NoneIsNotAllowedInACounterStyleIdent,
 	
-	InvalidMediaType(String),
-	DeprecatedMediaType(String),
-	UnrecognisedMediaType(String),
+	InvalidMediaType(CowRcStr<'i>),
+	DeprecatedMediaType(CowRcStr<'i>),
+	UnrecognisedMediaType(CowRcStr<'i>),
 	DeprecatedMediaQueryExpression(String),
 	UnsupportedMediaQueryExpression(String),
 	RatioNumeratorCanNotBeNegativeOrZero(i32),
@@ -69,7 +69,12 @@ pub enum CustomParseError<'i>
 	MonochromeBitDepthMustBeAnInteger(f32),
 	MediaTypeIsOnlyOptionalIfQualifiedIsNotSpecified,
 	
+	UnexpectedTokenForViewportLength(Token<'i>),
 	UnexpectedViewportProperty(CowRcStr<'i>),
+	
+	ViewportLengthsAreNotAllowedInAPageAtRule,
+	LengthDimensionWasUnrecognised(String),
+	ViewportLengthIsNegative(CssNumberConversionError),
 	
 	AtRuleImportMustBeBeforeAnyRuleExceptAtRuleCharset,
 	AtRuleNamespaceMustBeBeforeAnyRuleExceptAtRuleCharsetAndAtRuleImport,
@@ -86,6 +91,9 @@ pub enum CustomParseError<'i>
 	UnbalancedCloseParenthesisInDeclarationValueBlock,
 	UnbalancedCloseSquareBracketInDeclarationValueBlock,
 	UnbalancedCloseCurlyBracketInDeclarationValueBlock,
+	
+	CouldNotParseCssSignedNumber(CssNumberConversionError, f32),
+	UnknownFunctionInValueExpression(String),
 	
 	CouldNotParseInteger,
 	CouldNotParsePercentage,

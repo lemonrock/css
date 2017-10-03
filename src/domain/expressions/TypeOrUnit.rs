@@ -2,17 +2,36 @@
 // Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
 
 
-use super::*;
-use ::std::mem::replace;
-use ::std::ops::Add;
-use ::std::ops::Mul;
-
-
-include!("AbsoluteLength.rs");
-include!("AppUnitsPer.rs");
-include!("appUnitsToIntPx.rs");
-include!("FontRelativeLength.rs");
-include!("Length.rs");
-include!("LengthOrPercentageOrAuto.rs");
-include!("NoCalcLength.rs");
-include!("ViewportPercentageLength.rs");
+define_css_keyword_enum!
+{
+	TypeOrUnit:
+	"string" => string,
+	"color" => color,
+	"url" => url,
+	"integer" => integer,
+	"number" => number,
+	"length" => length,
+	"em" => em,
+	"ex" => ex,
+	"px" => px,
+	"rem" => rem,
+	"vw" => vw,
+	"vh" => vh,
+	"vmin" => vmin,
+	"vmax" => vmax,
+	"mm" => mm,
+	"cm" => cm,
+	"in" => in_,
+	"pt" => pt,
+	"pc" => pc,
+	"angle" => angle,
+	"deg" => deg,
+	"rad" => rad,
+	"time" => time,
+	"s" => s,
+	"ms" => ms,
+	"frequency" => frequency,
+	"Hz" => Hz,
+	"kHz" => kHz,
+	"%" => percentage,
+}

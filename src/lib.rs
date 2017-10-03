@@ -142,7 +142,7 @@ css-boxshadow
 css-transitions
 css-gradients
 css3-boxsizing
-calc
+expressions
 border-image
 css3-cursors-newer
 css3-cursors-grab

@@ -2,11 +2,39 @@
 // Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
 
 
-#[derive(Debug)]
-pub struct Stylesheet(pub Vec<CssRule>);
+#[derive(Debug, Clone)]
+pub struct Stylesheet
+{
+	pub rules: CssRules,
+	pub source_map_url: Option<String>,
+	pub source_url: Option<String>,
+}
 
 impl Stylesheet
 {
+	// An solution is to use the HTTP header SourceMap: <url>
+	pub fn to_css<W: fmt::Write>(&self, dest: &mut W, include_source_urls: bool) -> fmt::Result
+	{
+		if include_source_urls
+		{
+			// An older convention was to use '@' instead of '#'
+			
+			if let Some(ref source_map_url) = self.source_map_url
+			{
+				write!(dest, "//# sourceMappingURL=<{}>\n", source_map_url)?;
+			}
+			
+			if let Some(ref source_url) = self.source_url
+			{
+				write!(dest, "//# sourceURL=<{}>\n", source_url)?;
+			}
+		}
+		
+		self.rules.to_css(dest)?;
+		
+		Ok(())
+	}
+	
 	pub fn parse<'i>(css: &'i str) -> Result<Self, PreciseParseError<CustomParseError<'i>>>
 	{
 		const LineNumberingIsZeroBased: u32 = 0;
@@ -40,7 +68,15 @@ impl Stylesheet
 			}
 		}
 		
-		Ok(Stylesheet(rules))
+		Ok
+		(
+			Self
+			{
+				rules: CssRules(rules),
+				source_map_url: input.current_source_map_url().map(String::from),
+				source_url: input.current_source_url().map(String::from),
+			}
+		)
 	}
 	
 }

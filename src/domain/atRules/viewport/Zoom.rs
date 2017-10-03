@@ -74,30 +74,3 @@ impl Zoom
         }
     }
 }
-impl FromMeta for Zoom
-{
-	fn from_meta(value: &str) -> Option<Self>
-	{
-		use self::Zoom::Number;
-		
-		Some
-		(
-			match value
-			{
-				yes if yes.eq_ignore_ascii_case("yes") => Number(1.),
-				no if no.eq_ignore_ascii_case("no") => Number(0.1),
-				deviceWidth if deviceWidth.eq_ignore_ascii_case("device-width") => Number(10.),
-				deviceHeight if deviceHeight.eq_ignore_ascii_case("device-height") => Number(10.),
-				_ =>
-				{
-					match value.parse::<f32>()
-					{
-						Ok(n) if n >= 0. => Number(n.max(0.1).min(10.)),
-						Ok(_) => return None,
-						Err(_) => Number(0.1),
-					}
-				}
-			}
-		)
-	}
-}

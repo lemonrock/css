@@ -2,30 +2,15 @@
 // Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
 
 
-/// An expected unit we intend to parse within a `calc()` expression.
-///
-/// This is used as a hint for the parser to fast-reject invalid expressions.
-#[derive(Clone, Copy, PartialEq)]
-pub enum CalcUnit
-{
-	/// `<number>`
-	Number,
-	
-	/// `<integer>`
-	Integer,
-	
-	/// `<length>`
-	Length,
-	
-	/// `<percentage>`
-	Percentage,
-	
-	/// `<length> | <percentage>`
-	LengthOrPercentage,
-	
-	/// `<angle>`
-	Angle,
-	
-	/// `<time>`
-	Time,
-}
+use super::*;
+
+
+include!("AttrExpression.rs");
+include!("AttrFunction.rs");
+include!("CalcExpression.rs");
+include!("CalcFunction.rs");
+include!("CalculablePropertyValue.rs");
+include!("Expression.rs");
+include!("TypeOrUnit.rs");
+include!("VarExpression.rs");
+include!("VarFunction.rs");

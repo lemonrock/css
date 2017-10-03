@@ -2,7 +2,10 @@
 // Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
 
 
-define_css_keyword_enum!(MediaColorGamut:
-                         "srgb" => srgb,
-                         "p3" => p3,
-                         "rec2020" => rec2020);
+define_css_keyword_enum!
+(
+	MediaColorGamut:
+	"srgb" => srgb,
+	"p3" => p3,
+	"rec2020" => rec2020
+);

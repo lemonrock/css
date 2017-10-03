@@ -18,7 +18,6 @@ The license for this project is Mozilla Public License 2.0 (MPL-2.0). The code f
 
 ### @media
 
-* calc() nodes are reduced to simple assignments except for lengths
 * aspect-ratios are normalized using Euclid's algorithm
 * resolutions are reduced to either pixel densities (eg a DPI of 96 => a density of 1) or DPI from dots-per-centimetre (which is always larger)
 * Keyframe percentage of '100%' is written as 'to'
@@ -55,6 +54,7 @@ The license for this project is Mozilla Public License 2.0 (MPL-2.0). The code f
 
 * Do not specify a dimension if the value is 0 (eg for width)
 * Can omit final ';' in a list of property declarations (valid in W3C parser in any event)
+* Optimise css colors to the smallest size, whether hex, rgb, or a name
 
 
 ### @-rules

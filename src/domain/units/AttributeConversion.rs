@@ -2,7 +2,8 @@
 // Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
 
 
-trait FromMeta: Sized
+pub trait AttributeConversion<U: Unit>
 {
-	fn from_meta(value: &str) -> Option<Self>;
+	#[inline(always)]
+	fn attributeValue(&self, attribute_lower_case_name: &str) -> Option<U>;
 }
