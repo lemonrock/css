@@ -32,7 +32,7 @@ impl FontFeatureSetting
 			}
 			else
 			{
-				Ok(FontFeatureSetting(openTypeFeatureTag.into(), integer as u32))
+				Ok(FontFeatureSetting(openTypeFeatureTag.as_ref().into(), integer as u32))
 			}
 		}
 		else
@@ -43,9 +43,9 @@ impl FontFeatureSetting
 			{
 				&ident,
 				
-				"on" => Ok(FontFeatureSetting(openTypeFeatureTag.into(), 1)),
+				"on" => Ok(FontFeatureSetting(openTypeFeatureTag.as_ref().into(), 1)),
 				
-				"off" => Ok(FontFeatureSetting(openTypeFeatureTag.into(), 0)),
+				"off" => Ok(FontFeatureSetting(openTypeFeatureTag.as_ref().into(), 0)),
 				
 				_ => Err(ParseError::Custom(CustomParseError::FontFeatureSettingIfNotAnIntegerMustBeOnOrOff(ident.clone())))
 			}
