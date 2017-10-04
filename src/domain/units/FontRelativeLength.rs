@@ -33,16 +33,6 @@ impl<Number: CssNumber> ToCss for FontRelativeLength<Number>
 	}
 }
 
-impl<Number: CssNumber> Length for FontRelativeLength<Number>
-{
-	type Number = Number;
-}
-
-impl<Number: CssNumber> Unit for FontRelativeLength<Number>
-{
-	type Number = Number;
-}
-
 impl<Number: CssNumber> Default for FontRelativeLength<Number>
 {
 	#[inline(always)]
@@ -54,7 +44,7 @@ impl<Number: CssNumber> Default for FontRelativeLength<Number>
 
 impl<Number: CssNumber> Add<Number> for FontRelativeLength<Number>
 {
-	type Output = FontRelativeLength<Number>;
+	type Output = Self;
 	
 	#[inline(always)]
 	fn add(self, rhs: Number) -> Self::Output
@@ -86,7 +76,7 @@ impl<Number: CssNumber> AddAssign<Number> for FontRelativeLength<Number>
 
 impl<Number: CssNumber> Sub<Number> for FontRelativeLength<Number>
 {
-	type Output = FontRelativeLength<Number>;
+	type Output = Self;
 	
 	#[inline(always)]
 	fn sub(self, rhs: Number) -> Self::Output
@@ -118,7 +108,7 @@ impl<Number: CssNumber> SubAssign<Number> for FontRelativeLength<Number>
 
 impl<Number: CssNumber> Mul<Number> for FontRelativeLength<Number>
 {
-	type Output = FontRelativeLength<Number>;
+	type Output = Self;
 	
 	#[inline(always)]
 	fn mul(self, rhs: Number) -> Self::Output
@@ -150,7 +140,7 @@ impl<Number: CssNumber> MulAssign<Number> for FontRelativeLength<Number>
 
 impl<Number: CssNumber> Div<Number> for FontRelativeLength<Number>
 {
-	type Output = FontRelativeLength<Number>;
+	type Output = Self;
 	
 	#[inline(always)]
 	fn div(self, rhs: Number) -> Self::Output
@@ -182,7 +172,7 @@ impl<Number: CssNumber> DivAssign<Number> for FontRelativeLength<Number>
 
 impl<Number: CssNumber> Rem<Number> for FontRelativeLength<Number>
 {
-	type Output = FontRelativeLength<Number>;
+	type Output = Self;
 	
 	#[inline(always)]
 	fn rem(self, rhs: Number) -> Self::Output
@@ -200,7 +190,7 @@ impl<Number: CssNumber> Rem<Number> for FontRelativeLength<Number>
 impl<Number: CssNumber> RemAssign<Number> for FontRelativeLength<Number>
 {
 	#[inline(always)]
-	fn div_assign(&mut self, rhs: Number)
+	fn rem_assign(&mut self, rhs: Number)
 	{
 		match *self
 		{
@@ -214,7 +204,7 @@ impl<Number: CssNumber> RemAssign<Number> for FontRelativeLength<Number>
 
 impl<Number: CssNumber> Neg for FontRelativeLength<Number>
 {
-	type Output = FontRelativeLength<Number>;
+	type Output = Self;
 	
 	#[inline(always)]
 	fn neg(self) -> Self::Output
@@ -229,7 +219,7 @@ impl<Number: CssNumber> Neg for FontRelativeLength<Number>
 	}
 }
 
-impl<Number: CssNumber> CssNumberNewType for FontRelativeLength<Number>
+impl<Number: CssNumber> CssNumberNewType<Number> for FontRelativeLength<Number>
 {
 	#[inline(always)]
 	fn to_f32(&self) -> f32
@@ -238,7 +228,7 @@ impl<Number: CssNumber> CssNumberNewType for FontRelativeLength<Number>
 	}
 	
 	#[inline(always)]
-	fn as_CssNumber(&self) -> &CssNumber
+	fn as_CssNumber(&self) -> &Number
 	{
 		match *self
 		{
@@ -254,7 +244,7 @@ impl<Number: CssNumber> FontRelativeLength<Number>
 {
 	/// Convert this into a pixel value.
 	#[inline(always)]
-	fn to_px(&self, fontRelativeLengthConversion: &FontRelativeLengthConversion) -> Number
+	fn to_px(&self, fontRelativeLengthConversion: &FontRelativeLengthConversion<Number>) -> Number
 	{
 		match *self
 		{
@@ -267,7 +257,7 @@ impl<Number: CssNumber> FontRelativeLength<Number>
 	
 	/// Convert this into AppUnits.
 	#[inline]
-	pub fn to_app_units(&self, fontRelativeLengthConversion: &FontRelativeLengthConversion) -> Number
+	pub fn to_app_units(&self, fontRelativeLengthConversion: &FontRelativeLengthConversion<Number>) -> Number
 	{
 		self.to_px(fontRelativeLengthConversion) * Number::AppUnitsPerPX
 	}

@@ -31,7 +31,7 @@ define_css_keyword_enum!
 	"s" => s,
 	"ms" => ms,
 	"frequency" => frequency,
-	"Hz" => Hz,
-	"kHz" => kHz,
+	"hz" => Hz,
+	"khz" => kHz,
 	"%" => percentage,
 }

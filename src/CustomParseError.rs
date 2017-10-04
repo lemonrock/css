@@ -57,7 +57,7 @@ pub enum CustomParseError<'i>
 	RatioDivisorCanNotBeNegativeOrZero(i32),
 	UnrecognisedMediaQueryResolutionUnit(String),
 	MediaQueryResolutionDoesNotSupportThisIdentifier(String),
-	MediaQueryResolutionCanNotBeNegativeOrZero(CssFloat),
+	MediaQueryResolutionCanNotBeNegativeOrZero,
 	UnexpectedTokenWhenParsingMediaQueryResolution(Token<'i>),
 	MediaGridMustBeEitherZeroOrOne(i32),
 	MediaTransform3DMustBeEitherZeroOrOne(i32),
@@ -74,7 +74,6 @@ pub enum CustomParseError<'i>
 	
 	ViewportLengthsAreNotAllowedInAPageAtRule,
 	LengthDimensionWasUnrecognised(String),
-	ViewportLengthIsNegative(CssNumberConversionError),
 	
 	AtRuleImportMustBeBeforeAnyRuleExceptAtRuleCharset,
 	AtRuleNamespaceMustBeBeforeAnyRuleExceptAtRuleCharsetAndAtRuleImport,
@@ -92,7 +91,10 @@ pub enum CustomParseError<'i>
 	UnbalancedCloseSquareBracketInDeclarationValueBlock,
 	UnbalancedCloseCurlyBracketInDeclarationValueBlock,
 	
-	CouldNotParseCssSignedNumber(CssNumberConversionError, f32),
+	CouldNotParseCssSignedNumber(::domain::numbers::CssNumberConversionError, f32),
+	CouldNotParseCssUnsignedNumber(::domain::numbers::CssNumberConversionError, f32),
+	CouldNotParseDimensionLessNumber(f32),
+	CouldNotParseDimension(f32, CowRcStr<'i>),
 	UnknownFunctionInValueExpression(String),
 	
 	CouldNotParseInteger,

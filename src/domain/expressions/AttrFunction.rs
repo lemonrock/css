@@ -3,7 +3,7 @@
 
 
 #[derive(Debug, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
-pub struct AttrFunction<U: Unit>(AttrExpression<U>);
+pub struct AttrFunction<U: Unit>(Rc<AttrExpression<U>>);
 
 impl<U: Unit> ToCss for AttrFunction<U>
 {
@@ -21,7 +21,7 @@ impl<U: Unit> Expression<U> for AttrFunction<U>
 	/// Division by zero is handled by returning the maximum possible f32 value
 	/// Subtractions for UnsignedCssNumber that are negative are handled by returning 0.0
 	#[inline(always)]
-	fn evaluate<Conversion: FontRelativeLengthConversion<U::Number> + ViewportPercentageLengthConversion<U::Number> + PercentageOfLengthConversion<U::Number> + AttributeConversion<U::Number> + CssVariableConversion<U::Number>>(&self, conversion: &Conversion) -> Option<U::Number>
+	fn evaluate<Conversion: FontRelativeLengthConversion<U::Number> + ViewportPercentageLengthConversion<U::Number> + PercentageConversion<U::Number> + AttributeConversion<U::Number> + CssVariableConversion<U::Number>>(&self, conversion: &Conversion) -> Option<U::Number>
 	{
 		self.0.evaluate(conversion)
 	}

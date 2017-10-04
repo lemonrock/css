@@ -7,6 +7,8 @@ pub enum CalculablePropertyValue<U: Unit>
 {
 	Constant(U),
 	
+	Percentage(PercentageUnit<U::Number>),
+	
 	CalcFunction(CalcFunction<U>),
 	
 	AttrFunction(AttrFunction<U>),
@@ -31,7 +33,9 @@ impl<U: Unit> ToCss for CalculablePropertyValue<U>
 		
 		match *self
 		{
-			Constant(ref value) => value.to_css(dest)?,
+			Constant(ref constant) => constant.to_css(dest)?,
+			
+			Percentage(ref percentage) => percentage.to_css(dest)?,
 			
 			CalcFunction(ref function) => function.to_css(dest)?,
 			
@@ -48,13 +52,15 @@ impl<U: Unit> Expression<U> for CalculablePropertyValue<U>
 	/// Division by zero is handled by returning the maximum possible f32 value
 	/// Subtractions for UnsignedCssNumber that are negative are handled by returning 0.0
 	#[inline(always)]
-	fn evaluate<Conversion: FontRelativeLengthConversion<U::Number> + ViewportPercentageLengthConversion<U::Number> + PercentageOfLengthConversion<U::Number> + AttributeConversion<U::Number> + CssVariableConversion<U::Number>>(&self, conversion: &Conversion) -> Option<U::Number>
+	fn evaluate<Conversion: FontRelativeLengthConversion<U::Number> + ViewportPercentageLengthConversion<U::Number> + PercentageConversion<U::Number> + AttributeConversion<U::Number> + CssVariableConversion<U::Number>>(&self, conversion: &Conversion) -> Option<U::Number>
 	{
 		use self::CalculablePropertyValue::*;
 		
 		match *self
 		{
-			Constant(value_in_unit) => value_in_unit,
+			Constant(constant) => constant.to_canonical_dimension_value(), // not for length mixes...
+			
+			Percentage(ref percentage) => percentage.to_absolute_unit(conversion),
 			
 			CalcFunction(ref function) => function.evaluate(conversion),
 			

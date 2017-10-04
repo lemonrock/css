@@ -6,5 +6,5 @@ pub trait Device
 {
 	fn documentMatchesUrl(&self, urlMatchingFunction: &UrlMatchingFunction) -> bool;
 	
-	fn viewportWidthInAppUnitsMatches(&self, width: Range<Length>) -> bool;
+	fn viewportWidthInAppUnitsMatches<Number: CssNumber>(&self, width: Range<LengthUnit<Number>>) -> bool;
 }

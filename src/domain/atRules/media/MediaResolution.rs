@@ -98,7 +98,7 @@ impl MediaResolution
 			{
 				if value <= 0.
 				{
-					return Err(ParseError::Custom(CustomParseError::MediaQueryResolutionCanNotBeNegativeOrZero(value)))
+					return Err(ParseError::Custom(CustomParseError::MediaQueryResolutionCanNotBeNegativeOrZero))
 				}
 				
 				Ok(dppx(value))
@@ -131,7 +131,7 @@ impl MediaResolution
 			{
 				if value <= 0.
 				{
-					return Err(ParseError::Custom(CustomParseError::MediaQueryResolutionCanNotBeNegativeOrZero(value)))
+					return Err(ParseError::Custom(CustomParseError::MediaQueryResolutionCanNotBeNegativeOrZero))
 				}
 				
 				let result = match_ignore_ascii_case!

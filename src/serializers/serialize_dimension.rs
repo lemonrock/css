@@ -3,7 +3,7 @@
 
 
 /// Serialize a value with given unit into dest.
-pub(crate) fn serialize_dimension<W: fmt::Write>(value: CssFloat, unit: &str, dest: &mut W) -> fmt::Result
+pub(crate) fn serialize_dimension<W: fmt::Write, Number: CssNumber>(value: Number, unit: &str, dest: &mut W) -> fmt::Result
 {
 	value.to_css(dest)?;
 	dest.write_str(unit)

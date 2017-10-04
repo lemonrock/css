@@ -6,10 +6,10 @@
 pub enum ExpressionKind
 {
 	/// https://www.w3.org/TR/mediaqueries-4/#width
-	Width(Range<Length>),
+	Width(Range<LengthUnit<CssUnsignedNumber>>),
 	
 	/// https://www.w3.org/TR/mediaqueries-4/#height
-	Height(Range<Length>),
+	Height(Range<LengthUnit<CssUnsignedNumber>>),
 	
 	/// https://www.w3.org/TR/mediaqueries-4/#aspect-ratio
 	AspectRatio(Range<Ratio>),

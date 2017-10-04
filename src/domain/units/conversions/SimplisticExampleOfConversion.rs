@@ -40,7 +40,7 @@ impl<U: Unit> FontRelativeLengthConversion<U::Number> for SimplisticExampleOfCon
 	}
 	
 	#[inline(always)]
-	fn ch(&self) -> Number
+	fn ch(&self) -> U::Number
 	{
 		self.ch
 	}
@@ -52,7 +52,7 @@ impl<U: Unit> FontRelativeLengthConversion<U::Number> for SimplisticExampleOfCon
 	}
 }
 
-impl<U: Unit> ViewportPercentageLengthConversion for SimplisticExampleOfConversion<U>
+impl<U: Unit> ViewportPercentageLengthConversion<U::Number> for SimplisticExampleOfConversion<U>
 {
 	#[inline(always)]
 	fn vw(&self) -> U::Number

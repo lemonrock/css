@@ -2,19 +2,17 @@
 // Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
 
 
-pub trait Length: Sized
-+ Copy + Clone
-+ PartialEq<Self> + Eq + PartialOrd + Ord + Hash
-+ ToCss
-+ Default
-+ Add<Self, Output=Self> + AddAssign<Self>
-+ Sub<Self, Output=Self> + SubAssign<Self>
-+ Mul<Self, Output=Self> + MulAssign<Self>
-+ Div<Self, Output=Self> + DivAssign<Self>
-+ Rem<Self, Output=Self> + RemAssign<Self>
-+ Neg<Output=Self>
-+ Debug
-+ CssNumberNewType + Unit
+pub trait FontRelativeLengthConversion<Number: CssNumber>
 {
-	type Number: CssNumber;
+	#[inline(always)]
+	fn em(&self) -> Number;
+	
+	#[inline(always)]
+	fn ex(&self) -> Number;
+	
+	#[inline(always)]
+	fn ch(&self) -> Number;
+	
+	#[inline(always)]
+	fn rem(&self) -> Number;
 }

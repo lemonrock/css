@@ -3,28 +3,20 @@
 
 
 use super::*;
-use super::calc::Unit;
-use super::numbers::*;
 use self::AbsoluteLength::*;
-use self::AbsoluteOrFontRelativeOrViewportPercentageLength::*;
-use self::AbsoluteOrFontRelativeOrViewportPercentageOrPercentage::*;
+use self::LengthUnit::*;
+use self::either::Left;
+use self::either::Right;
 use self::FontRelativeLength::*;
+use self::LengthOrPercentageUnit::*;
+use self::TimeUnit::*;
 use self::ViewportPercentageLength::*;
-use ::std::convert::From;
-use ::std::error::Error;
+use self::conversions::*;
+use ::either::Either;
 use ::std::fmt;
-use ::std::fmt::Debug;
-use ::std::fmt::Display;
-use ::std::fmt::Formatter;
-use ::std::fmt::LowerExp;
-use ::std::fmt::UpperExp;
-use ::std::hash::Hash;
 use ::std::hash::Hasher;
-use ::std::num::ParseFloatError;
-use ::std::mem::replace;
 use ::std::ops::Add;
 use ::std::ops::AddAssign;
-use ::std::ops::Deref;
 use ::std::ops::Div;
 use ::std::ops::DivAssign;
 use ::std::ops::Mul;
@@ -34,22 +26,18 @@ use ::std::ops::Rem;
 use ::std::ops::RemAssign;
 use ::std::ops::Sub;
 use ::std::ops::SubAssign;
-use ::std::str::FromStr;
+
+
+pub mod conversions;
 
 
 include!("AbsoluteLength.rs");
-include!("AbsoluteOrFontRelativeOrViewportPercentageLength.rs");
+include!("LengthUnit.rs");
 include!("AppUnitsPer.rs");
-include!("AttributeConversion.rs");
-include!("CssVariableConversion.rs");
 include!("FontRelativeLength.rs");
-include!("FontRelativeLengthConversion.rs");
-include!("Length.rs");
-include!("LengthOrPercentage.rs");
-include!("Percentage.rs");
-include!("PercentageConversion.rs");
-include!("SimplisticExampleOfConversion.rs");
+include!("LengthOrPercentageUnit.rs");
+include!("PercentageUnit.rs");
+include!("TimeUnit.rs");
 include!("ViewportPercentageLength.rs");
-include!("ViewportPercentageLengthConversion.rs");
 include!("ToUnit.rs");
 include!("Unit.rs");

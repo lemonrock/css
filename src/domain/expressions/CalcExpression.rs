@@ -5,17 +5,11 @@
 #[derive(Debug, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub enum CalcExpression<U: Unit>
 {
-	Constant(U),
+	CalculablePropertyValue(CalculablePropertyValue<U>),
 	
-	Percentage(Percentage<CssSignedNumber>),
+	Number(U::Number),
 	
-	Parentheses(Box<CalcExpression<U>>),
-	
-	NestedCalcFunction(Box<CalcFunction<U>>),
-	
-	NestedAttrFunction(Box<AttrFunction<U>>),
-	
-	NestedVarFunction(Box<VarFunction<U>>),
+	Parentheses(CalculablePropertyValue<U>),
 	
 	Addition(Box<CalcExpression<U>>, Box<CalcExpression<U>>),
 	
@@ -43,9 +37,9 @@ impl<U: Unit> ToCss for CalcExpression<U>
 		
 		match *self
 		{
-			Constant(ref unit) => unit.to_css(dest)?,
+			CalculablePropertyValue(ref calculable) => calculable.to_css(dest)?,
 			
-			Percentage(ref percentage) => percentage.to_css(dest)?,
+			Number(ref number) => number.to_css(dest)?,
 			
 			Parentheses(ref calcFunctionBody) =>
 			{
@@ -53,12 +47,6 @@ impl<U: Unit> ToCss for CalcExpression<U>
 				calcFunctionBody.to_css(dest)?;
 				dest.write_char(')')
 			},
-			
-			NestedCalcFunction(ref subFunction) => subFunction.to_css(dest),
-			
-			NestedAttrFunction(ref subFunction) => subFunction.to_css(dest),
-			
-			NestedVarFunction(ref subFunction) => subFunction.to_css(dest),
 			
 			Addition(ref lhs, ref rhs) =>
 			{
@@ -93,29 +81,24 @@ impl<U: Unit> ToCss for CalcExpression<U>
 	}
 }
 
-impl<U: Unit> Expression<U> for CalculablePropertyValue<U>
+impl<U: Unit> Expression<U> for CalcExpression<U>
 {
 	/// Evaluate the calc() expression, returning the numeric value of the canonical dimension
 	/// Division by zero is handled by returning the maximum possible f32 value
 	/// Subtractions for UnsignedCssNumber that are negative are handled by returning 0.0
+	/// Note: We are quite lenient with calculations of unit-less and unit-having quantities, eg 100px * 100px is evaluated to 10,000px, not 10,000px^2, and 50 + 100px is evaluated to 150px
 	#[inline(always)]
-	fn evaluate<Conversion: FontRelativeLengthConversion<U::Number> + ViewportPercentageLengthConversion<U::Number> + PercentageOfLengthConversion<U::Number> + AttributeConversion<U::Number> + CssVariableConversion<U::Number>>(&self, conversion: &Conversion) -> Option<U::Number>
+	fn evaluate<Conversion: FontRelativeLengthConversion<U::Number> + ViewportPercentageLengthConversion<U::Number> + PercentageConversion<U::Number> + AttributeConversion<U::Number> + CssVariableConversion<U::Number>>(&self, conversion: &Conversion) -> Option<U::Number>
 	{
 		use self::CalcExpression::*;
 		
 		match *self
 		{
-			Constant(value_in_unit) => value_in_unit,
+			CalculablePropertyValue(ref calculable) => calculable.evaluate(conversion),
 			
-			Percentage(percentage) => percentage.to_absolute_unit(conversion),
+			Number(ref number) => number,
 			
 			Parentheses(ref subExpression) => subExpression.evaluate(conversion),
-			
-			NestedCalcFunction(ref subFunction) => subFunction.evaluate(conversion),
-			
-			NestedAttrFunction(ref subFunction) => subFunction.evaluate(conversion),
-			
-			NestedVarFunction(ref subFunction) => subFunction.evaluate(conversion),
 			
 			Addition(ref lhsSubExpression, ref rhsSubExpression) => lhsSubExpression.evaluate(conversion) + rhsSubExpression.evaluate(conversion),
 			
@@ -130,7 +113,7 @@ impl<U: Unit> Expression<U> for CalculablePropertyValue<U>
 
 impl<U: Unit> CalcExpression<U>
 {
-	/// Parse a top-level `expressions` expression, with all nested sub-expressions.
+	/// Parse a top-level `calc` expression, with all nested sub-expressions.
 	/// DOES NOT simplify expressions. This is because simplification is harder than it ought to be:-
 	/// * Percentages can be treated as multiples of 'x', eg 50% => 0.5x, BUT
 	/// * Zero percentages have to be preserved, so detecting 'divide by zero' at parse time isn't easy
@@ -147,10 +130,10 @@ impl<U: Unit> CalcExpression<U>
 	#[inline(always)]
 	fn parse<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
 	{
-		Self::parse_sum(context, input)
+		input.parse_nested_block(|input| Self::parse_sum(context, input))
 	}
 	
-	/// Parse a top-level `expressions` expression, and all the sum that may follow, and stop as soon as a non-sum expression is found.
+	/// Parse a `calc` expression, and all the sum that may follow, and stop as soon as a non-sum expression is found.
 	///
 	/// This is in charge of parsing, for example, `2 + 3 * 100%`.
 	fn parse_sum<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
@@ -163,9 +146,9 @@ impl<U: Unit> CalcExpression<U>
 		loop
 		{
 			let stateToResetParseToIfNotSum = input.state();
-			match input.next_including_whitespace()?
+			match *input.next_including_whitespace()?
 			{
-				&WhiteSpace(_) =>
+				WhiteSpace(_) =>
 				{
 					// a trailing whitespace
 					if input.is_exhausted()
@@ -173,7 +156,7 @@ impl<U: Unit> CalcExpression<U>
 						break;
 					}
 					
-					match input.next()?
+					match *input.next()?
 					{
 						Delim('+') =>
 						{
@@ -200,7 +183,7 @@ impl<U: Unit> CalcExpression<U>
 		Ok(currentSum)
 	}
 	
-	/// Parse a top-level `expressions` expression, and all the products that may follow, and stop as soon as a non-product expression is found.
+	/// Parse a `calc` expression, and all the products that may follow, and stop as soon as a non-product expression is found.
 	///
 	/// This should parse correctly:-
 	///
@@ -208,26 +191,26 @@ impl<U: Unit> CalcExpression<U>
 	/// * `2 * 2`
 	/// * `2 * 2 + 2` (will leave the `+ 2` unparsed).
 	/// * `2 / 2 * 2 + 2` (will leave the `+ 2` unparsed).
-	fn parse_product<'i, 't, U: Unit>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
+	fn parse_product<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
 	{
 		use ::cssparser::Token::*;
 		use self::CalcExpression::*;
 		
-		let mut currentProduct = Self::parse_one(context, input)?.to_canonical_dimension();
+		let mut currentProduct = Self::parse_one(context, input, true)?;
 		
 		loop
 		{
 			let stateToResetParseToIfNotProduct = input.state();
-			match input.next()?
+			match *input.next()?
 			{
-				&Delim('*') =>
+				Delim('*') =>
 				{
-					currentProduct = Multiplication(Box::new(currentProduct), Box::new(U::parse_one(context, input)?));
+					currentProduct = Multiplication(Box::new(currentProduct), Self::parse_one(context, input)?);
 				}
 				
-				&Delim('/') =>
+				Delim('/') =>
 				{
-					currentProduct = Division(Box::new(currentProduct), Box::new(U::parse_one(context, input)?));
+					currentProduct = Division(Box::new(currentProduct), Self::parse_one(context, input));
 				}
 				
 				_ =>
@@ -239,5 +222,18 @@ impl<U: Unit> CalcExpression<U>
 		}
 		
 		Ok(currentProduct)
+	}
+	
+	fn parse_one<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
+	{
+		let either = U::parse_one(context, input)?;
+		if either.is_left()
+		{
+			Ok(Box::new(CalcExpression::CalculablePropertyValue(either.left().unwrap())))
+		}
+		else
+		{
+			Ok(Box::new(either.right().unwrap()))
+		}
 	}
 }

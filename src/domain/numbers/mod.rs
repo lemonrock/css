@@ -3,7 +3,8 @@
 
 
 use super::*;
-use super::calc::Unit;
+use super::units::conversions::*;
+use ::either::Either;
 use ::std::convert::From;
 use ::std::error::Error;
 use ::std::fmt;
@@ -14,7 +15,7 @@ use ::std::fmt::LowerExp;
 use ::std::fmt::UpperExp;
 use ::std::hash::Hash;
 use ::std::hash::Hasher;
-use ::std::num::ParseFloatError;
+use ::std::num::FloatParseError;
 use ::std::ops::Add;
 use ::std::ops::AddAssign;
 use ::std::ops::Deref;
@@ -30,10 +31,7 @@ use ::std::ops::SubAssign;
 use ::std::str::FromStr;
 
 
-include!("css_number.rs");
-
-
-include!("CssInteger.rs");
+include!("CssNumber.rs");
 include!("CssNumberConversionError.rs");
 include!("CssNumberNewType.rs");
 include!("CssNumberParseError.rs");

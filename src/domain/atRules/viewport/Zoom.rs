@@ -52,9 +52,9 @@ impl Zoom
             // TODO: This parse() method should take ParserContext as an argument, and pass ParsingMode owned by the ParserContext to is_ok() instead of using PARSING_MODE_DEFAULT directly.  In order to do so, we might want to move this code into style::stylesheets::viewport_rule.
             Token::Percentage { unit_value, .. } if NonNegative.is_ok(ParsingMode::PARSING_MODE_DEFAULT, unit_value) => Ok(Percentage(unit_value)),
 			
-            Token::Number { value, .. } if NonNegative.is_ok(ParsingMode::PARSING_MODE_DEFAULT, value) => Ok(Number(value)),
+            Token::Number { numeric_value, .. } if NonNegative.is_ok(ParsingMode::PARSING_MODE_DEFAULT, numeric_value) => Ok(Number(numeric_value)),
 			
-            Token::Ident(ref value) if value.eq_ignore_ascii_case("auto") => Ok(Auto),
+            Token::Ident(ref ident) if ident.eq_ignore_ascii_case("auto") => Ok(Auto),
 			
             ref unexpectedToken => Err(ParseError::Custom(CustomParseError::UnexpectedTokenWhenParsingZoom(unexpectedToken.clone())))
         }

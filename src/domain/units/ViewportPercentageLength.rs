@@ -37,16 +37,6 @@ impl<Number: CssNumber> ToCss for ViewportPercentageLength<Number>
 	}
 }
 
-impl<Number: CssNumber> Length for ViewportPercentageLength<Number>
-{
-	type Number = Number;
-}
-
-impl<Number: CssNumber> Unit for ViewportPercentageLength<Number>
-{
-	type Number = Number;
-}
-
 impl<Number: CssNumber> Default for ViewportPercentageLength<Number>
 {
 	#[inline(always)]
@@ -204,7 +194,7 @@ impl<Number: CssNumber> Rem<Number> for ViewportPercentageLength<Number>
 impl<Number: CssNumber> RemAssign<Number> for ViewportPercentageLength<Number>
 {
 	#[inline(always)]
-	fn div_assign(&mut self, rhs: Number)
+	fn rem_assign(&mut self, rhs: Number)
 	{
 		match *self
 		{
@@ -258,7 +248,7 @@ impl<Number: CssNumber> ViewportPercentageLength<Number>
 {
 	/// Convert this into a pixel value.
 	#[inline(always)]
-	fn to_px(&self, viewportPercentageLengthConversion: &ViewportPercentageLengthConversion) -> Number
+	fn to_px(&self, viewportPercentageLengthConversion: &ViewportPercentageLengthConversion<Number>) -> Number
 	{
 		match *self
 		{
@@ -271,7 +261,7 @@ impl<Number: CssNumber> ViewportPercentageLength<Number>
 	
 	/// Convert this into AppUnits.
 	#[inline]
-	pub fn to_app_units(&self, viewportPercentageLengthConversion: &ViewportPercentageLengthConversion) -> Number
+	pub fn to_app_units(&self, viewportPercentageLengthConversion: &ViewportPercentageLengthConversion<Number>) -> Number
 	{
 		self.to_px(viewportPercentageLengthConversion) * Number::AppUnitsPerPX
 	}

@@ -13,7 +13,7 @@ pub enum ViewportLength
 	auto,
 	
 	/// invariant or calculated non-negative length or non-negative percentage
-	value(InvariantOrCalcFunction<LengthOrPercentage<AbsoluteOrFontRelativeOrViewportPercentage<CssUnsignedNumber>>>),
+	value(CalculablePropertyValue<LengthOrPercentageUnit<CssUnsignedNumber>>),
 }
 
 impl ToCss for ViewportLength
@@ -24,7 +24,7 @@ impl ToCss for ViewportLength
 		{
 			auto => dest.write_str("auto"),
 			
-			value(ref value) => value.to_css(dest),
+			value(ref numeric_value) => numeric_value.to_css(dest),
 		}
 	}
 }
@@ -33,43 +33,11 @@ impl ViewportLength
 {
 	pub(crate) fn parse<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
 	{
-		use ::cssparser::Token::*;
-		use self::ViewportLength::*;
-		use self::InvariantOrCalcFunction::*:
-		
-		match input.next()?
+		if input.try(|i| i.expect_ident_matching("auto")).is_ok()
 		{
-			&Ident(ref value) if value.eq_ignore_ascii_case("auto") => Ok(auto),
-			
-			&Dimension { value, ref unit, .. } =>
-			{
-				let number = CssUnsignedNumber::new(value).map_err(|error| ParseError::Custom(CustomParseError::ViewportLengthIsNegative(error)))?;
-				let unit = AbsoluteOrFontRelativeOrViewportPercentage::parse_length_dimension(context, number, unit).map_err(|error| ParseError::Custom(error))?;
-				Ok(value(Invariant(unit)))
-			}
-			
-			&Percentage { unit_value, .. } =>
-			{
-				let number = CssUnsignedNumber::new(value).map_err(|error| ParseError::Custom(CustomParseError::ViewportLengthIsNegative(error)))?;
-				let unit = Percentage(number);
-				Ok(value(Invariant(unit)))
-			}
-			
-			&Number { value, .. } =>
-			{
-				let value = CssUnsignedNumber::new(value).map_err(|error| ParseError::Custom(CustomParseError::ViewportLengthIsNegative(error)))?;
-				let unit = AbsoluteOrFontRelativeOrViewportPercentage::from_px(value);
-				Ok(value(Invariant(unit)))
-			},
-			
-			&Function(ref name) if name.eq_ignore_ascii_case("expressions") =>
-			{
-				let calc = input.parse_nested_block(|i| CalcNode::parse_length_or_percentage(context, i, num_context))?;
-				
-				Ok(value(CalcFunction(unit)))
-			}
-			
-			unexpectedToken @ _ => Err(ParseError::Custom(CustomParseError::UnexpectedTokenForViewportLength(unexpectedToken.clone())))
+			return Ok(auto);
 		}
+		
+		CalculablePropertyValue::parse_one_outside_calc_function(context, input)
 	}
 }

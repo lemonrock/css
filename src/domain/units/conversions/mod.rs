@@ -2,18 +2,13 @@
 // Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
 
 
-#[derive(Default, Debug, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
-pub trait ViewportPercentageLengthConversion<Number: CssNumber>
-{
-	#[inline(always)]
-	fn vw(&self) -> Number;
-	
-	#[inline(always)]
-	fn vh(&self) -> Number;
-	
-	#[inline(always)]
-	fn vmin(&self) -> Number;
-	
-	#[inline(always)]
-	fn vmax(&self) -> Number;
-}
+use super::*;
+use ::std::collections::HashMap;
+
+
+include!("AttributeConversion.rs");
+include!("CssVariableConversion.rs");
+include!("FontRelativeLengthConversion.rs");
+include!("PercentageConversion.rs");
+include!("SimplisticExampleOfConversion.rs");
+include!("ViewportPercentageLengthConversion.rs");

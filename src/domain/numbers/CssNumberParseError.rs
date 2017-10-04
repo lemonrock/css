@@ -2,11 +2,11 @@
 // Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
 
 
-#[derive(Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
+#[derive(Debug, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub enum CssNumberParseError
 {
 	Float(FloatParseError),
-	Conversion(CssFloatConversionError),
+	Conversion(CssNumberConversionError),
 }
 
 impl Display for CssNumberParseError
@@ -48,23 +48,5 @@ impl Error for CssNumberParseError
 			Float(ref error) => Some(error),
 			Conversion(ref error) => Some(error),
 		}
-	}
-}
-
-impl From<FloatParseError> for CssNumberParseError
-{
-	#[inline(always)]
-	fn from(error: FloatParseError) -> CssFloat
-	{
-		CssNumberParseError::Float(error)
-	}
-}
-
-impl From<CssFloatConversionError> for CssNumberParseError
-{
-	#[inline(always)]
-	fn from(error: CssFloatConversionError) -> CssFloat
-	{
-		CssNumberParseError::Conversion(error)
 	}
 }

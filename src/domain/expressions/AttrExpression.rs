@@ -34,13 +34,13 @@ impl<U: Unit> ToCss for AttrExpression<U>
 	}
 }
 
-impl<U: Unit> Expression<U> for CalculablePropertyValue<U>
+impl<U: Unit> Expression<U> for AttrExpression<U>
 {
 	/// Evaluate the calc() expression, returning the numeric value of the canonical dimension
 	/// Division by zero is handled by returning the maximum possible f32 value
 	/// Subtractions for UnsignedCssNumber that are negative are handled by returning 0.0
 	#[inline(always)]
-	fn evaluate<Conversion: FontRelativeLengthConversion<U::Number> + ViewportPercentageLengthConversion<U::Number> + PercentageOfLengthConversion<U::Number> + AttributeConversion<U::Number> + CssVariableConversion<U::Number>>(&self, conversion: &Conversion) -> Option<U::Number>
+	fn evaluate<Conversion: FontRelativeLengthConversion<U::Number> + ViewportPercentageLengthConversion<U::Number> + PercentageConversion<U::Number> + AttributeConversion<U::Number> + CssVariableConversion<U::Number>>(&self, conversion: &Conversion) -> Option<U::Number>
 	{
 		if let Some(value) = conversion.attributeValue(self.attribute_lower_case_name)
 		{
@@ -50,5 +50,14 @@ impl<U: Unit> Expression<U> for CalculablePropertyValue<U>
 		{
 			self.default_value
 		}
+	}
+}
+
+impl<U: Unit> AttrExpression<U>
+{
+	#[inline(always)]
+	fn parse<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
+	{
+		input.parse_nested_block(|input| Self::parse_sum(context, input))
 	}
 }

@@ -37,6 +37,11 @@ impl ParserContext
 	
 	pub(crate) fn isInPageRule(&self)
 	{
-		context.rule_type.map_or(false, |rule_type| rule_type == CssRuleType::Page)
+		self.rule_type.map_or(false, |rule_type| rule_type == CssRuleType::Page)
+	}
+	
+	pub(crate) fn isNotInPageRule(&self)
+	{
+		!self.isInPageRule()
 	}
 }

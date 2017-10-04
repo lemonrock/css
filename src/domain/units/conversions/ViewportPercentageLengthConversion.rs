@@ -2,5 +2,17 @@
 // Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
 
 
-/// A CSS integer value.
-pub type CssInteger = i32;
+pub trait ViewportPercentageLengthConversion<Number: CssNumber>
+{
+	#[inline(always)]
+	fn vw(&self) -> Number;
+	
+	#[inline(always)]
+	fn vh(&self) -> Number;
+	
+	#[inline(always)]
+	fn vmin(&self) -> Number;
+	
+	#[inline(always)]
+	fn vmax(&self) -> Number;
+}

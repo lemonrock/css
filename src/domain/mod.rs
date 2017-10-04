@@ -4,7 +4,6 @@
 
 use super::*;
 use super::parsers::NestedRuleParser;
-use super::parsers::AllowedNumericType;
 use super::parsers::separators::*;
 use self::atRules::counterStyle::*;
 use self::atRules::document::*;
@@ -31,7 +30,6 @@ use ::std::cmp::Ord;
 use ::std::cmp::Ordering;
 use ::std::collections::hash_map::DefaultHasher;
 use ::std::convert::From;
-use ::std::error::Error;
 use ::std::fmt;
 use ::std::fmt::Display;
 use ::std::fmt::Formatter;
@@ -39,21 +37,7 @@ use ::std::fmt::LowerExp;
 use ::std::fmt::UpperExp;
 use ::std::hash::Hash;
 use ::std::hash::Hasher;
-use ::std::iter::Product;
-use ::std::num::ParseFloatError;
-use ::std::ops::Add;
-use ::std::ops::AddAssign;
 use ::std::ops::Deref;
-use ::std::ops::Div;
-use ::std::ops::DivAssign;
-use ::std::ops::Mul;
-use ::std::ops::MulAssign;
-use ::std::ops::Neg;
-use ::std::ops::Rem;
-use ::std::ops::RemAssign;
-use ::std::ops::Sub;
-use ::std::ops::SubAssign;
-use ::std::str::FromStr;
 
 
 include!("define_css_keyword_enum.rs");
@@ -61,7 +45,7 @@ include!("define_css_keyword_enum.rs");
 
 pub mod atRules;
 pub mod expressions;
-pub mod unts;
+pub mod units;
 pub mod numbers;
 pub mod properties;
 pub mod selectors;

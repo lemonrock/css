@@ -3,6 +3,8 @@
 
 
 use super::*;
+use super::domain::numbers::CssNumber;
+
 
 include!("serialize_dimension.rs");
 include!("serialize_percentage.rs");

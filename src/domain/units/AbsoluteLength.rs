@@ -28,16 +28,6 @@ pub enum AbsoluteLength<Number: CssNumber>
 	pc(Number),
 }
 
-impl<Number: CssNumber> Length for AbsoluteLength<Number>
-{
-	type Number = Number;
-}
-
-impl<Number: CssNumber> Unit for AbsoluteLength<Number>
-{
-	type Number = Number;
-}
-
 impl<Number: CssNumber> ToCss for AbsoluteLength<Number>
 {
 	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
@@ -239,7 +229,7 @@ impl<Number: CssNumber> Rem<Number> for AbsoluteLength<Number>
 impl<Number: CssNumber> RemAssign<Number> for AbsoluteLength<Number>
 {
 	#[inline(always)]
-	fn div_assign(&mut self, rhs: Number)
+	fn rem_assign(&mut self, rhs: Number)
 	{
 		match *self
 		{
@@ -274,7 +264,7 @@ impl<Number: CssNumber> Neg for AbsoluteLength<Number>
 	}
 }
 
-impl<Number: CssNumber> CssNumberNewType for AbsoluteLength<Number>
+impl<Number: CssNumber> CssNumberNewType<Number> for AbsoluteLength<Number>
 {
 	#[inline(always)]
 	fn to_f32(&self) -> f32

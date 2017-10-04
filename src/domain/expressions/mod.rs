@@ -3,6 +3,8 @@
 
 
 use super::*;
+use self::domain::units::conversions::*;
+use ::std::rc::Rc;
 
 
 include!("AttrExpression.rs");
