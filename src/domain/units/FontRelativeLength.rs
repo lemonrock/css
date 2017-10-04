@@ -38,7 +38,7 @@ impl<Number: CssNumber> Default for FontRelativeLength<Number>
 	#[inline(always)]
 	fn default() -> Self
 	{
-		FontRelativeLength::em(0)
+		FontRelativeLength::em(Number::default())
 	}
 }
 

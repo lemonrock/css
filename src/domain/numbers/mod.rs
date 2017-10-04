@@ -4,6 +4,7 @@
 
 use super::*;
 use super::units::conversions::*;
+use self::CustomParseError::*;
 use self::Either::*;
 use ::either::Either;
 use ::std::convert::From;
@@ -16,7 +17,6 @@ use ::std::fmt::LowerExp;
 use ::std::fmt::UpperExp;
 use ::std::hash::Hash;
 use ::std::hash::Hasher;
-use ::std::num::ParseFloatError;
 use ::std::ops::Add;
 use ::std::ops::AddAssign;
 use ::std::ops::Deref;
@@ -36,6 +36,5 @@ use ::std::str::FromStr;
 include!("CssNumber.rs");
 include!("CssNumberConversionError.rs");
 include!("CssNumberNewType.rs");
-include!("CssNumberParseError.rs");
 include!("CssSignedNumber.rs");
 include!("CssUnsignedNumber.rs");

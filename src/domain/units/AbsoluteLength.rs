@@ -50,7 +50,7 @@ impl<Number: CssNumber> Default for AbsoluteLength<Number>
 	#[inline(always)]
 	fn default() -> Self
 	{
-		AbsoluteLength::px(0)
+		AbsoluteLength::px(Number::default())
 	}
 }
 

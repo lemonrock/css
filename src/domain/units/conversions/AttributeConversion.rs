@@ -2,8 +2,9 @@
 // Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
 
 
-pub trait AttributeConversion<U: Unit>
+pub trait AttributeConversion<U>
 {
+	/// Returns the (value of the attribute, property default if known)
 	#[inline(always)]
-	fn attributeValue(&self, attribute_lower_case_name: &str) -> Option<U>;
+	fn attributeValue(&self, attribute_lower_case_name: &str) -> (Option<&str>, U);
 }

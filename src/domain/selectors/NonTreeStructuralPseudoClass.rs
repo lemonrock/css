@@ -209,7 +209,7 @@ impl NonTreeStructuralPseudoClass
 	}
 	
 	#[inline(always)]
-	fn parse_without_arguments<'i>(name: CowRcStr<'i>) -> Result<Self, ParseError<'i, SelectorParseError<'i, CustomParseError>>>
+	fn parse_without_arguments<'i>(name: CowRcStr<'i>) -> Result<Self, ParseError<'i, SelectorParseError<'i, CustomParseError<'i>>>>
 	{
 		use self::NonTreeStructuralPseudoClass::*;
 		use self::VendorPrefix::*;

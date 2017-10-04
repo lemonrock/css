@@ -22,4 +22,7 @@ pub trait Unit: Sized
 	
 	#[inline(always)]
 	fn to_canonical_dimension_value<Conversion: FontRelativeLengthConversion<Self::Number> + ViewportPercentageLengthConversion<Self::Number> + PercentageConversion<Self::Number>>(&self, conversion: &Conversion) -> Self::Number;
+	
+	#[inline(always)]
+	fn from_raw_css_for_var_expression_evaluation(value: &str, is_not_in_page_rule: bool) -> Option<Self>;
 }

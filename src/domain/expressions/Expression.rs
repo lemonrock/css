@@ -8,5 +8,5 @@ pub trait Expression<U: Unit>
 	/// Division by zero is handled by returning the maximum possible f32 value
 	/// Subtractions for UnsignedCssNumber that are negative are handled by returning 0.0
 	#[inline(always)]
-	fn evaluate<Conversion: FontRelativeLengthConversion<U::Number> + ViewportPercentageLengthConversion<U::Number> + PercentageConversion<U::Number> + AttributeConversion<U::Number> + CssVariableConversion<U::Number>>(&self, conversion: &Conversion) -> Option<U::Number>;
+	fn evaluate<Conversion: FontRelativeLengthConversion<U::Number> + ViewportPercentageLengthConversion<U::Number> + PercentageConversion<U::Number> + AttributeConversion<U> + CssVariableConversion>(&self, conversion: &Conversion) -> Option<U::Number>;
 }

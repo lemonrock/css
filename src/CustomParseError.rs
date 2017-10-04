@@ -97,6 +97,8 @@ pub enum CustomParseError<'i>
 	CouldNotParseDimension(f32, CowRcStr<'i>),
 	UnknownFunctionInValueExpression(CowRcStr<'i>),
 	
+	CssVariablesInVarExpressionsMustStartWithTwoDashes(CowRcStr<'i>),
+	
 	CouldNotParseInteger,
 	CouldNotParsePercentage,
 	CouldNotParseNumber,

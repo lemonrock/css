@@ -35,3 +35,83 @@ define_css_keyword_enum!
 	"khz" => kHz,
 	"%" => percentage,
 }
+
+impl Default for TypeOrUnit
+{
+	#[inline(always)]
+	fn default() -> Self
+	{
+		TypeOrUnit::string
+	}
+}
+
+impl TypeOrUnit
+{
+	// Returns Err(()) if support not currently present
+	#[inline(always)]
+	pub fn to_css(&self, valueFromAttribute: &str) -> Result<String, ()>
+	{
+		use self::TypeOrUnit::*;
+		
+		match *self
+		{
+			string => Ok(format!("\"{}\"", valueFromAttribute)),
+			
+			color => Ok(valueFromAttribute.to_owned()),
+			
+			url => Ok(format!("url({})", valueFromAttribute)),
+			
+			integer => Ok(valueFromAttribute.to_owned()),
+			
+			number => Ok(valueFromAttribute.to_owned()),
+			
+			length => Ok(valueFromAttribute.to_owned()),
+			
+			em => Ok(format!("{}em", valueFromAttribute)),
+			
+			ex => Ok(format!("{}ex", valueFromAttribute)),
+			
+			px => Ok(format!("{}px", valueFromAttribute)),
+			
+			rem => Ok(format!("{}rem", valueFromAttribute)),
+			
+			vw => Ok(format!("{}vw", valueFromAttribute)),
+			
+			vh => Ok(format!("{}vh", valueFromAttribute)),
+			
+			vmin => Ok(format!("{}vmin", valueFromAttribute)),
+			
+			vmax => Ok(format!("{}vmax", valueFromAttribute)),
+			
+			mm => Ok(format!("{}mm", valueFromAttribute)),
+			
+			cm => Ok(format!("{}cm", valueFromAttribute)),
+			
+			in_ => Ok(format!("{}in", valueFromAttribute)),
+			
+			pt => Ok(format!("{}pt", valueFromAttribute)),
+			
+			pc => Ok(format!("{}pc", valueFromAttribute)),
+			
+			angle => Ok(valueFromAttribute.to_owned()),
+			
+			deg => Ok(format!("{}deg", valueFromAttribute)),
+			
+			rad => Ok(format!("{}rad", valueFromAttribute)),
+			
+			time => Ok(valueFromAttribute.to_owned()),
+			
+			s => Ok(format!("{}s", valueFromAttribute)),
+			
+			ms => Ok(format!("{}ms", valueFromAttribute)),
+			
+			frequency => Ok(valueFromAttribute.to_owned()),
+			
+			hz => Ok(format!("{}hz", valueFromAttribute)),
+			
+			khz => Ok(format!("{}khz", valueFromAttribute)),
+			
+			percentage => Ok(format!("{}%", valueFromAttribute)),
+		}
+	}
+}

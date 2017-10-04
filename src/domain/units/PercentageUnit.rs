@@ -10,7 +10,7 @@ impl<Number: CssNumber> ToCss for PercentageUnit<Number>
 {
 	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
 	{
-		serialize_percentage(self.0.to_f32(), dest)
+		serialize_percentage(self.0, dest)
 	}
 }
 
@@ -158,17 +158,16 @@ impl<NumberX: CssNumber> Unit for PercentageUnit<NumberX>
 	#[inline(always)]
 	fn parse_one_outside_calc_function<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<CalculablePropertyValue<Self>, ParseError<'i, CustomParseError<'i>>>
 	{
-		use ::cssparser::Token::*;
 		use self::CalculablePropertyValue::*;
 		use self::CustomParseError::*;
 		
 		match *input.next()?
 		{
-			Number { value, .. } =>
+			Token::Number { value, .. } =>
 			{
 				if value == 0.
 				{
-					Ok(Constant(PercentageUnit(Self::Number::Zero)))
+					Ok(Constant(Self::default()))
 				}
 				else
 				{
@@ -176,13 +175,13 @@ impl<NumberX: CssNumber> Unit for PercentageUnit<NumberX>
 				}
 			}
 			
-			PercentageUnit { unit_value, .. } =>
+			Token::Percentage { unit_value, .. } =>
 			{
-				let percentage = Self::new(unit_value).map_err(|cssNumberConversionError| ParseError::Custom(CouldNotParseCssUnsignedNumber(cssNumberConversionError, unit_value)))?;
+				let percentage = Self::Number::new(unit_value).map_err(|cssNumberConversionError| ParseError::Custom(CouldNotParseCssUnsignedNumber(cssNumberConversionError, unit_value)))?;
 				Ok(Constant(PercentageUnit(percentage)))
 			}
 			
-			Function(ref name) =>
+			Token::Function(ref name) =>
 			{
 				match_ignore_ascii_case!
 				{
@@ -205,27 +204,26 @@ impl<NumberX: CssNumber> Unit for PercentageUnit<NumberX>
 	#[inline(always)]
 	fn parse_one_inside_calc_function<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Either<CalculablePropertyValue<Self>, CalcExpression<Self>>, ParseError<'i, CustomParseError<'i>>>
 	{
-		use ::cssparser::Token::*;
 		use self::CalculablePropertyValue::*;
 		use self::CustomParseError::*;
 		
 		match *input.next()?
 		{
-			Number { value, .. } =>
+			Token::Number { value, .. } =>
 			{
-				let constant = Self::new(value).map_err(|cssNumberConversionError| ParseError::Custom(CouldNotParseCssUnsignedNumber(cssNumberConversionError, value)))?;
+				let constant = Self::Number::new(value).map_err(|cssNumberConversionError| ParseError::Custom(CouldNotParseCssUnsignedNumber(cssNumberConversionError, value)))?;
 				Ok(Right(CalcExpression::Number(constant)))
 			}
 			
-			PercentageUnit { unit_value, .. } =>
+			Token::Percentage { unit_value, .. } =>
 			{
-				let percentage = Self::new(unit_value).map_err(|cssNumberConversionError| ParseError::Custom(CouldNotParseCssUnsignedNumber(cssNumberConversionError, unit_value)))?;
-				Ok(Left(PercentageUnit(percentage)))
+				let percentage = Self::Number::new(unit_value).map_err(|cssNumberConversionError| ParseError::Custom(CouldNotParseCssUnsignedNumber(cssNumberConversionError, unit_value)))?;
+				Ok(Left(Constant(PercentageUnit(percentage))))
 			}
 			
-			ParenthesisBlock => Ok(Right(CalcExpression::parse(context, input)?)),
+			Token::ParenthesisBlock => Ok(Right(CalcExpression::parse(context, input)?)),
 			
-			Function(ref name) =>
+			Token::Function(ref name) =>
 			{
 				match_ignore_ascii_case!
 				{
@@ -248,7 +246,50 @@ impl<NumberX: CssNumber> Unit for PercentageUnit<NumberX>
 	#[inline(always)]
 	fn to_canonical_dimension_value<Conversion: FontRelativeLengthConversion<Self::Number> + ViewportPercentageLengthConversion<Self::Number> + PercentageConversion<Self::Number>>(&self, conversion: &Conversion) -> Self::Number
 	{
-		self.as_CssNumber() * conversion.one_hundred_percent_in_absolute_units()
+		self.to_absolute_value(conversion)
+	}
+	
+	#[inline(always)]
+	fn from_raw_css_for_var_expression_evaluation(value: &str, _is_not_in_page_rule: bool) -> Option<Self>
+	{
+		fn from_raw_css_for_var_expression_evaluation_internal<'i: 't, 't, Number: CssNumber>(input: &Parser<'i, 't>) -> Result<PercentageUnit<Number>, ParseError<'i, CustomParseError<'i>>>
+		{
+			let value = match *input.next()?
+			{
+				Token::Number { value, .. } =>
+				{
+					if value == 0.
+					{
+						Ok(PercentageUnit::default())
+					}
+					else
+					{
+						Err(ParseError::Custom(CouldNotParseDimensionLessNumber(value)))
+					}
+				}
+				
+				Token::Percentage { unit_value, .. } =>
+				{
+					let cssNumber = PercentageUnit::Number::new(value).map_err(|cssNumberConversionError| ParseError::Custom(CouldNotParseCssSignedNumber(cssNumberConversionError, value)))?;
+					Ok(PercentageUnit(cssNumber))
+				}
+				
+				unexpectedToken @ _ => Err(BasicParseError::UnexpectedToken(unexpectedToken.clone()).into()),
+			};
+			
+			input.skip_whitespace()?;
+			
+			input.expect_exhausted()?;
+			
+			Ok(value)
+		}
+		
+		const LineNumberingIsZeroBased: u32 = 0;
+		
+		let mut parserInput = ParserInput::new_with_line_number_offset(value, LineNumberingIsZeroBased);
+		let mut input = Parser::new(&mut parserInput);
+		
+		from_raw_css_for_var_expression_evaluation_internal(&input).ok()
 	}
 }
 
@@ -257,4 +298,13 @@ impl<Number: CssNumber> PercentageUnit<Number>
 	pub const ZeroPercent: PercentageUnit<Number> = PercentageUnit(Number::Zero);
 	
 	pub const OneHundredPercent: PercentageUnit<Number> = PercentageUnit(Number::One);
+}
+
+impl<Number: CssNumber> PercentageUnit<Number>
+{
+	#[inline(always)]
+	fn to_absolute_value<Conversion: PercentageConversion<Number>>(&self, conversion: &Conversion) -> Number
+	{
+		self.to_CssNumber() * conversion.one_hundred_percent_in_absolute_units()
+	}
 }

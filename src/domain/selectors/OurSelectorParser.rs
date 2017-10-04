@@ -66,7 +66,7 @@ impl OurSelectorParser
 		{
 			match parseError
 			{
-				// We are changing from a ParseError<SelectorParseError> to a ParseError<CustomParseError>, hence this superficially looking redundant code
+				// We are changing from a ParseError<SelectorParseError> to a ParseError<CustomParseError<'i>>, hence this superficially looking redundant code
 				ParseError::Basic(basicParseError) => ParseError::Basic(basicParseError),
 				ParseError::Custom(selectorParseError) => ParseError::Custom(CustomParseError::SpecificSelectorParseError(Box::new(selectorParseError))),
 			}

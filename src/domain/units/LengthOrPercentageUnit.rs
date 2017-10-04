@@ -26,7 +26,7 @@ impl<Number: CssNumber> Default for LengthOrPercentageUnit<Number>
 	#[inline(always)]
 	fn default() -> Self
 	{
-		LengthOrPercentageUnit::IsLength(LengthUnit::default())
+		IsLength(LengthUnit::default())
 	}
 }
 
@@ -222,7 +222,7 @@ impl<NumberX: CssNumber> Unit for LengthOrPercentageUnit<NumberX>
 			{
 				if value == 0.
 				{
-					Ok(Constant(IsLength(LengthOrPercentageUnit::from_px(LengthUnit::Number::Zero))))
+					Ok(Constant(Self::default()))
 				}
 				else
 				{
@@ -300,11 +300,11 @@ impl<NumberX: CssNumber> Unit for LengthOrPercentageUnit<NumberX>
 				}
 			}
 			
-			Token::Percentage { value, .. } =>
+			Token::Percentage { unit_value, .. } =>
 			{
-				let cssNumber = Self::Number::new(value).map_err(|cssNumberConversionError| ParseError::Custom(CouldNotParseCssSignedNumber(cssNumberConversionError, value)))?;
+				let cssNumber = Self::Number::new(unit_value).map_err(|cssNumberConversionError| ParseError::Custom(CouldNotParseCssSignedNumber(cssNumberConversionError, unit_value)))?;
 				
-				Ok(IsPercentage(Percentage(cssNumber)))
+				Ok(Constant(IsPercentage(PercentageUnit(cssNumber))))
 			}
 			
 			Token::Function(ref name) =>
@@ -337,14 +337,14 @@ impl<NumberX: CssNumber> Unit for LengthOrPercentageUnit<NumberX>
 		{
 			Token::Number { value, .. } =>
 			{
-				let constant = Self::new(value).map_err(|cssNumberConversionError| ParseError::Custom(CouldNotParseCssUnsignedNumber(cssNumberConversionError, value)))?;
+				let constant = Self::Number::new(value).map_err(|cssNumberConversionError| ParseError::Custom(CouldNotParseCssUnsignedNumber(cssNumberConversionError, value)))?;
 				Ok(Right(CalcExpression::Number(constant)))
 			}
 			
 			Token::Percentage { unit_value, .. } =>
 			{
-				let cssNumber = Self::new(unit_value).map_err(|cssNumberConversionError| ParseError::Custom(CouldNotParseCssUnsignedNumber(cssNumberConversionError, unit_value)))?;
-				Ok(Left(PercentageUnit(cssNumber)))
+				let cssNumber = Self::Number::new(unit_value).map_err(|cssNumberConversionError| ParseError::Custom(CouldNotParseCssUnsignedNumber(cssNumberConversionError, unit_value)))?;
+				Ok(Left(Constant(IsPercentage(PercentageUnit(cssNumber)))))
 			}
 			
 			Token::Dimension { value, ref unit, .. } =>
@@ -450,6 +450,119 @@ impl<NumberX: CssNumber> Unit for LengthOrPercentageUnit<NumberX>
 			IsPercentage(ref percentage) => percentage.to_canonical_dimension_value(conversion),
 		}
 	}
+	
+	#[inline(always)]
+	fn from_raw_css_for_var_expression_evaluation(value: &str, is_not_in_page_rule: bool) -> Option<Self>
+	{
+		fn from_raw_css_for_var_expression_evaluation_internal<'i: 't, 't, Number: CssNumber>(is_not_in_page_rule: bool, input: &Parser<'i, 't>) -> Result<LengthOrPercentageUnit<Number>, ParseError<'i, CustomParseError<'i>>>
+		{
+			let value = match *input.next()?
+			{
+				Token::Number { value, .. } =>
+				{
+					if value == 0.
+					{
+						Ok(LengthOrPercentageUnit::default())
+					}
+					else
+					{
+						Err(ParseError::Custom(CouldNotParseDimensionLessNumber(value)))
+					}
+				}
+				
+				Token::Percentage { unit_value, .. } =>
+				{
+					let cssNumber = LengthOrPercentageUnit::Number::new(value).map_err(|cssNumberConversionError| ParseError::Custom(CouldNotParseCssSignedNumber(cssNumberConversionError, value)))?;
+					Ok(IsPercentage(PercentageUnit(cssNumber)))
+				}
+				
+				Token::Dimension { value, ref unit, .. } =>
+				{
+					let cssNumber = LengthOrPercentageUnit::Number::new(value).map_err(|cssNumberConversionError| ParseError::Custom(CouldNotParseCssSignedNumber(cssNumberConversionError, value)))?;
+					
+					match_ignore_ascii_case!
+					{
+						&*unit,
+						
+						"px" => Ok(IsLength(Absolute(px(cssNumber)))),
+						
+						"in" => Ok(IsLength(Absolute(in_(cssNumber)))),
+						
+						"cm" => Ok(IsLength(Absolute(cm(cssNumber)))),
+						
+						"mm" => Ok(IsLength(Absolute(mm(cssNumber)))),
+						
+						"q" => Ok(IsLength(Absolute(q(cssNumber)))),
+						
+						"pt" => Ok(IsLength(Absolute(pt(cssNumber)))),
+						
+						"pc" => Ok(IsLength(Absolute(pc(cssNumber)))),
+						
+						"em" => Ok(IsLength(FontRelative(em(cssNumber)))),
+						
+						"ex" => Ok(IsLength(FontRelative(ex(cssNumber)))),
+						
+						"ch" => Ok(IsLength(FontRelative(ch(cssNumber)))),
+						
+						"rem" => Ok(IsLength(FontRelative(rem(cssNumber)))),
+						
+						"vw" => if is_not_in_page_rule
+						{
+							Ok(IsLength(ViewportPercentage(vw(cssNumber))))
+						}
+						else
+						{
+							Err(ParseError::Custom(CustomParseError::ViewportLengthsAreNotAllowedInAPageAtRule))
+						},
+						
+						"vh" => if is_not_in_page_rule
+						{
+							Ok(IsLength(ViewportPercentage(vh(cssNumber))))
+						}
+						else
+						{
+							Err(ParseError::Custom(CustomParseError::ViewportLengthsAreNotAllowedInAPageAtRule))
+						},
+						
+						"vmin" => if is_not_in_page_rule
+						{
+							Ok(IsLength(ViewportPercentage(vmin(cssNumber))))
+						}
+						else
+						{
+							Err(ParseError::Custom(CustomParseError::ViewportLengthsAreNotAllowedInAPageAtRule))
+						},
+						
+						"vmax" => if is_not_in_page_rule
+						{
+							Ok(IsLength(ViewportPercentage(vmax(cssNumber))))
+						}
+						else
+						{
+							Err(ParseError::Custom(CustomParseError::ViewportLengthsAreNotAllowedInAPageAtRule))
+						},
+						
+						_ => Err(ParseError::Custom(CouldNotParseDimension(value, unit.clone()))),
+					}
+				}
+				
+				unexpectedToken @ _ => Err(BasicParseError::UnexpectedToken(unexpectedToken.clone()).into()),
+			};
+			
+			input.skip_whitespace()?;
+			
+			input.expect_exhausted()?;
+			
+			Ok(value)
+		}
+		
+		const LineNumberingIsZeroBased: u32 = 0;
+		
+		let mut parserInput = ParserInput::new_with_line_number_offset(value, LineNumberingIsZeroBased);
+		let mut input = Parser::new(&mut parserInput);
+		
+		from_raw_css_for_var_expression_evaluation_internal(&input, is_not_in_page_rule).ok()
+	}
 }
 
 impl<Number: CssNumber> LengthOrPercentageUnit<Number>
@@ -461,7 +574,7 @@ impl<Number: CssNumber> LengthOrPercentageUnit<Number>
 		match *self
 		{
 			IsLength(ref length) => length.to_px(conversion),
-			IsPercentage(ref percentage) => percentage.to_absolute_unit(conversion),
+			IsPercentage(ref percentage) => percentage.to_absolute_value(conversion),
 		}
 	}
 	

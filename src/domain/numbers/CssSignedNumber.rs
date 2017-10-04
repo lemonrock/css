@@ -301,7 +301,7 @@ impl From<i8> for CssSignedNumber
 
 impl FromStr for CssSignedNumber
 {
-	type Err = CssNumberParseError;
+	type Err = UnitFromStrError;
 	
 	fn from_str(s: &str) -> Result<Self, Self::Err>
 	{
@@ -409,7 +409,7 @@ impl Unit for CssSignedNumber
 			Token::Percentage { unit_value, .. } =>
 			{
 				let percentage = Self::new(unit_value).map_err(|cssNumberConversionError| ParseError::Custom(CouldNotParseCssSignedNumber(cssNumberConversionError, unit_value)))?;
-				Ok(Left(PercentageUnit(percentage)))
+				Ok(Left(Percentage(PercentageUnit(percentage))))
 			}
 			
 			Token::ParenthesisBlock => Ok(Right(CalcExpression::parse(context, input)?)),
@@ -438,5 +438,32 @@ impl Unit for CssSignedNumber
 	fn to_canonical_dimension_value<Conversion: FontRelativeLengthConversion<Self::Number> + ViewportPercentageLengthConversion<Self::Number> + PercentageConversion<Self::Number>>(&self, _conversion: &Conversion) -> Self::Number
 	{
 		self.to_CssNumber()
+	}
+	
+	#[inline(always)]
+	fn from_raw_css_for_var_expression_evaluation(value: &str, _is_not_in_page_rule: bool) -> Option<Self>
+	{
+		fn from_raw_css_for_var_expression_evaluation_internal<'i: 't, 't>(input: &Parser<'i, 't>) -> Result<CssSignedNumber, ParseError<'i, CustomParseError<'i>>>
+		{
+			let value = match *input.next()?
+			{
+				Token::Number { value, .. } => CssSignedNumber::new(value).map_err(|cssNumberConversionError| ParseError::Custom(CouldNotParseCssSignedNumber(cssNumberConversionError, value))),
+				
+				unexpectedToken @ _ => Err(BasicParseError::UnexpectedToken(unexpectedToken.clone()).into()),
+			};
+			
+			input.skip_whitespace()?;
+			
+			input.expect_exhausted()?;
+			
+			Ok(value)
+		}
+		
+		const LineNumberingIsZeroBased: u32 = 0;
+		
+		let mut parserInput = ParserInput::new_with_line_number_offset(value, LineNumberingIsZeroBased);
+		let mut input = Parser::new(&mut parserInput);
+		
+		from_raw_css_for_var_expression_evaluation_internal(&input).ok()
 	}
 }

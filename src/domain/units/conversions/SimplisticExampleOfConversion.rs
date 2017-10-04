@@ -2,7 +2,7 @@
 // Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
 
 
-#[derive(Default, Debug, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
+#[derive(Default, Debug, Clone)]
 pub struct SimplisticExampleOfConversion<U: Unit>
 {
 	// Font relative lengths
@@ -21,8 +21,8 @@ pub struct SimplisticExampleOfConversion<U: Unit>
 	pub one_hundred_percent_in_absolute_units: U::Number,
 	
 	// Simplistic approach
-	pub cssVariablesWithLowerCaseNamesWithoutLeadingDoubleDash: HashMap<String, Box<ToUnit<U>>>,
-	pub attributesWithLowerCaseNames: HashMap<String, Box<ToUnit<U>>>,
+	pub cssVariablesWithLowerCaseNamesWithoutLeadingDoubleDashToRawCss: HashMap<String, String>,
+	pub attributesWithLowerCaseNames: HashMap<String, String>,
 }
 
 impl<U: Unit> FontRelativeLengthConversion<U::Number> for SimplisticExampleOfConversion<U>
@@ -88,20 +88,30 @@ impl<U: Unit> PercentageConversion<U::Number> for SimplisticExampleOfConversion<
 	}
 }
 
-impl<U: Unit> CssVariableConversion<U> for SimplisticExampleOfConversion<U>
+impl<U: Unit> CssVariableConversion for SimplisticExampleOfConversion<U>
 {
 	#[inline(always)]
-	fn cssVariableValue(&self, css_variable_lower_case_name_without_leading_double_dash: &str) -> Option<U>
+	fn cssVariableValue(&self, css_variable_lower_case_name_without_leading_double_dash: &str) -> Option<&str>
 	{
-		self.cssVariablesWithLowerCaseNamesWithoutLeadingDoubleDash.get(css_variable_lower_case_name_without_leading_double_dash).map(|value| value.try_to_canonical_unit())
+		match self.cssVariablesWithLowerCaseNamesWithoutLeadingDoubleDashToRawCss.get(css_variable_lower_case_name_without_leading_double_dash)
+		{
+			Some(value) => &value[..],
+			None => None,
+		}
 	}
 }
 
 impl<U: Unit> AttributeConversion<U> for SimplisticExampleOfConversion<U>
 {
+	/// Returns the (value of the attribute, property default)
+	/// In this simplistic example, since we don't know th property name, we assume all property defaults are the specification default: https://drafts.csswg.org/css-values-3/#typedef-type-or-unit
 	#[inline(always)]
-	fn attributeValue(&self, attribute_lower_case_name: &str) -> Option<U>
+	fn attributeValue(&self, attribute_lower_case_name: &str) -> (Option<&str>, U)
 	{
-		self.attributesWithLowerCaseNames.get(attribute_lower_case_name).map(|value| value.try_to_canonical_unit())
+		match self.attributesWithLowerCaseNames.get(attribute_lower_case_name)
+		{
+			Some(value) => (Some(&value[..]), U::default()),
+			None => (None, U::default()),
+		}
 	}
 }

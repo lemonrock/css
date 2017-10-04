@@ -3,16 +3,18 @@
 
 
 #[derive(Debug, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
-pub struct AttrExpression<U>
+pub struct AttrExpression
 {
 	pub attribute_lower_case_name: String,
 	
 	pub type_or_unit: TypeOrUnit,
 
-	pub default_value: Option<U>,
+	pub default_value_css: Option<String>,
+	
+	pub is_not_in_page_rule: bool,
 }
 
-impl<U: Unit> ToCss for AttrExpression<U>
+impl ToCss for AttrExpression
 {
 	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
 	{
@@ -24,40 +26,127 @@ impl<U: Unit> ToCss for AttrExpression<U>
 			self.type_or_unit.to_css(dest)?;
 		}
 		
-		if let Some(ref default_value) = self.default_value
+		if let Some(ref default_value_css) = self.default_value_css
 		{
 			dest.write_char(',')?;
-			default_value.to_css(dest)?;
+			dest.write_str(default_value_css)?;
 		}
 		
 		Ok(())
 	}
 }
 
-impl<U: Unit> Expression<U> for AttrExpression<U>
+impl<U: Unit> Expression<U> for AttrExpression
 {
-	/// Evaluate the calc() expression, returning the numeric value of the canonical dimension
 	/// Division by zero is handled by returning the maximum possible f32 value
 	/// Subtractions for UnsignedCssNumber that are negative are handled by returning 0.0
 	#[inline(always)]
-	fn evaluate<Conversion: FontRelativeLengthConversion<U::Number> + ViewportPercentageLengthConversion<U::Number> + PercentageConversion<U::Number> + AttributeConversion<U::Number> + CssVariableConversion<U::Number>>(&self, conversion: &Conversion) -> Option<U::Number>
+	fn evaluate<Conversion: FontRelativeLengthConversion<U::Number> + ViewportPercentageLengthConversion<U::Number> + PercentageConversion<U::Number> + AttributeConversion<U> + CssVariableConversion>(&self, conversion: &Conversion) -> Option<U::Number>
 	{
-		if let Some(value) = conversion.attributeValue(self.attribute_lower_case_name)
-		{
-			Some(value)
-		}
-		else
-		{
-			self.default_value
-		}
+		self.to_unit(conversion).map(|unit| unit.to_CssNumber())
 	}
 }
 
-impl<U: Unit> AttrExpression<U>
+impl AttrExpression
 {
+	pub fn to_unit<Conversion: AttributeConversion<U>>(&self, conversion: &Conversion)
+	{
+		let (possibleValue, propertyDefaultOrIfNoPropertyDefaultTheUnitDefault) = conversion.attributeValue(self.attribute_lower_case_name);
+		if let Some(value) = possibleValue
+		{
+			if let Some(value_css) = self.type_or_unit.to_css(value).ok()
+			{
+				U::from_raw_css_for_var_expression_evaluation(value_css, self.is_not_in_page_rule)
+			}
+			else if let Some(value_css) = self.default_value_css
+			{
+				U::from_raw_css_for_var_expression_evaluation(value_css, self.is_not_in_page_rule)
+			}
+			else
+			{
+				Some(propertyDefaultOrIfNoPropertyDefaultTheUnitDefault)
+			}
+		}
+		else if let Some(value_css) = self.default_value_css
+		{
+			U::from_raw_css_for_var_expression_evaluation(value_css, self.is_not_in_page_rule)
+		}
+		else
+		{
+			Some(propertyDefaultOrIfNoPropertyDefaultTheUnitDefault)
+		}
+	}
+	
 	#[inline(always)]
 	pub(crate) fn parse<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
 	{
-		input.parse_nested_block(|input| Self::parse_sum(context, input))
+		input.parse_nested_block(|input|
+		{
+			let attribute = input.expect_ident();
+			let attribute_lower_case_name = attribute.to_ascii_lowercase();
+			input.skip_whitespace()?;
+			
+			if input.is_exhauted()
+			{
+				Ok
+				(
+					Self
+					{
+						attribute_lower_case_name,
+						type_or_unit: TypeOrUnit::default(),
+						default_value_css: None,
+						is_not_in_page_rule: context.isNotInPageRule(),
+					}
+				)
+			}
+			else
+			{
+				let type_or_unit = if let Some(type_or_unit) = input.try(|input| TypeOrUnit::parse(input)).ok()
+				{
+					type_or_unit
+				}
+				else
+				{
+					TypeOrUnit::default()
+				};
+				
+				let result = input.try(|input|
+				{
+					input.skip_whitespace()?;
+					input.expect_comma()?;
+					input.skip_whitespace()?;
+					
+					let startPosition = input.position();
+					input.parse_entirely(|input| input.slice_from(startPosition).map(|slice| Some(slice.to_owned())))
+				});
+				
+				let default_value_css = if let Ok(Some(default_value_css)) = result
+				{
+					if default_value_css.is_empty()
+					{
+						None
+					}
+					else
+					{
+						Some(default_value_css)
+					}
+				}
+				else
+				{
+					None
+				};
+				
+				Ok
+				(
+					Self
+					{
+						attribute_lower_case_name,
+						type_or_unit,
+						default_value_css,
+						is_not_in_page_rule: context.isNotInPageRule(),
+					}
+				)
+			}
+		})
 	}
 }

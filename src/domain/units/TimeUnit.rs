@@ -30,7 +30,7 @@ impl<Number: CssNumber> Default for TimeUnit<Number>
 	#[inline(always)]
 	fn default() -> Self
 	{
-		TimeUnit::s(0)
+		s(Number::default())
 	}
 }
 
@@ -227,7 +227,7 @@ impl<NumberX: CssNumber> Unit for TimeUnit<NumberX>
 			{
 				if value == 0.
 				{
-					Ok(Constant(Absolute(px(Self::Number::Zero))))
+					Ok(Constant(Self::default()))
 				}
 				else
 				{
@@ -243,9 +243,9 @@ impl<NumberX: CssNumber> Unit for TimeUnit<NumberX>
 				{
 					&*unit,
 					
-					"s" => Ok(s(cssNumber)),
+					"s" => Ok(Constant(s(cssNumber))),
 					
-					"ms" => Ok(ms(cssNumber)),
+					"ms" => Ok(Constant(ms(cssNumber))),
 					
 					_ => Err(ParseError::Custom(CouldNotParseDimension(value, unit.clone()))),
 				}
@@ -281,14 +281,14 @@ impl<NumberX: CssNumber> Unit for TimeUnit<NumberX>
 		{
 			Token::Number { value, .. } =>
 			{
-				let constant = Self::new(value).map_err(|cssNumberConversionError| ParseError::Custom(CouldNotParseCssUnsignedNumber(cssNumberConversionError, value)))?;
+				let constant = Self::Number::new(value).map_err(|cssNumberConversionError| ParseError::Custom(CouldNotParseCssUnsignedNumber(cssNumberConversionError, value)))?;
 				Ok(Right(CalcExpression::Number(constant)))
 			}
 			
 			Token::Percentage { unit_value, .. } =>
 			{
-				let percentage = Self::new(unit_value).map_err(|cssNumberConversionError| ParseError::Custom(CouldNotParseCssUnsignedNumber(cssNumberConversionError, unit_value)))?;
-				Ok(Left(PercentageUnit(percentage)))
+				let percentage = Self::Number::new(unit_value).map_err(|cssNumberConversionError| ParseError::Custom(CouldNotParseCssUnsignedNumber(cssNumberConversionError, unit_value)))?;
+				Ok(Left(Percentage(PercentageUnit(percentage))))
 			}
 			
 			Token::Dimension { value, ref unit, .. } =>
@@ -299,9 +299,9 @@ impl<NumberX: CssNumber> Unit for TimeUnit<NumberX>
 				{
 					&*unit,
 					
-					"s" => Ok(Left(s(cssNumber))),
+					"s" => Ok(Left(Constant(s(cssNumber)))),
 					
-					"ms" => Ok(Left(ms(cssNumber))),
+					"ms" => Ok(Left(Constant(ms(cssNumber)))),
 					
 					_ => Err(ParseError::Custom(CouldNotParseDimension(value, unit.clone()))),
 				}
@@ -332,7 +332,7 @@ impl<NumberX: CssNumber> Unit for TimeUnit<NumberX>
 	#[inline(always)]
 	fn to_canonical_dimension(self) -> Self
 	{
-		match *self
+		match self
 		{
 			s(seconds) => s(seconds),
 			ms(milliseconds) => ms(milliseconds / NumberX::_construct(1000_f32)),
@@ -347,5 +347,58 @@ impl<NumberX: CssNumber> Unit for TimeUnit<NumberX>
 			s(seconds) => seconds,
 			ms(milliseconds) => milliseconds / NumberX::_construct(1000_f32),
 		}
+	}
+	
+	#[inline(always)]
+	fn from_raw_css_for_var_expression_evaluation(value: &str, _is_not_in_page_rule: bool) -> Option<Self>
+	{
+		fn from_raw_css_for_var_expression_evaluation_internal<'i: 't, 't, Number: CssNumber>(input: &Parser<'i, 't>) -> Result<TimeUnit<Number>, ParseError<'i, CustomParseError<'i>>>
+		{
+			let value = match *input.next()?
+			{
+				Token::Number { value, .. } =>
+				{
+					if value == 0.
+					{
+						Ok(TimeUnit::default())
+					}
+					else
+					{
+						Err(ParseError::Custom(CouldNotParseDimensionLessNumber(value)))
+					}
+				}
+				
+				Token::Dimension { value, ref unit, .. } =>
+				{
+					let cssNumber = TimeUnit::Number::new(value).map_err(|cssNumberConversionError| ParseError::Custom(CouldNotParseCssSignedNumber(cssNumberConversionError, value)))?;
+					
+					match_ignore_ascii_case!
+					{
+						&*unit,
+						
+						"s" => Ok(s(cssNumber)),
+						
+						"ms" => Ok(ms(cssNumber)),
+						
+						_ => Err(ParseError::Custom(CouldNotParseDimension(value, unit.clone()))),
+					}
+				}
+				
+				unexpectedToken @ _ => Err(BasicParseError::UnexpectedToken(unexpectedToken.clone()).into()),
+			};
+			
+			input.skip_whitespace()?;
+			
+			input.expect_exhausted()?;
+			
+			Ok(value)
+		}
+		
+		const LineNumberingIsZeroBased: u32 = 0;
+		
+		let mut parserInput = ParserInput::new_with_line_number_offset(value, LineNumberingIsZeroBased);
+		let mut input = Parser::new(&mut parserInput);
+		
+		from_raw_css_for_var_expression_evaluation_internal(&input).ok()
 	}
 }

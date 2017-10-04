@@ -88,7 +88,7 @@ impl<U: Unit> Expression<U> for CalcExpression<U>
 	/// Subtractions for UnsignedCssNumber that are negative are handled by returning 0.0
 	/// Note: We are quite lenient with calculations of unit-less and unit-having quantities, eg 100px * 100px is evaluated to 10,000px, not 10,000px^2, and 50 + 100px is evaluated to 150px
 	#[inline(always)]
-	fn evaluate<Conversion: FontRelativeLengthConversion<U::Number> + ViewportPercentageLengthConversion<U::Number> + PercentageConversion<U::Number> + AttributeConversion<U::Number> + CssVariableConversion<U::Number>>(&self, conversion: &Conversion) -> Option<U::Number>
+	fn evaluate<Conversion: FontRelativeLengthConversion<U::Number> + ViewportPercentageLengthConversion<U::Number> + PercentageConversion<U::Number> + AttributeConversion<U> + CssVariableConversion>(&self, conversion: &Conversion) -> Option<U::Number>
 	{
 		use self::CalcExpression::*;
 		

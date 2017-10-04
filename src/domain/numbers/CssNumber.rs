@@ -15,7 +15,7 @@ pub trait CssNumber: Sized
 + Neg<Output=Self>
 + Debug + Display + LowerExp + UpperExp
 + Deref
-+ From<u16> + From<i16> + From<u8> + From<i8> + FromStr<Err=CssNumberParseError>
++ From<u16> + From<i16> + From<u8> + From<i8> + FromStr<Err=UnitFromStrError>
 + CssNumberNewType<Self> + Unit<Number=Self> + AppUnitsPer
 {
 	const Zero: Self;
