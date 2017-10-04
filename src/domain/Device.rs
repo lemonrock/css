@@ -8,9 +8,9 @@ pub trait Device
 	
 	fn documentMatchesUrl(&self, urlMatchingFunction: &UrlMatchingFunction) -> bool;
 	
-	fn viewportWidthInAppUnitsMatches<Number: CssNumber>(&self, width: &Range<LengthUnit<Number>>) -> bool;
+	fn viewportWidthInAppUnitsMatches(&self, width: &Range<CalculablePropertyValue<LengthUnit<CssSignedNumber>>>) -> bool;
 	
-	fn viewportHeightInAppUnitsMatches<Number: CssNumber>(&self, width: &Range<LengthUnit<Number>>) -> bool;
+	fn viewportHeightInAppUnitsMatches(&self, width: &Range<CalculablePropertyValue<LengthUnit<CssSignedNumber>>>) -> bool;
 	
 	fn viewportAspectRatioMatches(&self, width: &Range<Ratio>) -> bool;
 	
