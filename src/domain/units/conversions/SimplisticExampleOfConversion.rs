@@ -95,7 +95,7 @@ impl<U: Unit> CssVariableConversion for SimplisticExampleOfConversion<U>
 	{
 		match self.cssVariablesWithLowerCaseNamesWithoutLeadingDoubleDashToRawCss.get(css_variable_lower_case_name_without_leading_double_dash)
 		{
-			Some(value) => &value[..],
+			Some(value) => Some(&value[..]),
 			None => None,
 		}
 	}

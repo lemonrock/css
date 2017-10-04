@@ -37,7 +37,7 @@ impl Parse for Ratio
 			return Err(ParseError::Custom(CustomParseError::RatioDivisorCanNotBeNegativeOrZero(width)))
 		}
 		
-		Ok(Self::new(width, height))
+		Ok(Self::new(width as u32, height as u32))
 	}
 }
 
@@ -45,7 +45,7 @@ impl Ratio
 {
 	/// This method will simplify the ratio, so creating smaller numbers in resultant CSS
 	#[inline(always)]
-	pub fn new(&self, width: u32, height: u32) -> Self
+	pub fn new(width: u32, height: u32) -> Self
 	{
 		debug_assert!(width != 0, "width can not be zero");
 		debug_assert!(height != 0, "height can not be zero");

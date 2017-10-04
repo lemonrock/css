@@ -7,7 +7,7 @@ pub struct VarExpression
 {
 	pub custom_property_lower_case_name_without_double_dash: String,
 
-	pub default_value_css: String,
+	pub default_value_css: Option<String>,
 
 	pub is_not_in_page_rule: bool,
 }
@@ -17,12 +17,12 @@ impl ToCss for VarExpression
 	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
 	{
 		dest.write_str("--")?;
-		serialize_identifier(&self.attribute, dest)?;
+		serialize_identifier(&self.custom_property_lower_case_name_without_double_dash, dest)?;
 		
 		if let Some(ref default_value) = self.default_value_css
 		{
 			dest.write_char(',')?;
-			dest.write_str(self.default_value_css)
+			dest.write_str(default_value);
 		}
 		
 		Ok(())
@@ -36,10 +36,17 @@ impl<U: Unit> Expression<U> for VarExpression
 	#[inline(always)]
 	fn evaluate<Conversion: FontRelativeLengthConversion<U::Number> + ViewportPercentageLengthConversion<U::Number> + PercentageConversion<U::Number> + AttributeConversion<U> + CssVariableConversion>(&self, conversion: &Conversion) -> Option<U::Number>
 	{
-		match conversion.cssVariableValue(self.custom_property_lower_case_name_without_double_dash)
+		match conversion.cssVariableValue(&self.custom_property_lower_case_name_without_double_dash)
 		{
-			Some(value_css) => U::from_raw_css_for_var_expression_evaluation(value_css, self.is_not_in_page_rule),
-			None => U::from_raw_css_for_var_expression_evaluation(&self.default_value_css, self.is_not_in_page_rule),
+			Some(value_css) => U::from_raw_css_for_var_expression_evaluation(value_css, self.is_not_in_page_rule).map(|unit| unit.to_CssNumber()),
+			None => if let Some(ref value_css) = self.default_value_css
+			{
+				U::from_raw_css_for_var_expression_evaluation(value_css, self.is_not_in_page_rule).map(|unit| unit.to_CssNumber())
+			}
+			else
+			{
+				None
+			},
 		}
 	}
 }
@@ -54,7 +61,7 @@ impl VarExpression
 			let identifier = input.expect_ident()?;
 			if !identifier.starts_with("--")
 			{
-				return Err(ParseError::Custom(CustomParseError::CssVariablesInVarExpressionsMustStartWithTwoDashes(identifier)))
+				return Err(ParseError::Custom(CustomParseError::CssVariablesInVarExpressionsMustStartWithTwoDashes(identifier.clone())))
 			}
 			let mut custom_property_lower_case_name_without_double_dash = (&identifier[2 .. ]).to_owned();
 			custom_property_lower_case_name_without_double_dash.make_ascii_lowercase();
@@ -63,8 +70,8 @@ impl VarExpression
 			
 			let result = input.try(|input|
 			{
-				input.expectComma()?;
-				input.skip_whitespace()?;
+				input.expect_comma()?;
+				input.skip_whitespace();
 				
 				if input.is_exhausted()
 				{
@@ -72,7 +79,7 @@ impl VarExpression
 				}
 				else
 				{
-					input.parse_entirely(|input| input.slice_from(startPosition).map(|slice| Some(slice.to_owned())))
+					input.parse_entirely(|input| Ok(Some(input.slice_from(startPosition).to_owned())))
 				}
 			});
 			

@@ -123,7 +123,7 @@ impl MediaResolution
 					
 					"infinite" => Ok(infinite),
 					
-					_ => Err(ParseError::Custom(CustomParseError::MediaQueryResolutionDoesNotSupportThisIdentifier(identifier.to_owned())))
+					_ => Err(ParseError::Custom(CustomParseError::MediaQueryResolutionDoesNotSupportThisIdentifier(identifier.clone())))
 				}
 			}
 			
@@ -144,7 +144,7 @@ impl MediaResolution
 					
 					"dpcm" => Ok(dpcm(value)),
 					
-					_ => Err(ParseError::Custom(CustomParseError::UnrecognisedMediaQueryResolutionUnit(unit.to_owned())))
+					_ => Err(ParseError::Custom(CustomParseError::UnrecognisedMediaQueryResolutionUnit(unit.clone())))
 				};
 				result.map(|resolution| resolution.reduce())
 			},

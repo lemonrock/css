@@ -77,7 +77,12 @@ impl MediaQuery
 	#[inline(always)]
 	fn never_matching() -> Self
 	{
-		Self::new(Some(Qualifier::Not), MediaQueryType::All, vec![])
+		Self
+		{
+			qualifier: Some(Qualifier::Not),
+			media_type: MediaQueryType::All,
+			expressions: vec![],
+		}
 	}
 	
 	/// Parse a media query given css input.
@@ -102,35 +107,42 @@ impl MediaQuery
 			None
 		};
 		
-		let media_type = match input.try(|i| i.expect_ident())
+		let media_type = input.try(|input|
 		{
-			Ok(ident) =>
+			match input.expect_ident()
 			{
-				let result: Result<_, ParseError> = MediaQueryType::parse(ident).map_err(|error| ParseError::Custom(error));
-				result?
-			}
-			
-			Err(_) =>
-			{
-				// Media type is only optional if qualifier is not specified.
-				if qualifier.is_some()
+				Ok(ident) => MediaQueryType::parse(ident).map_err(|error| ParseError::Custom(error)),
+				
+				Err(_) =>
 				{
-					return Err(ParseError::Custom(CustomParseError::MediaTypeIsOnlyOptionalIfQualifiedIsNotSpecified))
+					// Media type is only optional if qualifier is not specified.
+					if qualifier.is_some()
+					{
+						return Err(ParseError::Custom(CustomParseError::MediaTypeIsOnlyOptionalIfQualifiedIsNotSpecified))
+					}
+					
+					// Without a media type, require at least one expression.
+					expressions.push(Expression::parse(context, input)?);
+					
+					Ok(MediaQueryType::All)
 				}
-				
-				// Without a media type, require at least one expression.
-				expressions.push(Expression::parse(context, input)?);
-				
-				MediaQueryType::All
 			}
-		};
+		})?;
 		
 		// Parse any subsequent expressions
 		loop
 		{
 			if input.try(|input| input.expect_ident_matching("and")).is_err()
 			{
-				return Ok(Self::new(qualifier, media_type, expressions))
+				return Ok
+				(
+					Self
+					{
+						qualifier,
+						media_type,
+						expressions
+					}
+				);
 			}
 			expressions.push(Expression::parse(context, input)?)
 		}

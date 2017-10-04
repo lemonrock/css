@@ -2,7 +2,7 @@
 // Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
 
 
-pub trait Unit: Sized
+pub trait Unit: Sized + ToCss + Default + CssNumberNewType<<Self as Unit>::Number>
 {
 	type Number: CssNumber;
 	

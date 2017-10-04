@@ -14,7 +14,20 @@ impl ToCss for MediaList
 {
 	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
 	{
-		self.media_queries.to_css(dest)
+		if self.media_queries.is_empty()
+		{
+			return Ok(())
+		}
+		
+		let mut iterator = self.media_queries.iter();
+		iterator.next().unwrap().to_css(dest)?;
+		for mediaQuery in iterator
+		{
+			dest.write_char(',')?;
+			mediaQuery.to_css(dest)?;
+		}
+		
+		Ok(())
 	}
 }
 
@@ -33,11 +46,11 @@ impl MediaList
 	///
 	/// Always returns a media query list. If any invalid media query is found, the media query list is only filled with the equivalent of "not all", see:-
 	/// https://drafts.csswg.org/mediaqueries/#error-handling
-	pub(crate) fn parse_media_query_list<'i>(context: &ParserContext, input: &mut Parser, allowInvalidMediaQueries: bool) -> Result<MediaList, ParseError<'i, CustomParseError<'i>>>
+	pub(crate) fn parse_media_query_list<'i: 't, 't>(context: &ParserContext, input: &mut Parser<'i, 't>, allowInvalidMediaQueries: bool) -> Result<MediaList, ParseError<'i, CustomParseError<'i>>>
 	{
 		if input.is_exhausted()
 		{
-			return MediaList::empty();
+			return Ok(MediaList::empty());
 		}
 		
 		let mut media_queries = vec![];
@@ -91,7 +104,7 @@ impl MediaList
 			let media_match = mediaQuery.media_type.matches(device.media_type());
 			
 			// Check if all conditions match (AND condition)
-			let query_match =	media_match && mediaQuery.expressions.iter().all(|expression| expression.matches(&device));
+			let query_match =	media_match && mediaQuery.expressions.iter().all(|expression| expression.matches(device));
 			
 			// Apply the logical NOT qualifier to the result
 			match mediaQuery.qualifier

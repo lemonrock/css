@@ -3,7 +3,7 @@
 
 
 #[derive(Debug)]
-pub enum CustomParseError<'i>
+pub(crate) enum CustomParseError<'i>
 {
 	SpecificSelectorParseError(Box<SelectorParseError<'i, CustomParseError<'i>>>),
 	ThereAreNoSelectors,
@@ -51,12 +51,12 @@ pub enum CustomParseError<'i>
 	InvalidMediaType(CowRcStr<'i>),
 	DeprecatedMediaType(CowRcStr<'i>),
 	UnrecognisedMediaType(CowRcStr<'i>),
-	DeprecatedMediaQueryExpression(String),
-	UnsupportedMediaQueryExpression(String),
+	DeprecatedMediaQueryExpression(CowRcStr<'i>),
+	UnsupportedMediaQueryExpression(CowRcStr<'i>),
 	RatioNumeratorCanNotBeNegativeOrZero(i32),
 	RatioDivisorCanNotBeNegativeOrZero(i32),
-	UnrecognisedMediaQueryResolutionUnit(String),
-	MediaQueryResolutionDoesNotSupportThisIdentifier(String),
+	UnrecognisedMediaQueryResolutionUnit(CowRcStr<'i>),
+	MediaQueryResolutionDoesNotSupportThisIdentifier(CowRcStr<'i>),
 	MediaQueryResolutionCanNotBeNegativeOrZero,
 	UnexpectedTokenWhenParsingMediaQueryResolution(Token<'i>),
 	MediaGridMustBeEitherZeroOrOne(i32),
@@ -81,7 +81,7 @@ pub enum CustomParseError<'i>
 	UnexpectedCharsetAtRule,
 	UnexpectedAtRule(String),
 	
-	InvalidSupportsCondition(String),
+	InvalidSupportsCondition(CowRcStr<'i>),
 	
 	DocumentAtRuleUrlMatchingFunctionWasInvalid,
 	

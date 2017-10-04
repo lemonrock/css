@@ -10,7 +10,7 @@ impl<U: Unit> Default for CalcFunction<U>
 	#[inline(always)]
 	fn default() -> Self
 	{
-		CalcFunction(CalcExpression::default())
+		CalcFunction(Rc::new(CalcExpression::default()))
 	}
 }
 

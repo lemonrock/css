@@ -26,7 +26,7 @@ impl MediaQueryType
             "all" => Ok(All),
             
             _ => MediaType::parse(ident).map(Concrete),
-        };
+        }
 	}
 	
 	fn matches(&self, other: MediaType) -> bool

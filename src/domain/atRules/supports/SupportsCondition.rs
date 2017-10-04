@@ -120,7 +120,7 @@ impl SupportsCondition
 					&ident,
                     "and" => ("and", And as fn(_) -> _),
                     "or" => ("or", Or as fn(_) -> _),
-                    _ => return Err(ParseError::Custom(CustomParseError::InvalidSupportsCondition(ident.to_owned())))
+                    _ => return Err(ParseError::Custom(CustomParseError::InvalidSupportsCondition(ident.clone())))
                 }
 			}
 			

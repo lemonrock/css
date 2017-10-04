@@ -498,7 +498,7 @@ impl<NumberX: CssNumber> Unit for LengthUnit<NumberX>
 				
 				Token::Dimension { value, ref unit, .. } =>
 				{
-					let cssNumber = LengthUnit::Number::new(value).map_err(|cssNumberConversionError| ParseError::Custom(CouldNotParseCssSignedNumber(cssNumberConversionError, value)))?;
+					let cssNumber = <PercentageUnit<Number> as Unit>::Number::new(value).map_err(|cssNumberConversionError| ParseError::Custom(CouldNotParseCssSignedNumber(cssNumberConversionError, value)))?;
 					
 					match_ignore_ascii_case!
 					{
@@ -569,11 +569,11 @@ impl<NumberX: CssNumber> Unit for LengthUnit<NumberX>
 				unexpectedToken @ _ => Err(BasicParseError::UnexpectedToken(unexpectedToken.clone()).into()),
 			};
 			
-			input.skip_whitespace()?;
+			input.skip_whitespace();
 			
 			input.expect_exhausted()?;
 			
-			Ok(value)
+			value
 		}
 		
 		const LineNumberingIsZeroBased: u32 = 0;
@@ -581,7 +581,7 @@ impl<NumberX: CssNumber> Unit for LengthUnit<NumberX>
 		let mut parserInput = ParserInput::new_with_line_number_offset(value, LineNumberingIsZeroBased);
 		let mut input = Parser::new(&mut parserInput);
 		
-		from_raw_css_for_var_expression_evaluation_internal(&input, is_not_in_page_rule).ok()
+		from_raw_css_for_var_expression_evaluation_internal(is_not_in_page_rule, &input).ok()
 	}
 }
 

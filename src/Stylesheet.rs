@@ -35,7 +35,7 @@ impl Stylesheet
 		Ok(())
 	}
 	
-	pub fn parse<'i>(css: &'i str) -> Result<Self, PreciseParseError<CustomParseError<'i>>>
+	pub(crate) fn parse<'i>(css: &'i str) -> Result<Self, PreciseParseError<CustomParseError<'i>>>
 	{
 		const LineNumberingIsZeroBased: u32 = 0;
 		

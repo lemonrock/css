@@ -31,7 +31,7 @@ impl ViewportAtRule
 					}
 				}
 				
-				Err(error) => return Err(error),
+				Err(preciseParseError) => return Err(preciseParseError.error),
 			}
 		}
 		Ok(ViewportAtRule { declarations })

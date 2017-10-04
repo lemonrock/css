@@ -33,15 +33,15 @@ impl<U: Unit> ToCss for CalculablePropertyValue<U>
 		
 		match *self
 		{
-			Constant(ref constant) => constant.to_css(dest)?,
+			Constant(ref constant) => constant.to_css(dest),
 			
-			Percentage(ref percentage) => percentage.to_css(dest)?,
+			Percentage(ref percentage) => percentage.to_css(dest),
 			
-			Calc(ref function) => function.to_css(dest)?,
+			Calc(ref function) => function.to_css(dest),
 			
-			Attr(ref function) => function.to_css(dest)?,
+			Attr(ref function) => function.to_css(dest),
 			
-			Var(ref function) => function.to_css(dest)?,
+			Var(ref function) => function.to_css(dest),
 		}
 	}
 }
@@ -58,9 +58,9 @@ impl<U: Unit> Expression<U> for CalculablePropertyValue<U>
 		
 		match *self
 		{
-			Constant(constant) => constant.to_canonical_dimension_value(), // not for length mixes...
+			Constant(constant) => Some(constant.to_CssNumber()),
 			
-			Percentage(ref percentage) => percentage.to_absolute_unit(conversion),
+			Percentage(ref percentage) => Some(percentage.to_absolute_value(conversion)),
 			
 			Calc(ref function) => function.evaluate(conversion),
 			

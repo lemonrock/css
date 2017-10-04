@@ -3,7 +3,7 @@
 
 
 /// An enumeration that represents a ranged value.
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[derive(Debug, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub enum Range<T: ToCss>
 {
 	/// At least the inner value.

@@ -5,6 +5,7 @@
 use super::*;
 use self::domain::units::conversions::*;
 use ::std::rc::Rc;
+use ::std::ascii::AsciiExt;
 
 
 include!("AttrExpression.rs");

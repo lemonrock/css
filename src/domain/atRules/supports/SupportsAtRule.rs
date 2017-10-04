@@ -24,12 +24,8 @@ impl ToCss for SupportsAtRule
 	{
 		dest.write_str("@supports ")?;
 		self.condition.to_css(dest)?;
-		dest.write_str(" {")?;
-		for rule in self.rules.iter()
-		{
-			dest.write_str(" ")?;
-			rule.to_css(dest)?;
-		}
-		dest.write_str(" }")
+		dest.write_char('{')?;
+		self.rules.to_css(dest)?;
+		dest.write_char('}')
 	}
 }

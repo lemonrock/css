@@ -270,18 +270,18 @@ impl<NumberX: CssNumber> Unit for PercentageUnit<NumberX>
 				
 				Token::Percentage { unit_value, .. } =>
 				{
-					let cssNumber = PercentageUnit::Number::new(value).map_err(|cssNumberConversionError| ParseError::Custom(CouldNotParseCssSignedNumber(cssNumberConversionError, value)))?;
+					let cssNumber = <PercentageUnit<Number> as Unit>::Number::new(unit_value).map_err(|cssNumberConversionError| ParseError::Custom(CouldNotParseCssSignedNumber(cssNumberConversionError, value)))?;
 					Ok(PercentageUnit(cssNumber))
 				}
 				
 				unexpectedToken @ _ => Err(BasicParseError::UnexpectedToken(unexpectedToken.clone()).into()),
 			};
 			
-			input.skip_whitespace()?;
+			input.skip_whitespace();
 			
 			input.expect_exhausted()?;
 			
-			Ok(value)
+			value
 		}
 		
 		const LineNumberingIsZeroBased: u32 = 0;
@@ -303,7 +303,7 @@ impl<Number: CssNumber> PercentageUnit<Number>
 impl<Number: CssNumber> PercentageUnit<Number>
 {
 	#[inline(always)]
-	fn to_absolute_value<Conversion: PercentageConversion<Number>>(&self, conversion: &Conversion) -> Number
+	pub fn to_absolute_value<Conversion: PercentageConversion<Number>>(&self, conversion: &Conversion) -> Number
 	{
 		self.to_CssNumber() * conversion.one_hundred_percent_in_absolute_units()
 	}

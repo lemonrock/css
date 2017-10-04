@@ -452,11 +452,11 @@ impl Unit for CssSignedNumber
 				unexpectedToken @ _ => Err(BasicParseError::UnexpectedToken(unexpectedToken.clone()).into()),
 			};
 			
-			input.skip_whitespace()?;
+			input.skip_whitespace();
 			
 			input.expect_exhausted()?;
 			
-			Ok(value)
+			value
 		}
 		
 		const LineNumberingIsZeroBased: u32 = 0;

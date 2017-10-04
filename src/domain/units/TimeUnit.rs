@@ -370,7 +370,7 @@ impl<NumberX: CssNumber> Unit for TimeUnit<NumberX>
 				
 				Token::Dimension { value, ref unit, .. } =>
 				{
-					let cssNumber = TimeUnit::Number::new(value).map_err(|cssNumberConversionError| ParseError::Custom(CouldNotParseCssSignedNumber(cssNumberConversionError, value)))?;
+					let cssNumber = <TimeUnit<Number> as Unit>::Number::new(value).map_err(|cssNumberConversionError| ParseError::Custom(CouldNotParseCssSignedNumber(cssNumberConversionError, value)))?;
 					
 					match_ignore_ascii_case!
 					{
@@ -387,11 +387,11 @@ impl<NumberX: CssNumber> Unit for TimeUnit<NumberX>
 				unexpectedToken @ _ => Err(BasicParseError::UnexpectedToken(unexpectedToken.clone()).into()),
 			};
 			
-			input.skip_whitespace()?;
+			input.skip_whitespace();
 			
 			input.expect_exhausted()?;
 			
-			Ok(value)
+			value
 		}
 		
 		const LineNumberingIsZeroBased: u32 = 0;

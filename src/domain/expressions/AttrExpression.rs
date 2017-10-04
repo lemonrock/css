@@ -18,7 +18,7 @@ impl ToCss for AttrExpression
 {
 	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
 	{
-		serialize_identifier(&self.attribute, dest)?;
+		serialize_identifier(&self.attribute_lower_case_name, dest)?;
 		
 		if self.type_or_unit != TypeOrUnit::string
 		{
@@ -49,16 +49,16 @@ impl<U: Unit> Expression<U> for AttrExpression
 
 impl AttrExpression
 {
-	pub fn to_unit<Conversion: AttributeConversion<U>>(&self, conversion: &Conversion)
+	pub fn to_unit<U: Unit, Conversion: AttributeConversion<U>>(&self, conversion: &Conversion) -> Option<U>
 	{
-		let (possibleValue, propertyDefaultOrIfNoPropertyDefaultTheUnitDefault) = conversion.attributeValue(self.attribute_lower_case_name);
+		let (possibleValue, propertyDefaultOrIfNoPropertyDefaultTheUnitDefault) = conversion.attributeValue(&self.attribute_lower_case_name);
 		if let Some(value) = possibleValue
 		{
-			if let Some(value_css) = self.type_or_unit.to_css(value).ok()
+			if let Some(ref value_css) = self.type_or_unit.value_to_css(value).ok()
 			{
 				U::from_raw_css_for_var_expression_evaluation(value_css, self.is_not_in_page_rule)
 			}
-			else if let Some(value_css) = self.default_value_css
+			else if let Some(ref value_css) = self.default_value_css
 			{
 				U::from_raw_css_for_var_expression_evaluation(value_css, self.is_not_in_page_rule)
 			}
@@ -67,7 +67,7 @@ impl AttrExpression
 				Some(propertyDefaultOrIfNoPropertyDefaultTheUnitDefault)
 			}
 		}
-		else if let Some(value_css) = self.default_value_css
+		else if let Some(ref value_css) = self.default_value_css
 		{
 			U::from_raw_css_for_var_expression_evaluation(value_css, self.is_not_in_page_rule)
 		}
@@ -82,11 +82,11 @@ impl AttrExpression
 	{
 		input.parse_nested_block(|input|
 		{
-			let attribute = input.expect_ident();
+			let attribute = input.expect_ident()?;
 			let attribute_lower_case_name = attribute.to_ascii_lowercase();
-			input.skip_whitespace()?;
+			input.skip_whitespace();
 			
-			if input.is_exhauted()
+			if input.is_exhausted()
 			{
 				Ok
 				(
@@ -112,15 +112,15 @@ impl AttrExpression
 				
 				let result = input.try(|input|
 				{
-					input.skip_whitespace()?;
+					input.skip_whitespace();
 					input.expect_comma()?;
-					input.skip_whitespace()?;
+					input.skip_whitespace();
 					
 					let startPosition = input.position();
-					input.parse_entirely(|input| input.slice_from(startPosition).map(|slice| Some(slice.to_owned())))
+					input.parse_entirely(|input| Ok(input.slice_from(startPosition).to_owned()))
 				});
 				
-				let default_value_css = if let Ok(Some(default_value_css)) = result
+				let default_value_css = if let Ok(default_value_css) = result
 				{
 					if default_value_css.is_empty()
 					{

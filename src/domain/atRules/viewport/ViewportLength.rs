@@ -38,6 +38,6 @@ impl ViewportLength
 			return Ok(auto);
 		}
 		
-		CalculablePropertyValue::parse_one_outside_calc_function(context, input)
+		LengthOrPercentageUnit::parse_one_outside_calc_function(context, input).map(|length_or_percentage| value(length_or_percentage))
 	}
 }

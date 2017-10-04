@@ -133,29 +133,29 @@ impl Expression
 						
 						"aspect-ratio" => AspectRatio(Exact(Ratio::parse(context, input)?)),
 						
-						"orientation" => Orientation(MediaOrientation::parse(context, input)?),
+						"orientation" => Orientation(MediaOrientation::parse(input)?),
 						
-						"min-resolution" => Resolution(AtLeast(MediaResolution::parse(context, input)?)),
+						"min-resolution" => Resolution(AtLeast(MediaResolution::parse(input)?)),
 						
-						"max-resolution" => Resolution(AtLeast(MediaResolution::parse(context, input)?)),
+						"max-resolution" => Resolution(AtLeast(MediaResolution::parse(input)?)),
 						
-						"resolution" => Resolution(Exact(MediaResolution::parse(context, input)?)),
+						"resolution" => Resolution(Exact(MediaResolution::parse(input)?)),
 						
-						"-webkit-min-device-pixel-ratio" => Resolution(AtLeast(MediaResolution::parseWebKit(context, input)?)),
+						"-webkit-min-device-pixel-ratio" => Resolution(AtLeast(MediaResolution::parseWebKit(input)?)),
 						
-						"-webkit-max-device-pixel-ratio" => Resolution(AtMost(MediaResolution::parseWebKit(context, input)?)),
+						"-webkit-max-device-pixel-ratio" => Resolution(AtMost(MediaResolution::parseWebKit(input)?)),
 						
-						"-webkit-device-pixel-ratio" => Resolution(Exact(MediaResolution::parseWebKit(context, input)?)),
+						"-webkit-device-pixel-ratio" => Resolution(Exact(MediaResolution::parseWebKit(input)?)),
 						
-						"scan" => Scan(MediaScan::parse(context, input)?),
+						"scan" => Scan(MediaScan::parse(input)?),
 						
 						"grid" => Grid(MediaGrid::parse(context, input)?),
 						
-						"update" => Update(MediaUpdate::parse(context, input)?),
+						"update" => Update(MediaUpdate::parse(input)?),
 						
-						"overflow-block" => OverflowBlock(MediaOverflowBlock::parse(context, input)?),
+						"overflow-block" => OverflowBlock(MediaOverflowBlock::parse(input)?),
 						
-						"overflow-inline" => OverflowInline(MediaOverflowInline::parse(context, input)?),
+						"overflow-inline" => OverflowInline(MediaOverflowInline::parse(input)?),
 						
 						"min-color" => Color(AtLeast(ColorBitDepth::parse(context, input)?)),
 						
@@ -169,21 +169,21 @@ impl Expression
 						
 						"color-index" => ColorIndex(Exact(MediaColorIndex::parse(context, input)?)),
 						
-						"color-gamut" => ColorGamut(MediaColorGamut::parse(context, input)?),
+						"color-gamut" => ColorGamut(MediaColorGamut::parse(input)?),
 						
-						"pointer" => Pointer(MediaPointer::parse(context, input)?),
+						"pointer" => Pointer(MediaPointer::parse(input)?),
 						
-						"hover" => Hover(MediaHover::parse(context, input)?),
+						"hover" => Hover(MediaHover::parse(input)?),
 						
-						"any-pointer" => AnyPointer(MediaPointer::parse(context, input)?),
+						"any-pointer" => AnyPointer(MediaPointer::parse(input)?),
 						
-						"any-hover" => AnyHover(MediaHover::parse(context, input)?),
+						"any-hover" => AnyHover(MediaHover::parse(input)?),
 						
 						"-webkit-transform-3d" => Transform3D(MediaTransform3D::parse(context, input)?),
 						
-						"min-device-width" | "min-device-width" | "device-width" | "min-device-height" | "min-device-height" | "device-height" | "min-device-aspect-ratio" | "min-device-aspect-ratio" | "device-aspect-ratio" => return Err(ParseError::Custom(CustomParseError::DeprecatedMediaQueryExpression(name.to_owned()))),
+						"min-device-width" | "min-device-width" | "device-width" | "min-device-height" | "min-device-height" | "device-height" | "min-device-aspect-ratio" | "min-device-aspect-ratio" | "device-aspect-ratio" => return Err(ParseError::Custom(CustomParseError::DeprecatedMediaQueryExpression(name.clone()))),
 						
-						_ => return Err(ParseError::Custom(CustomParseError::UnsupportedMediaQueryExpression(name.to_owned())))
+						_ => return Err(ParseError::Custom(CustomParseError::UnsupportedMediaQueryExpression(name.clone())))
 					}
 				)
 			)
@@ -197,7 +197,12 @@ impl Expression
 		
 		match self.0
 		{
-			Width(ref range) => device.viewportWidthInAppUnitsMatches(range)
+			Width(ref range) => device.viewportWidthInAppUnitsMatches(range),
+			Height(ref range) => device.viewportHeightInAppUnitsMatches(range),
+			AspectRatio(ref range) => device.viewportAspectRatioMatches(range),
+			Orientation(orientation) => device.orientationMatches(orientation),
+			Resolution(ref range) => device.viewportResolutionMatches(range),
+			_ => unimplemented!("Please implement matches for remaining behaviours")
 		}
 	}
 }

@@ -24,12 +24,8 @@ impl ToCss for PageAtRule
 {
 	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
 	{
-		dest.write_str("@page { ")?;
-		self.declarations.to_css(dest)?;
-		if !self.declarations.is_empty()
-		{
-			dest.write_str(" ")?;
-		}
-		dest.write_str("}")
+		dest.write_str("@page{")?;
+		self.property_declarations.to_css(dest)?;
+		dest.write_char('}')
 	}
 }

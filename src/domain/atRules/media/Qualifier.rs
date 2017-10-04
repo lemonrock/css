@@ -3,7 +3,7 @@
 
 
 /// https://drafts.csswg.org/mediaqueries/#mq-prefix
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[derive(Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub enum Qualifier
 {
 	/// Hide a media query from legacy UAs:

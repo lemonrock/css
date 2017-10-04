@@ -2,6 +2,7 @@
 // Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
 
 
+#[derive(Default, Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct MediaColorIndex
 {
 	pub index: u32,
@@ -19,53 +20,7 @@ impl Parse for MediaColorIndex
 {
 	fn parse<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
 	{
-		use self::Token::*;
-		
-		match input.next()
-		{
-			Ok(&Number { value, int_value, .. }) => Self::fromRawNumber(value, int_value),
-			
-			Ok(&Function(ref name)) if name.eq_ignore_ascii_case("expressions") =>
-			{
-			}
-			
-			Ok(unexpectedToken) => return Err(BasicParseError::UnexpectedToken(unexpectedToken.clone()).into()),
-			
-			Err(error) => return Err(error.into())
-		}
-		
-		match input.parse_nested_block(|input| CalcNode::parse_number(context, input))
-		{
-			Ok(value) =>
-			{
-				let int_value = if value
-				{
-					Some
-					(
-						if value >= i32::MAX as f64
-						{
-							i32::MAX
-						}
-						else if value <= i32::MIN as f64
-						{
-							i32::MIN
-						}
-						else
-						{
-							value as i32
-						}
-					)
-				}
-				else
-				{
-					None
-				};
-				
-				Self::fromRawNumber(value, int_value)
-			}
-			
-			Err(error) => Err(error),
-		}
+		unimplemented!();
 	}
 }
 

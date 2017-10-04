@@ -25,7 +25,7 @@ impl<U: Unit> Default for CalcExpression<U>
 	#[inline(always)]
 	fn default() -> Self
 	{
-		CalcExpression::Constant(U::default())
+		CalcExpression::CalculablePropertyValue(CalculablePropertyValue::default())
 	}
 }
 
@@ -37,9 +37,9 @@ impl<U: Unit> ToCss for CalcExpression<U>
 		
 		match *self
 		{
-			CalculablePropertyValue(ref calculable) => calculable.to_css(dest)?,
+			CalculablePropertyValue(ref calculable) => calculable.to_css(dest),
 			
-			Number(ref number) => number.to_css(dest)?,
+			Number(ref number) => number.to_css(dest),
 			
 			Parentheses(ref calcFunctionBody) =>
 			{
@@ -50,32 +50,32 @@ impl<U: Unit> ToCss for CalcExpression<U>
 			
 			Addition(ref lhs, ref rhs) =>
 			{
-				lhs.to_css().to_css(dest)?;
+				lhs.to_css(dest)?;
 				// Whitespace should not be needed if the lhs ends in a ')' or the rhs begins with '(' but the spec does not permit this (https://www.w3.org/TR/css3-values/#calc-notation)
 				dest.write_str(" + ")?;
-				rhs.to_css().to_css(dest)
+				rhs.to_css(dest)
 			}
 			
 			Subtraction(ref lhs, ref rhs) =>
 			{
-				lhs.to_css().to_css(dest)?;
+				lhs.to_css(dest)?;
 				// Whitespace should not be needed if the lhs ends in a ')' or the rhs begins with '(' but the spec does not permit this (https://www.w3.org/TR/css3-values/#calc-notation)
 				dest.write_str(" - ")?;
-				rhs.to_css().to_css(dest)
+				rhs.to_css(dest)
 			}
 			
 			Multiplication(ref lhs, ref rhs) =>
 			{
-				lhs.to_css().to_css(dest)?;
+				lhs.to_css(dest)?;
 				dest.write_char('*')?;
-				rhs.to_css().to_css(dest)
+				rhs.to_css(dest)
 			}
 			
 			Division(ref lhs, ref rhs) =>
 			{
-				lhs.to_css().to_css(dest)?;
+				lhs.to_css(dest)?;
 				dest.write_char('/')?;
-				rhs.to_css().to_css(dest)
+				rhs.to_css(dest)
 			}
 		}
 	}
@@ -96,17 +96,33 @@ impl<U: Unit> Expression<U> for CalcExpression<U>
 		{
 			CalculablePropertyValue(ref calculable) => calculable.evaluate(conversion),
 			
-			Number(ref number) => number,
+			Number(number) => Some(number),
 			
 			Parentheses(ref subExpression) => subExpression.evaluate(conversion),
 			
-			Addition(ref lhsSubExpression, ref rhsSubExpression) => lhsSubExpression.evaluate(conversion) + rhsSubExpression.evaluate(conversion),
+			Addition(ref lhsSubExpression, ref rhsSubExpression) => match (lhsSubExpression.evaluate(conversion), rhsSubExpression.evaluate(conversion))
+			{
+				(Some(lhs), Some(rhs)) => Some(lhs + rhs),
+				_ => None,
+			},
 			
-			Subtraction(ref lhsSubExpression, ref rhsSubExpression) => lhsSubExpression.evaluate(conversion) - rhsSubExpression.evaluate(conversion),
+			Subtraction(ref lhsSubExpression, ref rhsSubExpression) => match (lhsSubExpression.evaluate(conversion), rhsSubExpression.evaluate(conversion))
+			{
+				(Some(lhs), Some(rhs)) => Some(lhs - rhs),
+				_ => None,
+			},
 			
-			Multiplication(ref lhsSubExpression, ref rhsSubExpression) => lhsSubExpression.evaluate(conversion) * rhsSubExpression.evaluate(conversion),
+			Multiplication(ref lhsSubExpression, ref rhsSubExpression) => match (lhsSubExpression.evaluate(conversion), rhsSubExpression.evaluate(conversion))
+			{
+				(Some(lhs), Some(rhs)) => Some(lhs * rhs),
+				_ => None,
+			},
 			
-			Division(ref lhsSubExpression, ref rhsSubExpression) => lhsSubExpression.evaluate(conversion) / rhsSubExpression.evaluate(conversion),
+			Division(ref lhsSubExpression, ref rhsSubExpression) => match (lhsSubExpression.evaluate(conversion), rhsSubExpression.evaluate(conversion))
+			{
+				(Some(lhs), Some(rhs)) => Some(lhs / rhs),
+				_ => None,
+			},
 		}
 	}
 }
@@ -160,12 +176,12 @@ impl<U: Unit> CalcExpression<U>
 					{
 						Delim('+') =>
 						{
-							currentSum = Addition(Box::new(currentSum), Self::parse_product(context, input)?);
+							currentSum = Addition(Box::new(currentSum), Box::new(Self::parse_product(context, input)?));
 						}
 						
 						Delim('-') =>
 						{
-							currentSum = Subtraction(Box::new(currentSum), Self::parse_product(context, input)?);
+							currentSum = Subtraction(Box::new(currentSum), Box::new(Self::parse_product(context, input)?));
 						}
 						
 						unexpectedToken => return Err(BasicParseError::UnexpectedToken(unexpectedToken).into()),
@@ -196,7 +212,7 @@ impl<U: Unit> CalcExpression<U>
 		use ::cssparser::Token::*;
 		use self::CalcExpression::*;
 		
-		let mut currentProduct = Self::parse_one(context, input, true)?;
+		let mut currentProduct = Self::parse_one(context, input)?;
 		
 		loop
 		{
@@ -205,12 +221,12 @@ impl<U: Unit> CalcExpression<U>
 			{
 				Delim('*') =>
 				{
-					currentProduct = Multiplication(Box::new(currentProduct), Self::parse_one(context, input)?);
+					currentProduct = Multiplication(Box::new(currentProduct), Box::new(Self::parse_one(context, input)?));
 				}
 				
 				Delim('/') =>
 				{
-					currentProduct = Division(Box::new(currentProduct), Self::parse_one(context, input));
+					currentProduct = Division(Box::new(currentProduct), Box::new(Self::parse_one(context, input)?));
 				}
 				
 				_ =>
@@ -226,14 +242,14 @@ impl<U: Unit> CalcExpression<U>
 	
 	fn parse_one<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
 	{
-		let either = U::parse_one(context, input)?;
+		let either = U::parse_one_inside_calc_function(context, input)?;
 		if either.is_left()
 		{
-			Ok(Box::new(CalcExpression::CalculablePropertyValue(either.left().unwrap())))
+			Ok(CalcExpression::CalculablePropertyValue(either.left().unwrap()))
 		}
 		else
 		{
-			Ok(Box::new(either.right().unwrap()))
+			Ok(either.right().unwrap())
 		}
 	}
 }

@@ -4,7 +4,17 @@
 
 pub trait Device
 {
+	fn media_type(&self) -> MediaType;
+	
 	fn documentMatchesUrl(&self, urlMatchingFunction: &UrlMatchingFunction) -> bool;
 	
-	fn viewportWidthInAppUnitsMatches<Number: CssNumber>(&self, width: Range<LengthUnit<Number>>) -> bool;
+	fn viewportWidthInAppUnitsMatches<Number: CssNumber>(&self, width: &Range<LengthUnit<Number>>) -> bool;
+	
+	fn viewportHeightInAppUnitsMatches<Number: CssNumber>(&self, width: &Range<LengthUnit<Number>>) -> bool;
+	
+	fn viewportAspectRatioMatches(&self, width: &Range<Ratio>) -> bool;
+	
+	fn orientationMatches(&self, orientation: MediaOrientation) -> bool;
+	
+	fn viewportResolutionMatches(&self, width: &Range<MediaResolution>) -> bool;
 }

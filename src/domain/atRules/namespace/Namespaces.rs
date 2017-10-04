@@ -2,7 +2,7 @@
 // Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
 
 
-#[derive(Debug, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub struct Namespaces
 {
 	defaultNamespace: Option<NamespaceUrl>,
@@ -41,8 +41,11 @@ impl Namespaces
 	{
 		match prefix
 		{
-			None => self.namespaces.defaultNamespace = url.clone(),
-			Some(prefix) => self.namespaces.namespaces.insert(prefix.clone(), url.clone())
+			None => self.defaultNamespace = Some(url.clone()),
+			Some(prefix) =>
+			{
+				self.namespaces.insert(prefix.clone(), url.clone());
+			},
 		}
 	}
 }

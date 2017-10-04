@@ -49,7 +49,7 @@ impl TypeOrUnit
 {
 	// Returns Err(()) if support not currently present
 	#[inline(always)]
-	pub fn to_css(&self, valueFromAttribute: &str) -> Result<String, ()>
+	pub fn value_to_css(&self, valueFromAttribute: &str) -> Result<String, ()>
 	{
 		use self::TypeOrUnit::*;
 		
