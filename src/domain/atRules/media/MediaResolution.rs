@@ -8,14 +8,7 @@ pub enum MediaResolution
 {
 	infinite,
 	
-	/// Dots per inch.
-	dpi(CssUnsignedNumber),
-	
-	/// Dots per pixel.
-	dppx(CssUnsignedNumber),
-	
-	/// Dots per centimetre.
-	dpcm(CssUnsignedNumber),
+	finite(CalculablePropertyValue<ResolutionUnit<CssSignedNumber>>),
 }
 
 impl ToCss for MediaResolution
@@ -27,129 +20,37 @@ impl ToCss for MediaResolution
 		match *self
 		{
 			infinite => dest.write_str("infinite"),
-			dpi(value) => serialize_dimension(value, "dpi", dest),
-			dppx(value) => serialize_dimension(value, "dppx", dest),
-			dpcm(value) => serialize_dimension(value, "dpcm", dest),
+			finite(ref value) => value.to_css(dest),
 		}
 	}
 }
 
 impl MediaResolution
 {
-	fn dotsPerInch(&self) -> f32
-	{
-		use self::MediaResolution::*;
-		
-		match *self
-		{
-			infinite => ::std::f32::INFINITY,
-			dpi(value) => value.as_f32(),
-			dppx(value) => (value * CssUnsignedNumber::DotsPerInch).as_f32(),
-			dpcm(value) => (value * CssUnsignedNumber::CentimetresPerInch).as_f32(),
-		}
-	}
-	
-	fn reduce(self) -> Self
-	{
-		use self::MediaResolution::*;
-		
-		match self
-		{
-			dpcm(dotsPerCentimetre) =>
-			{
-				let dotsPerInch = (dotsPerCentimetre / CssUnsignedNumber::CentimetresPerInch).round();
-				let dotsPerPixel = dotsPerInch / CssUnsignedNumber::DotsPerInch;
-				if dotsPerPixel.round() == dotsPerPixel
-				{
-					dppx(dotsPerPixel)
-				}
-				else
-				{
-					dpi(dotsPerInch)
-				}
-			},
-			
-			dpi(dotsPerInch) =>
-			{
-				let dotsPerPixel = dotsPerInch / CssUnsignedNumber::DotsPerInch;
-				if dotsPerPixel.round() == dotsPerPixel
-				{
-					dppx(dotsPerPixel)
-				}
-				else
-				{
-					dpi(dotsPerInch)
-				}
-			}
-			
-			unchanged @ _ => unchanged,
-		}
-	}
-	
-	// WebKit only supports integer values of 1 and 2, but we more liberally support floating point values greater than 0
+	// WebKit only supports integer values of 1 and 2, but we more liberally support floating point values of any value, positive or negative or zero
 	fn parseWebKit<'i, 't>(input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
 	{
 		use self::MediaResolution::*;
-		use ::cssparser::Token::*;
 		
-		match *input.next()?
+		let value = match *input.next()?
 		{
-			Number { value, .. } =>
-			{
-				if value <= 0.
-				{
-					return Err(ParseError::Custom(CustomParseError::MediaQueryResolutionCanNotBeNegativeOrZero))
-				}
-				
-				Ok(dppx(CssUnsignedNumber::_construct(value)))
-			},
+			Token::Number { value, .. } => CssSignedNumber::new(value).map_err(|cssNumberConversionError| ParseError::Custom(CustomParseError::CouldNotParseCssSignedNumber(cssNumberConversionError, value))),
 			
-			ref unrecognisedToken => return Err(ParseError::Custom(CustomParseError::UnexpectedTokenWhenParsingMediaQueryResolution(unrecognisedToken.clone()))),
-		}
+			unexpectedToken @ _ => Err(BasicParseError::UnexpectedToken(unexpectedToken.clone()).into()),
+		}?;
+		
+		Ok(finite(CalculablePropertyValue::Constant(ResolutionUnit::dppx(value))))
 	}
 	
-	fn parse<'i, 't>(input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
+	fn parse<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
 	{
 		use self::MediaResolution::*;
-		use ::cssparser::Token::*;
 		
-		match *input.next()?
+		if input.try(|i| i.expect_ident_matching("auto")).is_ok()
 		{
-			Ident(ref identifier) =>
-			{
-				match_ignore_ascii_case!
-				{
-					&*identifier,
-					
-					"infinite" => Ok(infinite),
-					
-					_ => Err(ParseError::Custom(CustomParseError::MediaQueryResolutionDoesNotSupportThisIdentifier(identifier.clone())))
-				}
-			}
-			
-			Dimension { value, ref unit, .. } =>
-			{
-				if value <= 0.
-				{
-					return Err(ParseError::Custom(CustomParseError::MediaQueryResolutionCanNotBeNegativeOrZero))
-				}
-				
-				let result = match_ignore_ascii_case!
-				{
-					&*unit,
-					
-					"dpi" => Ok(dpi(CssUnsignedNumber::_construct(value))),
-					
-					"dppx" => Ok(dppx(CssUnsignedNumber::_construct(value))),
-					
-					"dpcm" => Ok(dpcm(CssUnsignedNumber::_construct(value))),
-					
-					_ => Err(ParseError::Custom(CustomParseError::UnrecognisedMediaQueryResolutionUnit(unit.clone())))
-				};
-				result.map(|resolution| resolution.reduce())
-			},
-			
-			ref unrecognisedToken => return Err(ParseError::Custom(CustomParseError::UnexpectedTokenWhenParsingMediaQueryResolution(unrecognisedToken.clone()))),
+			return Ok(infinite);
 		}
+		
+		Ok(finite(ResolutionUnit::parse_one_outside_calc_function(context, input)?))
 	}
 }

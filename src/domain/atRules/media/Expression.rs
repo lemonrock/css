@@ -135,11 +135,11 @@ impl Expression
 						
 						"orientation" => Orientation(MediaOrientation::parse(input)?),
 						
-						"min-resolution" => Resolution(AtLeast(MediaResolution::parse(input)?)),
+						"min-resolution" => Resolution(AtLeast(MediaResolution::parse(context, input)?)),
 						
-						"max-resolution" => Resolution(AtLeast(MediaResolution::parse(input)?)),
+						"max-resolution" => Resolution(AtLeast(MediaResolution::parse(context, input)?)),
 						
-						"resolution" => Resolution(Exact(MediaResolution::parse(input)?)),
+						"resolution" => Resolution(Exact(MediaResolution::parse(context, input)?)),
 						
 						"-webkit-min-device-pixel-ratio" => Resolution(AtLeast(MediaResolution::parseWebKit(input)?)),
 						

@@ -304,9 +304,21 @@ impl CssNumber for CssUnsignedInteger
 		{
 			Err(CssNumberConversionError::NegativeNumberMayNotBeAllowed)
 		}
+		else if value == 0.0
+		{
+			Ok(CssUnsignedInteger(0))
+		}
 		else
 		{
-			Ok(CssUnsignedInteger(value as u32))
+			let cast = value as u32;
+			if f32::from_bits(cast) == value
+			{
+				Ok(CssUnsignedInteger(0))
+			}
+			else
+			{
+				Err(CssNumberConversionError::FloatingPointNumberMayNotBeAllowed)
+			}
 		}
 	}
 }

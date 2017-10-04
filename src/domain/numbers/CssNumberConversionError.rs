@@ -8,6 +8,7 @@ pub enum CssNumberConversionError
 	InfinityIsNotAllowed,
 	NotANumberIsNotAllowed,
 	NegativeNumberMayNotBeAllowed,
+	FloatingPointNumberMayNotBeAllowed,
 }
 
 impl Display for CssNumberConversionError

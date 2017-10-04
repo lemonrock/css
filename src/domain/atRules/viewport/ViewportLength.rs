@@ -33,11 +33,13 @@ impl ViewportLength
 {
 	pub(crate) fn parse<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
 	{
+		use self::ViewportLength::*;
+		
 		if input.try(|i| i.expect_ident_matching("auto")).is_ok()
 		{
 			return Ok(auto);
 		}
 		
-		LengthOrPercentageUnit::parse_one_outside_calc_function(context, input).map(|length_or_percentage| value(length_or_percentage))
+		Ok(value(LengthOrPercentageUnit::parse_one_outside_calc_function(context, input)?))
 	}
 }
