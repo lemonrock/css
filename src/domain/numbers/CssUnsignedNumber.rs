@@ -11,7 +11,7 @@ impl PartialEq for CssUnsignedNumber
 	#[inline(always)]
 	fn eq(&self, other: &Self) -> bool
 	{
-		self.to_f32().eq(other.0)
+		self.to_f32().eq(&other.0)
 	}
 }
 
@@ -24,7 +24,7 @@ impl PartialOrd for CssUnsignedNumber
 	#[inline(always)]
 	fn partial_cmp(&self, other: &Self) -> Option<Ordering>
 	{
-		self.to_f32().partial_cmp(other.0)
+		self.to_f32().partial_cmp(&other.0)
 	}
 }
 
@@ -60,7 +60,7 @@ impl Display for CssUnsignedNumber
 	#[inline(always)]
 	fn fmt(&self, fmt: &mut Formatter) -> fmt::Result
 	{
-		self.to_f32().display(fmt)
+		<f32 as Display>::fmt(&self.to_f32(), fmt)
 	}
 }
 
@@ -68,7 +68,7 @@ impl LowerExp for CssUnsignedNumber
 {
 	fn fmt(&self, f: &mut Formatter) -> fmt::Result
 	{
-		<f32 as LowerExp>::fmt(self.to_f32(), f)
+		<f32 as LowerExp>::fmt(&self.to_f32(), f)
 	}
 }
 
@@ -76,7 +76,7 @@ impl UpperExp for CssUnsignedNumber
 {
 	fn fmt(&self, f: &mut Formatter) -> fmt::Result
 	{
-		<f32 as UpperExp>::fmt(self.to_f32(), f)
+		<f32 as UpperExp>::fmt(&self.to_f32(), f)
 	}
 }
 
@@ -160,11 +160,11 @@ impl Div<CssUnsignedNumber> for CssUnsignedNumber
 		{
 			let value = if (self.to_f32() / rhs.0).is_sign_positive()
 			{
-				f32::MAX
+				::std::f32::MAX
 			}
 			else
 			{
-				f32::MIN
+				::std::f32::MIN
 			};
 			CssUnsignedNumber(value)
 		}
@@ -195,11 +195,11 @@ impl Rem<CssUnsignedNumber> for CssUnsignedNumber
 		{
 			let value = if (self.to_f32() % rhs.0).is_sign_positive()
 			{
-				f32::MAX
+				::std::f32::MAX
 			}
 			else
 			{
-				f32::MIN
+				::std::f32::MIN
 			};
 			CssUnsignedNumber(value)
 		}
@@ -316,9 +316,9 @@ impl CssNumber for CssUnsignedNumber
 	
 	const One: Self = CssUnsignedNumber(1.0);
 	
-	const Maximum: Self = CssUnsignedNumber(f32::MAX);
+	const Maximum: Self = CssUnsignedNumber(::std::f32::MAX);
 	
-	const Minimum: Self = CssUnsignedNumber(f32::MIN);
+	const Minimum: Self = CssUnsignedNumber(::std::f32::MIN);
 	
 	#[doc(hidden)]
 	#[inline(always)]
@@ -375,13 +375,15 @@ impl Unit for CssUnsignedNumber
 			
 			Function(ref name) =>
 			{
-				match name
+				match_ignore_ascii_case!
 				{
-					"calc" => Ok(CalcFunction(CalcExpression::parse(context, input)?)),
+					&*name,
 					
-					"attr" => Ok(AttrFunction(AttrExpression::parse(context, input)?)),
+					"calc" => Ok(Calc(CalcFunction(Rc::new(CalcExpression::parse(context, input)?)))),
 					
-					"var" => Ok(VarFunction(VarExpression::parse(context, input)?)),
+					"attr" => Ok(Attr(AttrFunction(Rc::new(AttrExpression::parse(context, input)?)))),
+					
+					"var" => Ok(Var(VarFunction(Rc::new(VarExpression::parse(context, input)?)))),
 					
 					_ => return Err(ParseError::Custom(UnknownFunctionInValueExpression(name.to_owned())))
 				}
@@ -401,28 +403,30 @@ impl Unit for CssUnsignedNumber
 			Token::Number { value, .. } =>
 			{
 				let constant = Self::new(value).map_err(|cssNumberConversionError| ParseError::Custom(CouldNotParseCssUnsignedNumber(cssNumberConversionError, value)))?;
-				Ok(Either::Left(Constant(constant)))
+				Ok(Left(Constant(constant)))
 			},
 			
 			Token::Percentage { unit_value, .. } =>
 			{
 				let percentage = Self::new(unit_value).map_err(|cssNumberConversionError| ParseError::Custom(CouldNotParseCssUnsignedNumber(cssNumberConversionError, unit_value)))?;
-				Ok(Either::Left(Percentage(percentage)))
+				Ok(Left(PercentageUnit(percentage)))
 			}
 			
-			Token::ParenthesisBlock => Ok(Either::Right(CalcExpression::parse(context, input)?)),
+			Token::ParenthesisBlock => Ok(Right(CalcExpression::parse(context, input)?)),
 			
 			Token::Function(ref name) =>
 			{
-				match name
+				match_ignore_ascii_case!
 				{
-					"calc" => Ok(Either::Left(CalcFunction(CalcExpression::parse(context, input)?))),
+					&*name,
 					
-					"attr" => Ok(Either::Left(AttrFunction(AttrExpression::parse(context, input)?))),
+					"calc" => Ok(Left(Calc(CalcFunction(Rc::new(CalcExpression::parse(context, input)?))))),
 					
-					"var" => Ok(Either::Left(VarFunction(VarExpression::parse(context, input)?))),
+					"attr" => Ok(Left(Attr(AttrFunction(Rc::new(AttrExpression::parse(context, input)?))))),
 					
-					_ => return Err(ParseError::Custom(UnknownFunctionInValueExpression(name.to_owned())))
+					"var" => Ok(Left(Var(VarFunction(Rc::new(VarExpression::parse(context, input)?))))),
+					
+					_ => return Err(ParseError::Custom(UnknownFunctionInValueExpression(name.clone())))
 				}
 			}
 			

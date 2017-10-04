@@ -3,7 +3,7 @@
 
 
 #[derive(Debug, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
-pub struct AttrFunction<U: Unit>(Rc<AttrExpression<U>>);
+pub struct AttrFunction<U: Unit>(pub Rc<AttrExpression<U>>);
 
 impl<U: Unit> ToCss for AttrFunction<U>
 {

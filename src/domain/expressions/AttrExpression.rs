@@ -56,7 +56,7 @@ impl<U: Unit> Expression<U> for AttrExpression<U>
 impl<U: Unit> AttrExpression<U>
 {
 	#[inline(always)]
-	fn parse<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
+	pub(crate) fn parse<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
 	{
 		input.parse_nested_block(|input| Self::parse_sum(context, input))
 	}

@@ -35,12 +35,12 @@ impl ParserContext
 		!self.parsing_mode.allows_unitless_lengths()
 	}
 	
-	pub(crate) fn isInPageRule(&self)
+	pub(crate) fn isInPageRule(&self) -> bool
 	{
 		self.rule_type.map_or(false, |rule_type| rule_type == CssRuleType::Page)
 	}
 	
-	pub(crate) fn isNotInPageRule(&self)
+	pub(crate) fn isNotInPageRule(&self) -> bool
 	{
 		!self.isInPageRule()
 	}

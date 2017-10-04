@@ -42,7 +42,7 @@ impl<Number: CssNumber> Default for ViewportPercentageLength<Number>
 	#[inline(always)]
 	fn default() -> Self
 	{
-		ViewportPercentageLength::vw(0)
+		ViewportPercentageLength::vw(Number::Zero)
 	}
 }
 

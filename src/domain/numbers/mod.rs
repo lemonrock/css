@@ -4,6 +4,7 @@
 
 use super::*;
 use super::units::conversions::*;
+use self::Either::*;
 use ::either::Either;
 use ::std::convert::From;
 use ::std::error::Error;
@@ -15,7 +16,7 @@ use ::std::fmt::LowerExp;
 use ::std::fmt::UpperExp;
 use ::std::hash::Hash;
 use ::std::hash::Hasher;
-use ::std::num::FloatParseError;
+use ::std::num::ParseFloatError;
 use ::std::ops::Add;
 use ::std::ops::AddAssign;
 use ::std::ops::Deref;
@@ -28,6 +29,7 @@ use ::std::ops::Rem;
 use ::std::ops::RemAssign;
 use ::std::ops::Sub;
 use ::std::ops::SubAssign;
+use ::std::rc::Rc;
 use ::std::str::FromStr;
 
 

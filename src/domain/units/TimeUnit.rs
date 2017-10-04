@@ -253,13 +253,15 @@ impl<NumberX: CssNumber> Unit for TimeUnit<NumberX>
 			
 			Function(ref name) =>
 			{
-				match name
+				match_ignore_ascii_case!
 				{
-					"calc" => Ok(CalcFunction(CalcExpression::parse(context, input)?)),
+					&*name,
 					
-					"attr" => Ok(AttrFunction(AttrExpression::parse(context, input)?)),
+					"calc" => Ok(Calc(CalcFunction(Rc::new(CalcExpression::parse(context, input)?)))),
 					
-					"var" => Ok(VarFunction(VarExpression::parse(context, input)?)),
+					"attr" => Ok(Attr(AttrFunction(Rc::new(AttrExpression::parse(context, input)?)))),
+					
+					"var" => Ok(Var(VarFunction(Rc::new(VarExpression::parse(context, input)?)))),
 					
 					_ => return Err(ParseError::Custom(UnknownFunctionInValueExpression(name.to_owned())))
 				}
@@ -286,7 +288,7 @@ impl<NumberX: CssNumber> Unit for TimeUnit<NumberX>
 			Token::Percentage { unit_value, .. } =>
 			{
 				let percentage = Self::new(unit_value).map_err(|cssNumberConversionError| ParseError::Custom(CouldNotParseCssUnsignedNumber(cssNumberConversionError, unit_value)))?;
-				Ok(Left(Percentage(percentage)))
+				Ok(Left(PercentageUnit(percentage)))
 			}
 			
 			Token::Dimension { value, ref unit, .. } =>
@@ -309,13 +311,15 @@ impl<NumberX: CssNumber> Unit for TimeUnit<NumberX>
 			
 			Token::Function(ref name) =>
 			{
-				match name
+				match_ignore_ascii_case!
 				{
-					"calc" => Ok(Left(CalcFunction(CalcExpression::parse(context, input)?))),
+					&*name,
 					
-					"attr" => Ok(Left(AttrFunction(AttrExpression::parse(context, input)?))),
+					"calc" => Ok(Left(Calc(CalcFunction(Rc::new(CalcExpression::parse(context, input)?))))),
 					
-					"var" => Ok(Left(VarFunction(VarExpression::parse(context, input)?))),
+					"attr" => Ok(Left(Attr(AttrFunction(Rc::new(AttrExpression::parse(context, input)?))))),
+					
+					"var" => Ok(Left(Var(VarFunction(Rc::new(VarExpression::parse(context, input)?))))),
 					
 					_ => return Err(ParseError::Custom(UnknownFunctionInValueExpression(name.to_owned())))
 				}

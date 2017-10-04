@@ -9,11 +9,11 @@ pub enum CalculablePropertyValue<U: Unit>
 	
 	Percentage(PercentageUnit<U::Number>),
 	
-	CalcFunction(CalcFunction<U>),
+	Calc(CalcFunction<U>),
 	
-	AttrFunction(AttrFunction<U>),
+	Attr(AttrFunction<U>),
 	
-	VarFunction(VarFunction<U>),
+	Var(VarFunction<U>),
 }
 
 impl<U: Unit> Default for CalculablePropertyValue<U>
@@ -37,11 +37,11 @@ impl<U: Unit> ToCss for CalculablePropertyValue<U>
 			
 			Percentage(ref percentage) => percentage.to_css(dest)?,
 			
-			CalcFunction(ref function) => function.to_css(dest)?,
+			Calc(ref function) => function.to_css(dest)?,
 			
-			AttrFunction(ref function) => function.to_css(dest)?,
+			Attr(ref function) => function.to_css(dest)?,
 			
-			VarFunction(ref function) => function.to_css(dest)?,
+			Var(ref function) => function.to_css(dest)?,
 		}
 	}
 }
@@ -62,11 +62,11 @@ impl<U: Unit> Expression<U> for CalculablePropertyValue<U>
 			
 			Percentage(ref percentage) => percentage.to_absolute_unit(conversion),
 			
-			CalcFunction(ref function) => function.evaluate(conversion),
+			Calc(ref function) => function.evaluate(conversion),
 			
-			AttrFunction(ref function) => function.evaluate(conversion),
+			Attr(ref function) => function.evaluate(conversion),
 			
-			VarFunction(ref function) => function.evaluate(conversion),
+			Var(ref function) => function.evaluate(conversion),
 		}
 	}
 }

@@ -3,7 +3,7 @@
 
 
 #[derive(Debug, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
-pub struct VarFunction<U: Unit>(Rc<VarExpression<U>>);
+pub struct VarFunction<U: Unit>(pub Rc<VarExpression<U>>);
 
 impl<U: Unit> ToCss for VarFunction<U>
 {

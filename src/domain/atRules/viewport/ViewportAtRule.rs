@@ -37,125 +37,6 @@ impl ViewportAtRule
 		Ok(ViewportAtRule { declarations })
 	}
 	
-	#[allow(missing_docs)]
-	pub(crate) fn from_html_meta_viewport_element_value(content: &str) -> Option<ViewportAtRule>
-	{
-		let mut declarations = vec![None; VIEWPORT_DESCRIPTOR_VARIANTS];
-		
-		macro_rules! push_descriptor
-		{
-            ($descriptor:ident($value:expr)) =>
-            {
-				{
-					let descriptor = ViewportDescriptor::$descriptor($value);
-					let discriminant = descriptor.discriminant_value();
-					declarations[discriminant] = Some(ViewportDescriptorDeclaration::new(descriptor, false));
-				}
-        	}
-        }
-		
-		let mut has_width = false;
-		let mut has_height = false;
-		let mut has_zoom = false;
-		
-		let mut iter = content.chars().enumerate();
-		
-		macro_rules! start_of_name
-		{
-            ($iter:ident) =>
-            {
-                $iter.by_ref().skip_while(|&(_, c)| Self::is_whitespace_separator_or_equals(&c)).next()
-            }
-        }
-		
-		while let Some((start, _)) = start_of_name!(iter)
-		{
-			let property = ViewportAtRule::parse_meta_property(content, &mut iter, start);
-			
-			if let Some((name, value)) = property
-			{
-				macro_rules! push
-				{
-                    ($descriptor:ident($translate:path)) =>
-                    {
-                        if let Some(value) = $translate(value)
-                        {
-                            push_descriptor!($descriptor(value));
-                        }
-                    }
-                }
-				
-				match name
-				{
-					width if width.eq_ignore_ascii_case("width") =>
-					{
-						if let Some(value) = ViewportLength::from_html_meta_viewport_element_value(value)
-						{
-							push_descriptor!(MinWidth(ViewportLength::ExtendToZoom));
-							push_descriptor!(MaxWidth(value));
-							has_width = true;
-						}
-					}
-					
-					height if height.eq_ignore_ascii_case("height") =>
-					{
-						if let Some(value) = ViewportLength::from_html_meta_viewport_element_value(value)
-						{
-							push_descriptor!(MinHeight(ViewportLength::ExtendToZoom));
-							push_descriptor!(MaxHeight(value));
-							has_height = true;
-						}
-					}
-					
-					initialScale if initialScale.eq_ignore_ascii_case("initial-scale") =>
-					{
-						if let Some(value) = Zoom::from_html_meta_viewport_element_value(value)
-						{
-							push_descriptor!(Zoom(value));
-							has_zoom = true;
-						}
-					}
-					
-					minimumScale if minimumScale.eq_ignore_ascii_case("minimum-scale") => push!(MinZoom(Zoom::from_html_meta_viewport_element_value)),
-					
-					maximumScale if maximumScale.eq_ignore_ascii_case("maximum-scale") => push!(MaxZoom(Zoom::from_html_meta_viewport_element_value)),
-					
-					userScalable if userScalable.eq_ignore_ascii_case("user-scalable") => push!(UserZoom(UserZoom::from_html_meta_viewport_element_value)),
-					
-					_ =>
-					{
-					}
-				}
-			}
-		}
-		
-		// DEVICE-ADAPT § 9.4 - The 'width' and 'height' properties
-		// http://dev.w3.org/csswg/css-device-adapt/#width-and-height-properties
-		if !has_width && has_zoom
-		{
-			if has_height
-			{
-				push_descriptor!(MinWidth(ViewportLength::Specified(LengthOrPercentageOrAuto::Auto)));
-				push_descriptor!(MaxWidth(ViewportLength::Specified(LengthOrPercentageOrAuto::Auto)));
-			}
-			else
-			{
-				push_descriptor!(MinWidth(ViewportLength::ExtendToZoom));
-				push_descriptor!(MaxWidth(ViewportLength::ExtendToZoom));
-			}
-		}
-		
-		let declarations: Vec<_> = declarations.into_iter().filter_map(|entry| entry).collect();
-		if declarations.is_empty()
-		{
-			None
-		}
-		else
-		{
-			Some(ViewportAtRule { declarations })
-		}
-	}
-	
 	fn parse_meta_property<'a>(content: &'a str, iter: &mut Enumerate<Chars<'a>>, start: usize) -> Option<(&'a str, &'a str)>
 	{
 		fn end_of_token(iter: &mut Enumerate<Chars>) -> Option<(usize, char)>
@@ -194,13 +75,13 @@ impl ViewportAtRule
 			_ => return None
 		};
 		
-		let value = match end_of_token(iter)
+		let slice = match end_of_token(iter)
 		{
 			Some((end, _)) => &content[start..end],
 			_ => &content[start..]
 		};
 		
-		Some((name, value))
+		Some((name, slice))
 	}
 	
 	/// Whitespace as defined by DEVICE-ADAPT § 9.2

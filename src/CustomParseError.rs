@@ -95,7 +95,7 @@ pub enum CustomParseError<'i>
 	CouldNotParseCssUnsignedNumber(::domain::numbers::CssNumberConversionError, f32),
 	CouldNotParseDimensionLessNumber(f32),
 	CouldNotParseDimension(f32, CowRcStr<'i>),
-	UnknownFunctionInValueExpression(String),
+	UnknownFunctionInValueExpression(CowRcStr<'i>),
 	
 	CouldNotParseInteger,
 	CouldNotParsePercentage,

@@ -41,7 +41,7 @@ impl<U: Unit> Expression<U> for VarExpression<U>
 impl<U: Unit> VarExpression<U>
 {
 	#[inline(always)]
-	fn parse<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
+	pub(crate) fn parse<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
 	{
 		input.parse_nested_block(|input| Self::parse_sum(context, input))
 	}

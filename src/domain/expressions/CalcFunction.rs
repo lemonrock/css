@@ -3,7 +3,7 @@
 
 
 #[derive(Debug, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
-pub struct CalcFunction<U: Unit>(Rc<CalcExpression<U>>);
+pub struct CalcFunction<U: Unit>(pub Rc<CalcExpression<U>>);
 
 impl<U: Unit> Default for CalcFunction<U>
 {

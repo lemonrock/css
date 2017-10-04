@@ -128,7 +128,7 @@ impl<U: Unit> CalcExpression<U>
 	///
 	/// This is in charge of parsing, for example, `2 + 3 * 100%`.
 	#[inline(always)]
-	fn parse<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
+	pub(crate) fn parse<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
 	{
 		input.parse_nested_block(|input| Self::parse_sum(context, input))
 	}

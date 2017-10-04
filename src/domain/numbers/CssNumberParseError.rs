@@ -50,3 +50,21 @@ impl Error for CssNumberParseError
 		}
 	}
 }
+
+impl From<ParseFloatError> for CssNumberParseError
+{
+	#[inline(always)]
+	fn from(error: ParseFloatError) -> Self
+	{
+		CssNumberParseError::Float(error)
+	}
+}
+
+impl From<CssNumberConversionError> for CssNumberParseError
+{
+	#[inline(always)]
+	fn from(error: CssNumberConversionError) -> Self
+	{
+		CssNumberParseError::Conversion(error)
+	}
+}
