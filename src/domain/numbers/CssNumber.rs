@@ -13,9 +13,9 @@ pub trait CssNumber: Sized
 + Div<Self, Output=Self> + DivAssign<Self>
 + Rem<Self, Output=Self> + RemAssign<Self>
 + Neg<Output=Self>
-+ Debug + Display + LowerExp + UpperExp
++ Debug + Display
 + Deref
-+ From<u16> + From<i16> + From<u8> + From<i8> + FromStr<Err=UnitFromStrError>
++ From<u16> + From<u8>
 + CssNumberNewType<Self> + Unit<Number=Self> + AppUnitsPer
 {
 	const Zero: Self;
@@ -76,6 +76,9 @@ pub trait CssNumber: Sized
 	
 	#[inline(always)]
 	fn as_f32(&self) -> f32;
+	
+	#[inline(always)]
+	fn as_u32(&self) -> u32;
 	
 	#[inline(always)]
 	fn round(self) -> Self

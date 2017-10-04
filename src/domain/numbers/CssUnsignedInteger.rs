@@ -2,85 +2,29 @@
 // Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
 
 
-/// A CSS float value similar to f32 but with a more restricted range
-#[derive(Debug, Copy, Clone)]
-pub struct CssUnsignedNumber(f32);
+/// A CSS integer value similar to u32
+#[derive(Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
+pub struct CssUnsignedInteger(u32);
 
-impl PartialEq for CssUnsignedNumber
-{
-	#[inline(always)]
-	fn eq(&self, other: &Self) -> bool
-	{
-		self.to_f32().eq(&other.0)
-	}
-}
-
-impl Eq for CssUnsignedNumber
-{
-}
-
-impl PartialOrd for CssUnsignedNumber
-{
-	#[inline(always)]
-	fn partial_cmp(&self, other: &Self) -> Option<Ordering>
-	{
-		self.to_f32().partial_cmp(&other.0)
-	}
-}
-
-impl Ord for CssUnsignedNumber
-{
-	#[inline(always)]
-	fn cmp(&self, other: &Self) -> Ordering
-	{
-		self.partial_cmp(other).unwrap_or(Ordering::Equal)
-	}
-}
-
-impl Hash for CssUnsignedNumber
-{
-	#[inline(always)]
-	fn hash<H: Hasher>(&self, state: &mut H)
-	{
-		self.to_bits().hash(state)
-	}
-}
-
-impl ToCss for CssUnsignedNumber
+impl ToCss for CssUnsignedInteger
 {
 	#[inline(always)]
 	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
 	{
-		self.to_f32().to_css(dest)
+		self.0.to_css(dest)
 	}
 }
 
-impl Display for CssUnsignedNumber
+impl Display for CssUnsignedInteger
 {
 	#[inline(always)]
 	fn fmt(&self, fmt: &mut Formatter) -> fmt::Result
 	{
-		<f32 as Display>::fmt(&self.to_f32(), fmt)
+		<u32 as Display>::fmt(&self.0, fmt)
 	}
 }
 
-impl LowerExp for CssUnsignedNumber
-{
-	fn fmt(&self, f: &mut Formatter) -> fmt::Result
-	{
-		<f32 as LowerExp>::fmt(&self.to_f32(), f)
-	}
-}
-
-impl UpperExp for CssUnsignedNumber
-{
-	fn fmt(&self, f: &mut Formatter) -> fmt::Result
-	{
-		<f32 as UpperExp>::fmt(&self.to_f32(), f)
-	}
-}
-
-impl Default for CssUnsignedNumber
+impl Default for CssUnsignedInteger
 {
 	#[inline(always)]
 	fn default() -> Self
@@ -89,137 +33,114 @@ impl Default for CssUnsignedNumber
 	}
 }
 
-impl Add<CssUnsignedNumber> for CssUnsignedNumber
+impl Add<CssUnsignedInteger> for CssUnsignedInteger
 {
 	type Output = Self;
 	
 	#[inline(always)]
-	fn add(self, rhs: CssUnsignedNumber) -> Self::Output
+	fn add(self, rhs: CssUnsignedInteger) -> Self::Output
 	{
-		Self::clamp(self.to_f32() + rhs.0)
+		CssUnsignedInteger(self.0 + rhs.0)
 	}
 }
 
-impl AddAssign<CssUnsignedNumber> for CssUnsignedNumber
+impl AddAssign<CssUnsignedInteger> for CssUnsignedInteger
 {
 	#[inline(always)]
-	fn add_assign(&mut self, rhs: CssUnsignedNumber)
+	fn add_assign(&mut self, rhs: CssUnsignedInteger)
 	{
 		*self = self.add(rhs)
 	}
 }
 
-impl Sub<CssUnsignedNumber> for CssUnsignedNumber
+impl Sub<CssUnsignedInteger> for CssUnsignedInteger
 {
 	type Output = Self;
 	
 	#[inline(always)]
-	fn sub(self, rhs: CssUnsignedNumber) -> Self::Output
+	fn sub(self, rhs: CssUnsignedInteger) -> Self::Output
 	{
-		Self::clamp(self.to_f32() - rhs.0)
+		CssUnsignedInteger(self.0 - rhs.0)
 	}
 }
 
-impl SubAssign<CssUnsignedNumber> for CssUnsignedNumber
+impl SubAssign<CssUnsignedInteger> for CssUnsignedInteger
 {
 	#[inline(always)]
-	fn sub_assign(&mut self, rhs: CssUnsignedNumber)
+	fn sub_assign(&mut self, rhs: CssUnsignedInteger)
 	{
 		*self = self.sub(rhs)
 	}
 }
 
-impl Mul<CssUnsignedNumber> for CssUnsignedNumber
+impl Mul<CssUnsignedInteger> for CssUnsignedInteger
 {
 	type Output = Self;
 	
 	#[inline(always)]
-	fn mul(self, rhs: CssUnsignedNumber) -> Self::Output
+	fn mul(self, rhs: CssUnsignedInteger) -> Self::Output
 	{
-		Self::clamp(self.to_f32() * rhs.0)
+		CssUnsignedInteger(self.0 * rhs.0)
 	}
 }
 
-impl MulAssign<CssUnsignedNumber> for CssUnsignedNumber
+impl MulAssign<CssUnsignedInteger> for CssUnsignedInteger
 {
 	#[inline(always)]
-	fn mul_assign(&mut self, rhs: CssUnsignedNumber)
+	fn mul_assign(&mut self, rhs: CssUnsignedInteger)
 	{
 		*self = self.mul(rhs)
 	}
 }
 
-impl Div<CssUnsignedNumber> for CssUnsignedNumber
+impl Div<CssUnsignedInteger> for CssUnsignedInteger
 {
 	type Output = Self;
 	
 	#[inline(always)]
-	fn div(self, rhs: CssUnsignedNumber) -> Self::Output
+	fn div(self, rhs: CssUnsignedInteger) -> Self::Output
 	{
-		if rhs.0.is_nan()
+		if rhs.0 == 0
 		{
-			let value = if (self.to_f32() / rhs.0).is_sign_positive()
-			{
-				::std::f32::MAX
-			}
-			else
-			{
-				::std::f32::MIN
-			};
-			CssUnsignedNumber(value)
+			CssUnsignedInteger(::std::u32::MAX)
 		}
 		else
 		{
-			Self::clamp(self.to_f32() / rhs.0)
+			CssUnsignedInteger(self.0 / rhs.0)
 		}
 	}
 }
 
-impl DivAssign<CssUnsignedNumber> for CssUnsignedNumber
+impl DivAssign<CssUnsignedInteger> for CssUnsignedInteger
 {
 	#[inline(always)]
-	fn div_assign(&mut self, rhs: CssUnsignedNumber)
+	fn div_assign(&mut self, rhs: CssUnsignedInteger)
 	{
 		*self = self.div(rhs)
 	}
 }
 
-impl Rem<CssUnsignedNumber> for CssUnsignedNumber
+impl Rem<CssUnsignedInteger> for CssUnsignedInteger
 {
 	type Output = Self;
 	
 	#[inline(always)]
-	fn rem(self, rhs: CssUnsignedNumber) -> Self::Output
+	fn rem(self, rhs: CssUnsignedInteger) -> Self::Output
 	{
-		if rhs.0.is_nan()
-		{
-			let value = if (self.to_f32() % rhs.0).is_sign_positive()
-			{
-				::std::f32::MAX
-			}
-			else
-			{
-				::std::f32::MIN
-			};
-			CssUnsignedNumber(value)
-		}
-		else
-		{
-			Self::clamp(self.to_f32() % rhs.0)
-		}
+		CssUnsignedInteger(self.0 % rhs.0)
 	}
 }
 
-impl RemAssign<CssUnsignedNumber> for CssUnsignedNumber
+impl RemAssign<CssUnsignedInteger> for CssUnsignedInteger
 {
 	#[inline(always)]
-	fn rem_assign(&mut self, rhs: CssUnsignedNumber)
+	fn rem_assign(&mut self, rhs: CssUnsignedInteger)
 	{
 		*self = self.rem(rhs)
 	}
 }
 
-impl Neg for CssUnsignedNumber
+impl Neg for CssUnsignedInteger
 {
 	type Output = Self;
 	
@@ -232,108 +153,135 @@ impl Neg for CssUnsignedNumber
 		}
 		else
 		{
-			CssUnsignedNumber(-self.to_f32())
+			CssUnsignedInteger(0)
 		}
 	}
 }
 
-impl CssNumberNewType<Self> for CssUnsignedNumber
+impl CssNumberNewType<Self> for CssUnsignedInteger
 {
 	#[inline(always)]
 	fn to_f32(&self) -> f32
 	{
-		self.to_f32()
+		self.0 as f32
 	}
 	
 	#[inline(always)]
-	fn as_CssNumber(&self) -> &CssUnsignedNumber
+	fn as_CssNumber(&self) -> &CssUnsignedInteger
 	{
 		self
 	}
+	
+	#[inline(always)]
+	fn is_zero(&self) -> bool
+	{
+		self.0 == 0
+	}
+	
+	#[inline(always)]
+	fn is_positive(&self) -> bool
+	{
+		self.0 != 0
+	}
+	
+	#[inline(always)]
+	fn is_negative(&self) -> bool
+	{
+		false
+	}
+	
+	#[inline(always)]
+	fn is_zero_or_positive(&self) -> bool
+	{
+		true
+	}
+	
+	#[inline(always)]
+	fn is_zero_or_negative(&self) -> bool
+	{
+		self.is_zero()
+	}
 }
 
-impl Deref for CssUnsignedNumber
+impl Deref for CssUnsignedInteger
 {
-	type Target = f32;
+	type Target = u32;
 	
 	#[inline(always)]
 	fn deref(&self) -> &Self::Target
 	{
-		&self.to_f32()
+		&self.0
 	}
 }
 
-impl From<u16> for CssUnsignedNumber
+impl From<u32> for CssUnsignedInteger
 {
 	#[inline(always)]
-	fn from(small: u16) -> CssUnsignedNumber
+	fn from(small: u32) -> CssUnsignedInteger
 	{
-		CssUnsignedNumber(small as f32)
+		CssUnsignedInteger(small)
 	}
 }
 
-impl From<i16> for CssUnsignedNumber
+impl From<u16> for CssUnsignedInteger
 {
 	#[inline(always)]
-	fn from(small: i16) -> CssUnsignedNumber
+	fn from(small: u16) -> CssUnsignedInteger
 	{
-		CssUnsignedNumber(small as f32)
+		CssUnsignedInteger(small as u32)
 	}
 }
 
-impl From<u8> for CssUnsignedNumber
+impl From<u8> for CssUnsignedInteger
 {
 	#[inline(always)]
-	fn from(small: u8) -> CssUnsignedNumber
+	fn from(small: u8) -> CssUnsignedInteger
 	{
-		CssUnsignedNumber(small as f32)
+		CssUnsignedInteger(small as u32)
 	}
 }
 
-impl From<i8> for CssUnsignedNumber
+impl FromStr for CssUnsignedInteger
 {
-	#[inline(always)]
-	fn from(small: i8) -> CssUnsignedNumber
-	{
-		CssUnsignedNumber(small as f32)
-	}
-}
-
-impl FromStr for CssUnsignedNumber
-{
-	type Err = UnitFromStrError;
+	type Err = ParseIntError;
 	
 	fn from_str(s: &str) -> Result<Self, Self::Err>
 	{
-		let value = f32::from_str(s)?;
-		Ok(CssUnsignedNumber::new(value)?)
+		let value = u32::from_str(s)?;
+		Ok(CssUnsignedInteger(value))
 	}
 }
 
-impl CssNumber for CssUnsignedNumber
+impl CssNumber for CssUnsignedInteger
 {
-	const Zero: Self = CssUnsignedNumber(0.0);
+	const Zero: Self = CssUnsignedInteger(0);
 	
-	const One: Self = CssUnsignedNumber(1.0);
+	const One: Self = CssUnsignedInteger(1);
 	
-	const Maximum: Self = CssUnsignedNumber(::std::f32::MAX);
+	const Maximum: Self = CssUnsignedInteger(::std::u32::MAX);
 	
-	const Minimum: Self = CssUnsignedNumber(::std::f32::MIN);
+	const Minimum: Self = CssUnsignedInteger(::std::u32::MIN);
 	
-	const DotsPerInch: Self = CssUnsignedNumber(96.0);
+	const DotsPerInch: Self = CssUnsignedInteger(96);
 	
-	const CentimetresPerInch: Self = CssUnsignedNumber(2.54);
+	const CentimetresPerInch: Self = CssUnsignedInteger(2);
 	
 	#[inline(always)]
 	fn as_f32(&self) -> f32
 	{
-		self.0
+		self.0 as f32
 	}
 	
 	#[inline(always)]
 	fn as_u32(&self) -> u32
 	{
-		self.0 as u32
+		self.0
+	}
+	
+	#[inline(always)]
+	fn round(self) -> Self
+	{
+		self
 	}
 	
 	#[inline(always)]
@@ -346,35 +294,48 @@ impl CssNumber for CssUnsignedNumber
 	#[inline(always)]
 	fn _construct(value: f32) -> Self
 	{
-		CssUnsignedNumber(value)
+		CssUnsignedInteger(value as u32)
+	}
+	
+	#[inline(always)]
+	fn new(value: f32) -> Result<Self, CssNumberConversionError>
+	{
+		if value.is_sign_negative()
+		{
+			Err(CssNumberConversionError::NegativeNumberMayNotBeAllowed)
+		}
+		else
+		{
+			Ok(CssUnsignedInteger(value as u32))
+		}
 	}
 }
 
-impl AppUnitsPer for CssUnsignedNumber
+impl AppUnitsPer for CssUnsignedInteger
 {
 	/// Number of app units per pixel
-	const AppUnitsPerPX: Self = CssUnsignedNumber(f32::AppUnitsPerPX);
+	const AppUnitsPerPX: Self = CssUnsignedInteger(f32::AppUnitsPerPX as u32);
 	
 	/// Number of app units per inch
-	const AppUnitsPerIN: Self = CssUnsignedNumber(f32::AppUnitsPerIN);
+	const AppUnitsPerIN: Self = CssUnsignedInteger(f32::AppUnitsPerIN as u32);
 	
 	/// Number of app units per centimeter
-	const AppUnitsPerCM: Self = CssUnsignedNumber(f32::AppUnitsPerCM);
+	const AppUnitsPerCM: Self = CssUnsignedInteger(f32::AppUnitsPerCM as u32);
 	
 	/// Number of app units per millimeter
-	const AppUnitsPerMM: Self = CssUnsignedNumber(f32::AppUnitsPerMM);
+	const AppUnitsPerMM: Self = CssUnsignedInteger(f32::AppUnitsPerMM as u32);
 	
 	/// Number of app units per quarter
-	const AppUnitsPerQ: Self = CssUnsignedNumber(f32::AppUnitsPerQ);
+	const AppUnitsPerQ: Self = CssUnsignedInteger(f32::AppUnitsPerQ as u32);
 	
 	/// Number of app units per point
-	const AppUnitsPerPT: Self = CssUnsignedNumber(f32::AppUnitsPerPT);
+	const AppUnitsPerPT: Self = CssUnsignedInteger(f32::AppUnitsPerPT as u32);
 	
 	/// Number of app units per pica
-	const AppUnitsPerPC: Self = CssUnsignedNumber(f32::AppUnitsPerPC);
+	const AppUnitsPerPC: Self = CssUnsignedInteger(f32::AppUnitsPerPC as u32);
 }
 
-impl Unit for CssUnsignedNumber
+impl Unit for CssUnsignedInteger
 {
 	type Number = Self;
 	
@@ -389,10 +350,23 @@ impl Unit for CssUnsignedNumber
 		
 		match *input.next()?
 		{
-			Number { value, .. } =>
+			Number { int_value, value, .. } =>
 			{
-				let constant = Self::new(value).map_err(|cssNumberConversionError| ParseError::Custom(CouldNotParseCssUnsignedNumber(cssNumberConversionError, value)))?;
-				Ok(Constant(constant))
+				if let Some(constant) = int_value
+				{
+					if constant >= 0
+					{
+						Ok(Constant(CssUnsignedInteger(constant as u32)))
+					}
+					else
+					{
+						Err(ParseError::Custom(CustomParseError::UnsignedIntegersCanNotBeNegative(constant)))
+					}
+				}
+				else
+				{
+					Err(ParseError::Custom(CustomParseError::UnsignedIntegersCanNotBeFloats(value)))
+				}
 			}
 			
 			Function(ref name) =>
@@ -422,10 +396,23 @@ impl Unit for CssUnsignedNumber
 		
 		match *input.next()?
 		{
-			Token::Number { value, .. } =>
+			Token::Number { value, int_value, .. } =>
 			{
-				let constant = Self::new(value).map_err(|cssNumberConversionError| ParseError::Custom(CouldNotParseCssUnsignedNumber(cssNumberConversionError, value)))?;
-				Ok(Left(Constant(constant)))
+				if let Some(constant) = int_value
+				{
+					if constant >= 0
+					{
+						Ok(Left(Constant(CssUnsignedInteger(constant as u32))))
+					}
+					else
+					{
+						Err(ParseError::Custom(CustomParseError::UnsignedIntegersCanNotBeNegative(constant)))
+					}
+				}
+				else
+				{
+					Err(ParseError::Custom(CustomParseError::UnsignedIntegersCanNotBeFloats(value)))
+				}
 			},
 			
 			Token::Percentage { unit_value, .. } =>
@@ -465,11 +452,25 @@ impl Unit for CssUnsignedNumber
 	#[inline(always)]
 	fn from_raw_css_for_var_expression_evaluation(value: &str, _is_not_in_page_rule: bool) -> Option<Self>
 	{
-		fn from_raw_css_for_var_expression_evaluation_internal<'i: 't, 't>(input: &Parser<'i, 't>) -> Result<CssUnsignedNumber, ParseError<'i, CustomParseError<'i>>>
+		fn from_raw_css_for_var_expression_evaluation_internal<'i: 't, 't>(input: &Parser<'i, 't>) -> Result<CssUnsignedInteger, ParseError<'i, CustomParseError<'i>>>
 		{
 			let value = match *input.next()?
 			{
-				Token::Number { value, .. } => CssUnsignedNumber::new(value).map_err(|cssNumberConversionError| ParseError::Custom(CouldNotParseCssSignedNumber(cssNumberConversionError, value))),
+				Token::Number { value, int_value, .. } => if let Some(constant) = int_value
+				{
+					if constant >= 0
+					{
+						Ok(CssUnsignedInteger(constant as u32))
+					}
+					else
+					{
+						Err(ParseError::Custom(CustomParseError::UnsignedIntegersCanNotBeNegative(constant)))
+					}
+				}
+				else
+				{
+					Err(ParseError::Custom(CustomParseError::UnsignedIntegersCanNotBeFloats(value)))
+				},
 				
 				unexpectedToken @ _ => Err(BasicParseError::UnexpectedToken(unexpectedToken.clone()).into()),
 			};

@@ -71,7 +71,6 @@ pub(crate) enum CustomParseError<'i>
 	
 	UnexpectedTokenForViewportLength(Token<'i>),
 	UnexpectedViewportProperty(CowRcStr<'i>),
-	
 	ViewportLengthsAreNotAllowedInAPageAtRule,
 	LengthDimensionWasUnrecognised(String),
 	
@@ -109,4 +108,7 @@ pub(crate) enum CustomParseError<'i>
 	CouldNotParseTimeDimensionInCalcFunction,
 	CouldNotParseAngleDimensionInCalcFunction,
 	CouldNotParseLengthDimensionInCalcFunction,
+	
+	UnsignedIntegersCanNotBeNegative(i32),
+	UnsignedIntegersCanNotBeFloats(f32),
 }

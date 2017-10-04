@@ -330,6 +330,12 @@ impl CssNumber for CssSignedNumber
 		self.0
 	}
 	
+	#[inline(always)]
+	fn as_u32(&self) -> u32
+	{
+		self.0 as u32
+	}
+	
 	#[doc(hidden)]
 	#[inline(always)]
 	fn _construct(value: f32) -> Self
