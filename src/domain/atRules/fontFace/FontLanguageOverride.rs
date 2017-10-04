@@ -30,9 +30,23 @@ impl FontLanguageOverride
 	{
 		use self::FontLanguageOverride::*;;
 		
-		if let Ok(value) = input.try(|i| i.expect_string())
+		if let Ok(value) = input.try::<>(|input|
 		{
-			return Ok(Override(OpenTypeLanguageTag::parse(value)?))
+			match input.expect_string()
+			{
+				Err(_) => Err(()),
+				Ok(value) =>
+				{
+					match OpenTypeLanguageTag::parse(value)
+					{
+						Err(_) => Err(()),
+						Ok(openTypeLanguageTag) => Ok(Override(openTypeLanguageTag))
+					}
+				}
+			}
+		})
+		{
+			return Ok(value)
 		}
 		
 		let identifier = input.expect_ident()?.clone();
