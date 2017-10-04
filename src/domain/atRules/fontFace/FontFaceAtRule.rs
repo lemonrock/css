@@ -5,7 +5,7 @@
 /// A `@font-face` rule.
 ///
 /// https://drafts.csswg.org/css-fonts/#font-face-rule
-#[derive(Clone, Debug)]
+#[derive(Debug, Clone)]
 pub struct FontFaceAtRule
 {
 	/// The name of this font face
@@ -27,7 +27,7 @@ pub struct FontFaceAtRule
 	pub display: Option<FontDisplay>,
 	
 	/// The ranges of code points outside of which this font face should not be used.
-	pub unicode_range: Option<UnicodeRange>,
+	pub unicode_range: Option<Vec<UnicodeRange>>,
 	
 	/// The feature settings of this font face.
 	pub feature_settings: Option<FontFeatureSettings>,
@@ -44,31 +44,62 @@ impl ToCss for FontFaceAtRule
 	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
 	{
 		#[inline(always)]
-		fn writePropertyDeclaration<W: fmt::Write, T>(dest: &mut W, name: &str, value: &Option<T>)
+		fn writePropertyDeclaration<W: fmt::Write, T: ToCss>(dest: &mut W, name: &str, value: &Option<T>) -> fmt::Result
 		{
-			if let Some(ref value) = value
+			if let &Some(ref value) = value
 			{
-				dest.write_str("  ")?;
 				dest.write_str(name)?;
-				dest.write_str(": ")?;
+				dest.write_char(':')?;
 				value.to_css(dest)?;
-				dest.write_str(";\n")?;
+				dest.write_char(';')
+			}
+			else
+			{
+				Ok(())
 			}
 		}
 		
-		dest.write_str("@font-face {\n")?;
+		#[inline(always)]
+		fn writePropertyDeclarationValues<W: fmt::Write, T: ToCss>(dest: &mut W, name: &str, value: &Option<Vec<T>>) -> fmt::Result
+		{
+			if let &Some(ref value) = value
+			{
+				if value.is_empty()
+				{
+					return Ok(());
+				}
+				
+				dest.write_str(name)?;
+				dest.write_char(':')?;
+				
+				let mut iterator = value.iter();
+				iterator.next().unwrap().to_css(dest)?;
+				for value in iterator
+				{
+					value.to_css(dest)?;
+				}
+				
+				dest.write_char(';')
+			}
+			else
+			{
+				Ok(())
+			}
+		}
+		
+		dest.write_str("@font-face{")?;
 		
 		writePropertyDeclaration(dest, "font-family", &self.family);
-		writePropertyDeclaration(dest, "src", &self.sources);
+		writePropertyDeclarationValues(dest, "src", &self.sources);
 		writePropertyDeclaration(dest, "font-style", &self.style);
 		writePropertyDeclaration(dest, "font-weight", &self.weight);
 		writePropertyDeclaration(dest, "font-stretch", &self.stretch);
 		writePropertyDeclaration(dest, "font-display", &self.display);
-		writePropertyDeclaration(dest, "unicode-range", &self.unicode_range);
+		writePropertyDeclarationValues(dest, "unicode-range", &self.unicode_range);
 		writePropertyDeclaration(dest, "font-feature-settings", &self.feature_settings);
 		writePropertyDeclaration(dest, "font-language-override", &self.language_override);
 		
-		dest.write_str("}")
+		dest.write_char('}')
 	}
 }
 
@@ -92,7 +123,7 @@ impl FontFaceAtRule
 	}
 
 	/// Parse the block inside a `@font-face` rule.
-	pub(crate) fn parse_body<'i>(context: &ParserContext, input: &mut Parser, source_location: SourceLocation) -> Result<FontFaceAtRule, ParseError<'i, CustomParseError<'i>>>
+	pub(crate) fn parse_body<'i: 't, 't>(context: &ParserContext, input: &mut Parser<'i, 't>, source_location: SourceLocation) -> Result<FontFaceAtRule, ParseError<'i, CustomParseError<'i>>>
 	{
 		let mut rule = Self::empty(source_location);
 		
@@ -108,7 +139,7 @@ impl FontFaceAtRule
 			{
 				if declaration.is_err()
 				{
-					return declaration;
+					return Err(declaration.unwrap_err().error);
 				}
 			}
 		}

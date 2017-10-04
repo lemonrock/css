@@ -26,6 +26,10 @@ pub trait CssNumber: Sized
 	
 	const Minimum: Self;
 	
+	const DotsPerInch: Self;
+	
+	const CentimetresPerInch: Self;
+	
 	#[inline(always)]
 	fn new(value: f32) -> Result<Self, CssNumberConversionError>
 	{
@@ -68,6 +72,15 @@ pub trait CssNumber: Sized
 		{
 			unreachable!("What other kind of f32 is there?");
 		}
+	}
+	
+	#[inline(always)]
+	fn as_f32(&self) -> f32;
+	
+	#[inline(always)]
+	fn round(self) -> Self
+	{
+		Self::_construct(self.to_f32().round())
 	}
 	
 	#[inline(always)]

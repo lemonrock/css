@@ -64,7 +64,7 @@ impl ToCss for KeyframesName
 		match *self
 		{
 			KeyframesName::Ident(ref ident) => ident.to_css(dest),
-			KeyframesName::QuotedString(ref atom) => atom.to_string().to_css(dest),
+			KeyframesName::QuotedString(ref atom) => atom.to_css(dest),
 		}
 	}
 }

@@ -33,6 +33,12 @@ impl ToCss for MediaList
 
 impl MediaList
 {
+	/// Is this media list empty?
+	pub fn is_not_empty(&self) -> bool
+	{
+		!self.media_queries.is_empty()
+	}
+	
 	/// Create an empty MediaList.
 	pub fn empty() -> Self
 	{

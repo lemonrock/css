@@ -46,12 +46,16 @@ impl ToCss for CounterStyleAtRule
 		#[inline(always)]
 		fn write<W: fmt::Write, T: ToCss>(dest: &mut W, name: &str, value: &Option<T>) -> fmt::Result
 		{
-			if let Some(ref value) = value
+			if let &Some(ref value) = value
 			{
 				dest.write_str(name)?;
 				dest.write_char(':')?;
 				value.to_css(dest)?;
-				dest.write_char(';')?;
+				dest.write_char(';')
+			}
+			else
+			{
+				Ok(())
 			}
 		}
 		
@@ -87,7 +91,7 @@ impl CounterStyleAtRule
 			range: None,
 			pad: None,
 			fallback: None,
-			synbols: None,
+			symbols: None,
 			additive_symbols: None,
 			speak_as: None,
 		}
@@ -209,7 +213,7 @@ impl CounterStyleAtRule
 	#[inline(always)]
 	pub fn additive_symbols(&self) -> Option<&AdditiveSymbols>
 	{
-		self.symbols.as_ref()
+		self.additive_symbols.as_ref()
 	}
 	
 	/// https://drafts.csswg.org/css-counter-styles/#counter-style-speak-as
@@ -241,7 +245,7 @@ impl CounterStyleAtRule
 			{
 				if declaration.is_err()
 				{
-					return declaration;
+					return Err(declaration.unwrap_err().error);
 				}
 			}
 		}
@@ -251,12 +255,12 @@ impl CounterStyleAtRule
 		{
 			ref system @ Cyclic | ref system @ Fixed { .. } | ref system @ Symbolic | ref system @ Alphabetic | ref system @ Numeric if rule.symbols.is_none() =>
 			{
-				Err(ParseError::Custom(CustomParseError::InvalidCounterStyleWithoutSymbols(system)))
+				Err(ParseError::Custom(CustomParseError::InvalidCounterStyleWithoutSymbols(*system)))
 			}
 			
 			ref system @ Alphabetic | ref system @ Numeric if rule.symbols().unwrap().0.len() < 2 =>
 			{
-				Err(ParseError::Custom(CustomParseError::InvalidCounterStyleNotEnoughSymbols(system)))
+				Err(ParseError::Custom(CustomParseError::InvalidCounterStyleNotEnoughSymbols(*system)))
 			}
 			
 			Additive if rule.additive_symbols.is_none() =>

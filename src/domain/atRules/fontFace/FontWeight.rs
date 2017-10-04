@@ -49,8 +49,8 @@ impl Parse for FontWeight
 			match_ignore_ascii_case!
 			{
 				&ident,
-                "normal" => Ok(FontWeight::Normal),
-                "bold" => Ok(FontWeight::Bold),
+                "normal" => Ok(Self::normal),
+                "bold" => Ok(Self::bold),
                 _ => Err(())
             }
 		});
@@ -84,17 +84,17 @@ impl FontWeight
 	
 	pub fn isExactlyNormal(&self) -> bool
 	{
-		self.0 == FontWeight::_400
+		*self == FontWeight::_400
 	}
 	
 	pub fn isExactlyBold(&self) -> bool
 	{
-		self.0 == FontWeight::_700
+		*self == FontWeight::_700
 	}
 	
 	pub fn isBold(&self) -> bool
 	{
-		self.0 > FontWeight::_500
+		*self > FontWeight::_500
 	}
 	
 	/// Return the bolder weight
@@ -102,11 +102,11 @@ impl FontWeight
 	{
 		use self::FontWeight::*;
 		
-		if self.0 < _400
+		if self < _400
 		{
 			_400
 		}
-		else if self.0 < _600
+		else if self < _600
 		{
 			_700
 		}
@@ -121,11 +121,11 @@ impl FontWeight
 	{
 		use self::FontWeight::*;
 		
-		if self.0 < _600
+		if self < _600
 		{
 			_100
 		}
-		else if self.0 < _800
+		else if self < _800
 		{
 			_400
 		}
@@ -135,7 +135,7 @@ impl FontWeight
 		}
 	}
 	
-	pub const Normal: FontWeight = FontWeight::_400;
+	pub const normal: FontWeight = FontWeight::_400;
 	
-	pub const Bold: FontWeight = FontWeight::_700;
+	pub const bold: FontWeight = FontWeight::_700;
 }

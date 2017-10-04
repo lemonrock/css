@@ -17,9 +17,9 @@ impl ToCss for AdditiveTuple
 {
 	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
 	{
-		self.0.to_css(dest)?;
+		self.weight.to_css(dest)?;
 		dest.write_char(' ')?;
-		self.1.to_css(dest)
+		self.symbol.to_css(dest)
 	}
 }
 

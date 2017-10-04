@@ -30,7 +30,7 @@ impl ToCss for FontUrlSource
 			for formatHint in formatHintsIterator
 			{
 				dest.write_char(',')?;
-				serialize_string(formatHint)?;
+				serialize_string(formatHint, dest)?;
 			}
 			dest.write_char(')')?;
 		}

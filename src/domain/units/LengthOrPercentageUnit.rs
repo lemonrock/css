@@ -472,7 +472,7 @@ impl<NumberX: CssNumber> Unit for LengthOrPercentageUnit<NumberX>
 				
 				Token::Percentage { unit_value, .. } =>
 				{
-					let cssNumber = <PercentageUnit<Number> as Unit>::Number::new(unit_value).map_err(|cssNumberConversionError| ParseError::Custom(CouldNotParseCssSignedNumber(cssNumberConversionError, value)))?;
+					let cssNumber = <PercentageUnit<Number> as Unit>::Number::new(unit_value).map_err(|cssNumberConversionError| ParseError::Custom(CouldNotParseCssSignedNumber(cssNumberConversionError, unit_value)))?;
 					Ok(IsPercentage(PercentageUnit(cssNumber)))
 				}
 				

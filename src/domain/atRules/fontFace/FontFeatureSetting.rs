@@ -9,22 +9,22 @@ impl FontFeatureSetting
 {
 	fn parse<'i, 't>(input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
 	{
-		let openTypeFeatureTag = input.expect_string()?.to_owned();
+		let openTypeFeatureTag = input.expect_string()?;
 		if openTypeFeatureTag.len() != 4
 		{
-			return Err(ParseError::Custom(CustomParseError::FontFeatureSettingOpenTypeFeatureTagMustBeFourCharacters(openTypeFeatureTag)))
+			return Err(ParseError::Custom(CustomParseError::FontFeatureSettingOpenTypeFeatureTagMustBeFourCharacters(openTypeFeatureTag.clone())))
 		}
 		
 		for character in openTypeFeatureTag.chars()
 		{
-			if character <= 0x20 || character > 0x7E
+			if character <= '\x20' || character > '\x7E'
 			{
-				return Err(ParseError::Custom(CustomParseError::FontFeatureSettingOpenTypeFeatureTagMustBePrintableAscii(openTypeFeatureTag)))
+				return Err(ParseError::Custom(CustomParseError::FontFeatureSettingOpenTypeFeatureTagMustBePrintableAscii(openTypeFeatureTag.clone())))
 			}
 		}
 		
 		let integer = input.try(|input| input.expect_integer());
-		if let Some(integer) = integer
+		if let Ok(integer) = integer
 		{
 			if integer < 0
 			{
@@ -32,7 +32,7 @@ impl FontFeatureSetting
 			}
 			else
 			{
-				Ok(FontFeatureSetting(openTypeFeatureTag, integer))
+				Ok(FontFeatureSetting(openTypeFeatureTag.into(), integer as u32))
 			}
 		}
 		else
@@ -43,11 +43,11 @@ impl FontFeatureSetting
 			{
 				&ident,
 				
-				"on" => Ok(FontFeatureSetting(openTypeFeatureTag, 1)),
+				"on" => Ok(FontFeatureSetting(openTypeFeatureTag.into(), 1)),
 				
-				"off" => Ok(FontFeatureSetting(openTypeFeatureTag, 0)),
+				"off" => Ok(FontFeatureSetting(openTypeFeatureTag.into(), 0)),
 				
-				_ => Err(ParseError::Custom(CustomParseError::FontFeatureSettingIfNotAnIntegerMustBeOnOrOff(ident.to_owned())))
+				_ => Err(ParseError::Custom(CustomParseError::FontFeatureSettingIfNotAnIntegerMustBeOnOrOff(ident.clone())))
 			}
 		}
 	}

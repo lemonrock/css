@@ -2,7 +2,7 @@
 // Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
 
 
-#[derive(Clone, Debug, Eq, Hash, PartialEq)]
+#[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct FamilyName
 {
 	pub name: Atom,
@@ -17,7 +17,7 @@ impl ToCss for FamilyName
 		
 		match self.syntax
 		{
-			Quoted => serialize_string(self.name.as_ref()),
+			Quoted => serialize_string(self.name.as_ref(), dest),
 			
 			// Note that `serialization` is already escaped or serialized appropriately.
 			Identifiers(ref serialization) => dest.write_str(&*serialization),

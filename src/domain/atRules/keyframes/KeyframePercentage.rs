@@ -2,9 +2,9 @@
 // Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
 
 
-/// A number from 0 to 1, indicating the percentage of the animation when this keyframe should run.
+/// A percentage from 0% to 100%, indicating the percentage of the animation when this keyframe should run.
 #[derive(Clone, Copy, Debug, PartialEq, PartialOrd)]
-pub struct KeyframePercentage(pub f32);
+pub struct KeyframePercentage(pub PercentageUnit<CssUnsignedNumber>);
 
 impl Ord for KeyframePercentage
 {
@@ -24,43 +24,35 @@ impl ToCss for KeyframePercentage
 {
 	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
 	{
-		if self.0 == 1.
+		if self.0.is_zero()
 		{
 			dest.write_str("to")
 		}
 		else
 		{
-			serialize_percentage(self.0, dest)
+			self.0.to_css(dest)
 		}
 	}
 }
 
 impl KeyframePercentage
 {
-	/// Trivially constructs a new `KeyframePercentage`.
-	#[inline]
-	pub fn new(value: f32) -> KeyframePercentage
-	{
-		debug_assert!(value >= 0. && value <= 1., "value must be between 0 and 1 inclusive");
-		KeyframePercentage(value)
-	}
-	
 	fn parse<'i, 't>(input: &mut Parser<'i, 't>) -> Result<KeyframePercentage, ParseError<'i, CustomParseError<'i>>>
 	{
 		let percentage = if input.try(|input| input.expect_ident_matching("from")).is_ok()
 		{
-			KeyframePercentage::new(0.)
+			KeyframePercentage(PercentageUnit::ZeroPercent)
 		}
 		else if input.try(|input| input.expect_ident_matching("to")).is_ok()
 		{
-			KeyframePercentage::new(1.)
+			KeyframePercentage(PercentageUnit::OneHundredPercent)
 		}
 		else
 		{
 			let percentage = input.expect_percentage()?;
 			if percentage >= 0. && percentage <= 1.
 			{
-				KeyframePercentage::new(percentage)
+				KeyframePercentage(PercentageUnit(CssUnsignedNumber::_construct(percentage)))
 			}
 			else
 			{

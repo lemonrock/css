@@ -64,14 +64,14 @@ impl FontFeatureValuesAtRule
 		}
 	}
 	
-	pub(crate) fn parse_body<'i>(context: &ParserContext, input: &mut Parser, family_names: Vec<FamilyName>, source_location: SourceLocation) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
+	pub(crate) fn parse_body<'i: 't, 't>(context: &ParserContext, input: &mut Parser<'i, 't>, family_names: Vec<FamilyName>, source_location: SourceLocation) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
 	{
 		let mut fontFeatureValuesRule = Self::new(family_names, source_location);
 		
 		let mut iterator = RuleListParser::new_for_nested_rule(input, FontFeatureValuesAtRuleParser
 		{
 			context,
-			fontFeatureValuesRule: &mut fontFeatureValuesRule,
+			rule: &mut fontFeatureValuesRule,
 		});
 		while let Some(possiblePreciseParseError) = iterator.next()
 		{
@@ -112,7 +112,11 @@ impl FontFeatureValuesAtRule
 				{
 					declaration.to_css(dest)?;
 				}
-				dest.write_char('}')?
+				dest.write_char('}')
+			}
+			else
+			{
+				Ok(())
 			}
 		}
 		

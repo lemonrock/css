@@ -2,6 +2,7 @@
 // Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
 
 
+#[derive(Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub enum FontLanguageOverride
 {
 	normal,
@@ -41,7 +42,7 @@ impl FontLanguageOverride
 			
 			"normal" => Ok(normal),
 			
-			_ => Err(ParseError::Custom(CustomParseError::InvalidFontLanguageOverrideIdentifier(identifier.to_owned()))),
+			_ => Err(ParseError::Custom(CustomParseError::InvalidFontLanguageOverrideIdentifier(identifier.clone()))),
 		}
 	}
 }

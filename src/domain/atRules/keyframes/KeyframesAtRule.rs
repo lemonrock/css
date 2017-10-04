@@ -27,7 +27,7 @@ impl ToCss for KeyframesAtRule
 		dest.write_str("@")?;
 		if let Some(vendor_prefix) = self.vendor_prefix
 		{
-			vendor_prefix.to_css(dest)
+			vendor_prefix.to_css(dest)?;
 		}
 		dest.write_str("keyframes ")?;
 		self.name.to_css(dest)?;

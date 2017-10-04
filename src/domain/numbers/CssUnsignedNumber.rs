@@ -320,6 +320,16 @@ impl CssNumber for CssUnsignedNumber
 	
 	const Minimum: Self = CssUnsignedNumber(::std::f32::MIN);
 	
+	const DotsPerInch: Self = CssUnsignedNumber(96.0);
+	
+	const CentimetresPerInch: Self = CssUnsignedNumber(2.54);
+	
+	#[inline(always)]
+	fn as_f32(&self) -> f32
+	{
+		self.0
+	}
+	
 	#[doc(hidden)]
 	#[inline(always)]
 	fn _construct(value: f32) -> Self

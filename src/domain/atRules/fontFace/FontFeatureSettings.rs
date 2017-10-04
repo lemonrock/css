@@ -2,6 +2,7 @@
 // Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
 
 
+#[derive(Debug, Clone)]
 pub struct FontFeatureSettings(pub BTreeMap<String, u32>);
 
 impl ToCss for FontFeatureSettings
@@ -10,11 +11,11 @@ impl ToCss for FontFeatureSettings
 	{
 		if self.0.is_empty()
 		{
-			serialize_identifier("normal")
+			serialize_identifier("normal", dest)
 		}
 		else
 		{
-			for &(ref openTypeFeatureTag, ref integer) in self.0.iter()
+			for (openTypeFeatureTag, integer) in self.0.iter()
 			{
 				serialize_string(openTypeFeatureTag, dest)?;
 				let integer = *integer;
@@ -42,7 +43,7 @@ impl Parse for FontFeatureSettings
 			let mut settings = BTreeMap::new();
 			for setting in input.parse_comma_separated(|input| FontFeatureSetting::parse(input))?
 			{
-				settings.insert(setting.0, setting.1)
+				settings.insert(setting.0, setting.1);
 			}
 			Ok(FontFeatureSettings(settings))
 		}
@@ -54,24 +55,30 @@ impl FontFeatureSettings
 	#[inline(always)]
 	pub fn setting(&self, openTypeFeatureTag: &str) -> Option<u32>
 	{
-		self.0.get(openTypeFeatureTag)
+		self.0.get(openTypeFeatureTag).map(|reference| *reference)
 	}
 	
 	#[inline(always)]
 	pub fn isOn(&self, openTypeFeatureTag: &str) -> Option<bool>
 	{
-		self.0.get(openTypeFeatureTag).map(|integer| integer == 1)
+		self.0.get(openTypeFeatureTag).map(|integer| *integer == 1)
 	}
 	
 	#[inline(always)]
 	pub fn isOff(&self, openTypeFeatureTag: &str) -> Option<bool>
 	{
-		self.0.get(openTypeFeatureTag).map(|integer| integer == 0)
+		self.0.get(openTypeFeatureTag).map(|integer| *integer == 0)
 	}
 	
 	#[inline(always)]
 	pub fn isNormal(&self) -> bool
 	{
-		self.0.is_none()
+		self.0.is_empty()
+	}
+	
+	#[inline(always)]
+	pub fn normal() -> Self
+	{
+		FontFeatureSettings(Default::default())
 	}
 }

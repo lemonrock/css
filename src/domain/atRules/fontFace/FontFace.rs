@@ -96,7 +96,7 @@ impl<'a> FontFace<'a>
 		}
 		else
 		{
-			FontFeatureSettings::normal
+			FontFeatureSettings::normal()
 		}
 	}
 	

@@ -39,7 +39,7 @@ macro_rules! parse_quoted_or_unquoted_string
                     Ok(t) => Err(BasicParseError::UnexpectedToken(t.clone()).into()),
                     Err(e) => Err(e.into()),
                 }
-            }).or_else(|_: ParseError|
+            }).or_else(|_: ParseError<'i, CustomParseError<'i>>|
             {
                 while let Ok(_) = input.next()
                 {
@@ -55,30 +55,32 @@ impl ToCss for UrlMatchingFunction
 {
 	fn to_css<W: fmt::Write >(&self, dest: &mut W) -> fmt::Result
 	{
+		use self::UrlMatchingFunction::*;
+		
 		match *self
 		{
-			UrlMatchingFunction::Url(ref url) => url.to_css(dest),
+			Url(ref url) => url.to_css(dest),
 			
-			UrlMatchingFunction::UrlPrefix(ref url_prefix) =>
-				{
-					dest.write_str("url-prefix(")?;
-					url_prefix.to_css(dest)?;
-					dest.write_str(")")
-				},
+			UrlPrefix(ref url_prefix) =>
+			{
+				dest.write_str("url-prefix(")?;
+				serialize_string(url_prefix, dest)?;
+				dest.write_char(')')
+			},
 			
-			UrlMatchingFunction::Domain(ref domain) =>
-				{
-					dest.write_str("domain(")?;
-					domain.to_css(dest)?;
-					dest.write_str(")")
-				},
+			Domain(ref domain) =>
+			{
+				dest.write_str("domain(")?;
+				serialize_string(domain, dest)?;
+				dest.write_char(')')
+			},
 			
-			UrlMatchingFunction::RegExp(ref regex) =>
-				{
-					dest.write_str("regexp(")?;
-					regex.to_css(dest)?;
-					dest.write_str(")")
-				},
+			RegExp(ref regex) =>
+			{
+				dest.write_str("regexp(")?;
+				serialize_string(regex, dest)?;
+				dest.write_char(')')
+			},
 		}
 	}
 }

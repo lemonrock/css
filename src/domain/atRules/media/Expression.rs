@@ -115,17 +115,17 @@ impl Expression
 					{
 						&name,
 						
-						"min-width" => Width(AtLeast(Length::parse_non_negative(context, input)?)),
+						"min-width" => Width(AtLeast(LengthUnit::parse_non_negative(context, input)?)),
 						
-						"max-width" => Width(AtMost(Length::parse_non_negative(context, input)?)),
+						"max-width" => Width(AtMost(LengthUnit::parse_non_negative(context, input)?)),
 						
-						"width" => Width(Exact(Length::parse_non_negative(context, input)?)),
+						"width" => Width(Exact(LengthUnit::parse_non_negative(context, input)?)),
 						
-						"min-height" => Height(AtLeast(Length::parse_non_negative(context, input)?)),
+						"min-height" => Height(AtLeast(LengthUnit::parse_non_negative(context, input)?)),
 						
-						"max-height" => Height(AtMost(Length::parse_non_negative(context, input)?)),
+						"max-height" => Height(AtMost(LengthUnit::parse_non_negative(context, input)?)),
 						
-						"height" => Height(Exact(Length::parse_non_negative(context, input)?)),
+						"height" => Height(Exact(LengthUnit::parse_non_negative(context, input)?)),
 						
 						"min-aspect-ratio" => AspectRatio(AtLeast(Ratio::parse(context, input)?)),
 						

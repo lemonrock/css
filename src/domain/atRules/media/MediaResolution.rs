@@ -9,13 +9,13 @@ pub enum MediaResolution
 	infinite,
 	
 	/// Dots per inch.
-	dpi(CssFloat),
+	dpi(CssUnsignedNumber),
 	
 	/// Dots per pixel.
-	dppx(CssFloat),
+	dppx(CssUnsignedNumber),
 	
 	/// Dots per centimetre.
-	dpcm(CssFloat),
+	dpcm(CssUnsignedNumber),
 }
 
 impl ToCss for MediaResolution
@@ -36,16 +36,16 @@ impl ToCss for MediaResolution
 
 impl MediaResolution
 {
-	fn dotsPerInch(&self) -> CssFloat
+	fn dotsPerInch(&self) -> f32
 	{
 		use self::MediaResolution::*;
 		
 		match *self
 		{
 			infinite => ::std::f32::INFINITY,
-			dpi(value) => value,
-			dppx(value) => value * 96.0,
-			dpcm(value) => value * 2.54,
+			dpi(value) => value.as_f32(),
+			dppx(value) => (value * CssUnsignedNumber::DotsPerInch).as_f32(),
+			dpcm(value) => (value * CssUnsignedNumber::CentimetresPerInch).as_f32(),
 		}
 	}
 	
@@ -57,8 +57,8 @@ impl MediaResolution
 		{
 			dpcm(dotsPerCentimetre) =>
 			{
-				let dotsPerInch = (dotsPerCentimetre / 2.54).round();
-				let dotsPerPixel = dotsPerInch / 96.0;
+				let dotsPerInch = (dotsPerCentimetre / CssUnsignedNumber::CentimetresPerInch).round();
+				let dotsPerPixel = dotsPerInch / CssUnsignedNumber::DotsPerInch;
 				if dotsPerPixel.round() == dotsPerPixel
 				{
 					dppx(dotsPerPixel)
@@ -71,7 +71,7 @@ impl MediaResolution
 			
 			dpi(dotsPerInch) =>
 			{
-				let dotsPerPixel = dotsPerInch / 96.0;
+				let dotsPerPixel = dotsPerInch / CssUnsignedNumber::DotsPerInch;
 				if dotsPerPixel.round() == dotsPerPixel
 				{
 					dppx(dotsPerPixel)
@@ -101,7 +101,7 @@ impl MediaResolution
 					return Err(ParseError::Custom(CustomParseError::MediaQueryResolutionCanNotBeNegativeOrZero))
 				}
 				
-				Ok(dppx(value))
+				Ok(dppx(CssUnsignedNumber::_construct(value)))
 			},
 			
 			ref unrecognisedToken => return Err(ParseError::Custom(CustomParseError::UnexpectedTokenWhenParsingMediaQueryResolution(unrecognisedToken.clone()))),
@@ -138,11 +138,11 @@ impl MediaResolution
 				{
 					&*unit,
 					
-					"dpi" => Ok(dpi(value)),
+					"dpi" => Ok(dpi(CssUnsignedNumber::_construct(value))),
 					
-					"dppx" => Ok(dppx(value)),
+					"dppx" => Ok(dppx(CssUnsignedNumber::_construct(value))),
 					
-					"dpcm" => Ok(dpcm(value)),
+					"dpcm" => Ok(dpcm(CssUnsignedNumber::_construct(value))),
 					
 					_ => Err(ParseError::Custom(CustomParseError::UnrecognisedMediaQueryResolutionUnit(unit.clone())))
 				};

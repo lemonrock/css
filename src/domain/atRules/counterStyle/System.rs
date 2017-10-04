@@ -62,7 +62,7 @@ impl Parse for System
             
             "extends" =>  Ok(Extends(CounterStyleIdent::parse(input)?)),
             
-            _ => Err(ParseError::Custom(CustomParseError::CounterStyleSystemIsNotKnown(identifier.to_owned()))),
+            _ => Err(ParseError::Custom(CustomParseError::CounterStyleSystemIsNotKnown(identifier.clone()))),
         }
 	}
 }
