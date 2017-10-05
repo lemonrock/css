@@ -274,7 +274,7 @@ impl<NumberX: CssNumber> Unit for PercentageUnit<NumberX>
 					Ok(PercentageUnit(cssNumber))
 				}
 				
-				unexpectedToken @ _ => Err(BasicParseError::UnexpectedToken(unexpectedToken.clone()).into()),
+				ref unexpectedToken @ _ => Err(BasicParseError::UnexpectedToken(unexpectedToken.clone()).into()),
 			};
 			
 			input.skip_whitespace();
