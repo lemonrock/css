@@ -103,3 +103,18 @@ pub enum CustomParseError<'i>
 	UnknownFunctionInValueExpression(CowRcStr<'i>),
 	CssVariablesInVarExpressionsMustStartWithTwoDashes(CowRcStr<'i>),
 }
+
+impl<'i> CustomParseError<'i>
+{
+	#[inline(always)]
+	fn unexpectedToken<T>(unexpectedToken: &Token<'i>) -> Result<T, ParseError<'i, CustomParseError<'i>>>
+	{
+		Err(ParseError::Basic(BasicParseError::UnexpectedToken(unexpectedToken.clone())))
+	}
+	
+	#[inline(always)]
+	fn dimensionless<T>(value: f32) -> Result<T, ParseError<'i, CustomParseError<'i>>>
+	{
+		Err(ParseError::Custom(CustomParseError::CouldNotParseDimensionLessNumber(value)))
+	}
+}

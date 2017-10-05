@@ -9,7 +9,7 @@ pub enum CalcExpression<U: Unit>
 	
 	Number(U::Number),
 	
-	Parentheses(CalculablePropertyValue<U>),
+	Parentheses(Box<CalcExpression<U>>),
 	
 	Addition(Box<CalcExpression<U>>, Box<CalcExpression<U>>),
 	
@@ -184,7 +184,7 @@ impl<U: Unit> CalcExpression<U>
 							currentSum = Subtraction(Box::new(currentSum), Box::new(Self::parse_product(context, input)?));
 						}
 						
-						ref unexpectedToken => return Err(BasicParseError::UnexpectedToken(unexpectedToken.clone()).into()),
+						ref unexpectedToken => return CustomParseError::unexpectedToken(unexpectedToken),
 					}
 				}
 				
@@ -251,5 +251,11 @@ impl<U: Unit> CalcExpression<U>
 		{
 			Ok(either.right().unwrap())
 		}
+	}
+	
+	#[inline(always)]
+	pub(crate) fn parse_parentheses<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Either<U, CalcExpression<U>>, ParseError<'i, CustomParseError<'i>>>
+	{
+		Ok(Right(CalcExpression::Parentheses(Box::new(CalcExpression::parse(context, input)?))))
 	}
 }

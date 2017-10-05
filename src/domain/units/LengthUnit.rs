@@ -243,227 +243,40 @@ impl<NumberX: CssNumber> Unit for LengthUnit<NumberX>
 	fn parse_one_outside_calc_function<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<CalculablePropertyValue<Self>, ParseError<'i, CustomParseError<'i>>>
 	{
 		use self::CalculablePropertyValue::*;
-		use self::CustomParseError::*;
 		
-		match *input.next()?
+		let functionParser = match *input.next()?
 		{
-			Token::Number { value, .. } =>
-			{
-				if value == 0.
-				{
-					Ok(Constant(Self::default()))
-				}
-				else if context.parsing_mode_allows_unitless_lengths()
-				{
-					let cssNumber = Self::Number::new(value).map_err(|cssNumberConversionError| ParseError::Custom(CouldNotParseCssSignedNumber(cssNumberConversionError, value)))?;
-					Ok(Constant(Absolute(px(cssNumber))))
-				}
-				else
-				{
-					Err(ParseError::Custom(CouldNotParseDimensionLessNumber(value)))
-				}
-			}
+			Token::Number { value, .. } => return Self::parseUnitLessNumber(value, context.parsing_mode_allows_unitless_lengths()).map(|value| Constant(value)),
 			
-			Token::Dimension { value, ref unit, .. } =>
-			{
-				let cssNumber = Self::Number::new(value).map_err(|cssNumberConversionError| ParseError::Custom(CouldNotParseCssSignedNumber(cssNumberConversionError, value)))?;
-				
-				match_ignore_ascii_case!
-				{
-					&*unit,
-					
-					"px" => Ok(Constant(Absolute(px(cssNumber)))),
-					
-					"in" => Ok(Constant(Absolute(in_(cssNumber)))),
-					
-					"cm" => Ok(Constant(Absolute(cm(cssNumber)))),
-					
-					"mm" => Ok(Constant(Absolute(mm(cssNumber)))),
-					
-					"q" => Ok(Constant(Absolute(q(cssNumber)))),
-					
-					"pt" => Ok(Constant(Absolute(pt(cssNumber)))),
-					
-					"pc" => Ok(Constant(Absolute(pc(cssNumber)))),
-					
-					"em" => Ok(Constant(FontRelative(em(cssNumber)))),
-					
-					"ex" => Ok(Constant(FontRelative(ex(cssNumber)))),
-					
-					"ch" => Ok(Constant(FontRelative(ch(cssNumber)))),
-					
-					"rem" => Ok(Constant(FontRelative(rem(cssNumber)))),
-					
-					"vw" => if context.isNotInPageRule()
-					{
-						Ok(Constant(ViewportPercentage(vw(cssNumber))))
-					}
-					else
-					{
-						Err(ParseError::Custom(CustomParseError::ViewportLengthsAreNotAllowedInAPageAtRule))
-					},
-					
-					"vh" => if context.isNotInPageRule()
-					{
-						Ok(Constant(ViewportPercentage(vh(cssNumber))))
-					}
-					else
-					{
-						Err(ParseError::Custom(CustomParseError::ViewportLengthsAreNotAllowedInAPageAtRule))
-					},
-					
-					"vmin" => if context.isNotInPageRule()
-					{
-						Ok(Constant(ViewportPercentage(vmin(cssNumber))))
-					}
-					else
-					{
-						Err(ParseError::Custom(CustomParseError::ViewportLengthsAreNotAllowedInAPageAtRule))
-					},
-					
-					"vmax" => if context.isNotInPageRule()
-					{
-						Ok(Constant(ViewportPercentage(vmax(cssNumber))))
-					}
-					else
-					{
-						Err(ParseError::Custom(CustomParseError::ViewportLengthsAreNotAllowedInAPageAtRule))
-					},
-					
-					_ => Err(ParseError::Custom(CouldNotParseDimension(value, unit.clone()))),
-				}
-			}
+			Token::Dimension { value, ref unit, .. } => return Self::parseDimension(value, unit, context.isNotInPageRule()).map(Constant),
 			
-			Token::Function(ref name) =>
-			{
-				match_ignore_ascii_case!
-				{
-					&*name,
-					
-					"calc" => Ok(Calc(CalcFunction(Rc::new(CalcExpression::parse(context, input)?)))),
-					
-					"attr" => Ok(Attr(AttrFunction(Rc::new(AttrExpression::parse(context, input)?)))),
-					
-					"var" => Ok(Var(VarFunction(Rc::new(VarExpression::parse(context, input)?)))),
-					
-					_ => return Err(ParseError::Custom(UnknownFunctionInValueExpression(name.to_owned())))
-				}
-			},
+			Token::Function(ref name) => FunctionName::parser(name)?,
 			
-			ref unexpectedToken @ _ => Err(BasicParseError::UnexpectedToken(unexpectedToken.clone()).into()),
-		}
+			ref unexpectedToken @ _ => return CustomParseError::unexpectedToken(unexpectedToken),
+		};
+		functionParser.parse_one_outside_calc_function(context, input)
 	}
 	
 	#[inline(always)]
 	fn parse_one_inside_calc_function<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Either<CalculablePropertyValue<Self>, CalcExpression<Self>>, ParseError<'i, CustomParseError<'i>>>
 	{
 		use self::CalculablePropertyValue::*;
-		use self::CustomParseError::*;
 		
-		match *input.next()?
+		let functionParser = match *input.next()?
 		{
-			Token::Number { value, .. } =>
-			{
-				let constant = Self::Number::new(value).map_err(|cssNumberConversionError| ParseError::Custom(CouldNotParseCssUnsignedNumber(cssNumberConversionError, value)))?;
-				Ok(Right(CalcExpression::Number(constant)))
-			}
+			Token::Number { value, .. } => return Self::number_inside_calc_function(value),
 			
-			Token::Percentage { unit_value, .. } =>
-			{
-				let percentage = Self::Number::new(unit_value).map_err(|cssNumberConversionError| ParseError::Custom(CouldNotParseCssUnsignedNumber(cssNumberConversionError, unit_value)))?;
-				Ok(Left(Percentage(PercentageUnit(percentage))))
-			}
+			Token::Percentage { unit_value, .. } => return PercentageUnit::parse_percentage(unit_value).map(|value| Left(Percentage(value))),
 			
-			Token::Dimension { value, ref unit, .. } =>
-			{
-				let cssNumber = Self::Number::new(value).map_err(|cssNumberConversionError| ParseError::Custom(CouldNotParseCssSignedNumber(cssNumberConversionError, value)))?;
-				
-				match_ignore_ascii_case!
-				{
-					&*unit,
-					
-					"px" => Ok(Left(Constant(Absolute(px(cssNumber))))),
-					
-					"in" => Ok(Left(Constant(Absolute(in_(cssNumber))))),
-					
-					"cm" => Ok(Left(Constant(Absolute(cm(cssNumber))))),
-					
-					"mm" => Ok(Left(Constant(Absolute(mm(cssNumber))))),
-					
-					"q" => Ok(Left(Constant(Absolute(q(cssNumber))))),
-					
-					"pt" => Ok(Left(Constant(Absolute(pt(cssNumber))))),
-					
-					"pc" => Ok(Left(Constant(Absolute(pc(cssNumber))))),
-					
-					"em" => Ok(Left(Constant(FontRelative(em(cssNumber))))),
-					
-					"ex" => Ok(Left(Constant(FontRelative(ex(cssNumber))))),
-					
-					"ch" => Ok(Left(Constant(FontRelative(ch(cssNumber))))),
-					
-					"rem" => Ok(Left(Constant(FontRelative(rem(cssNumber))))),
-					
-					"vw" => if context.isNotInPageRule()
-					{
-						Ok(Left(Constant(ViewportPercentage(vw(cssNumber)))))
-					}
-					else
-					{
-						Err(ParseError::Custom(CustomParseError::ViewportLengthsAreNotAllowedInAPageAtRule))
-					},
-					
-					"vh" => if context.isNotInPageRule()
-					{
-						Ok(Left(Constant(ViewportPercentage(vh(cssNumber)))))
-					}
-					else
-					{
-						Err(ParseError::Custom(CustomParseError::ViewportLengthsAreNotAllowedInAPageAtRule))
-					},
-					
-					"vmin" => if context.isNotInPageRule()
-					{
-						Ok(Left(Constant(ViewportPercentage(vmin(cssNumber)))))
-					}
-					else
-					{
-						Err(ParseError::Custom(CustomParseError::ViewportLengthsAreNotAllowedInAPageAtRule))
-					},
-					
-					"vmax" => if context.isNotInPageRule()
-					{
-						Ok(Left(Constant(ViewportPercentage(vmax(cssNumber)))))
-					}
-					else
-					{
-						Err(ParseError::Custom(CustomParseError::ViewportLengthsAreNotAllowedInAPageAtRule))
-					},
-					
-					_ => Err(ParseError::Custom(CouldNotParseDimension(value, unit.clone()))),
-				}
-			}
+			Token::Dimension { value, ref unit, .. } => return Self::parseDimension(value, unit, context.isNotInPageRule()).map(|value| Left(Constant(value))),
 			
-			Token::ParenthesisBlock => Ok(Right(CalcExpression::parse(context, input)?)),
+			Token::ParenthesisBlock => return CalcExpression::parse_parentheses(context, input),
 			
-			Token::Function(ref name) =>
-			{
-				match_ignore_ascii_case!
-				{
-					&*name,
-					
-					"calc" => Ok(Left(Calc(CalcFunction(Rc::new(CalcExpression::parse(context, input)?))))),
-					
-					"attr" => Ok(Left(Attr(AttrFunction(Rc::new(AttrExpression::parse(context, input)?))))),
-					
-					"var" => Ok(Left(Var(VarFunction(Rc::new(VarExpression::parse(context, input)?))))),
-					
-					_ => return Err(ParseError::Custom(UnknownFunctionInValueExpression(name.to_owned())))
-				}
-			},
+			Token::Function(ref name) => FunctionName::parser(name)?,
 			
-			ref unexpectedToken @ _ => Err(BasicParseError::UnexpectedToken(unexpectedToken.clone()).into()),
-		}
+			ref unexpectedToken @ _ => return CustomParseError::unexpectedToken(unexpectedToken),
+		};
+		functionParser.parse_one_inside_calc_function(context, input)
 	}
 	
 	#[inline(always)]
@@ -489,89 +302,11 @@ impl<NumberX: CssNumber> Unit for LengthUnit<NumberX>
 		{
 			let value = match *input.next()?
 			{
-				Token::Number { value, .. } =>
-				{
-					if value == 0.
-					{
-						Ok(LengthUnit::default())
-					}
-					else
-					{
-						Err(ParseError::Custom(CouldNotParseDimensionLessNumber(value)))
-					}
-				}
+				Token::Number { value, .. } => LengthUnit::parseUnitLessNumber(value, false),
 				
-				Token::Dimension { value, ref unit, .. } =>
-				{
-					let cssNumber = <PercentageUnit<Number> as Unit>::Number::new(value).map_err(|cssNumberConversionError| ParseError::Custom(CouldNotParseCssSignedNumber(cssNumberConversionError, value)))?;
-					
-					match_ignore_ascii_case!
-					{
-						&*unit,
-						
-						"px" => Ok(Absolute(px(cssNumber))),
-						
-						"in" => Ok(Absolute(in_(cssNumber))),
-						
-						"cm" => Ok(Absolute(cm(cssNumber))),
-						
-						"mm" => Ok(Absolute(mm(cssNumber))),
-						
-						"q" => Ok(Absolute(q(cssNumber))),
-						
-						"pt" => Ok(Absolute(pt(cssNumber))),
-						
-						"pc" => Ok(Absolute(pc(cssNumber))),
-						
-						"em" => Ok(FontRelative(em(cssNumber))),
-						
-						"ex" => Ok(FontRelative(ex(cssNumber))),
-						
-						"ch" => Ok(FontRelative(ch(cssNumber))),
-						
-						"rem" => Ok(FontRelative(rem(cssNumber))),
-						
-						"vw" => if is_not_in_page_rule
-						{
-							Ok(ViewportPercentage(vw(cssNumber)))
-						}
-						else
-						{
-							Err(ParseError::Custom(CustomParseError::ViewportLengthsAreNotAllowedInAPageAtRule))
-						},
-						
-						"vh" => if is_not_in_page_rule
-						{
-							Ok(ViewportPercentage(vh(cssNumber)))
-						}
-						else
-						{
-							Err(ParseError::Custom(CustomParseError::ViewportLengthsAreNotAllowedInAPageAtRule))
-						},
-						
-						"vmin" => if is_not_in_page_rule
-						{
-							Ok(ViewportPercentage(vmin(cssNumber)))
-						}
-						else
-						{
-							Err(ParseError::Custom(CustomParseError::ViewportLengthsAreNotAllowedInAPageAtRule))
-						},
-						
-						"vmax" => if is_not_in_page_rule
-						{
-							Ok(ViewportPercentage(vmax(cssNumber)))
-						}
-						else
-						{
-							Err(ParseError::Custom(CustomParseError::ViewportLengthsAreNotAllowedInAPageAtRule))
-						},
-						
-						_ => Err(ParseError::Custom(CouldNotParseDimension(value, unit.clone()))),
-					}
-				}
+				Token::Dimension { value, ref unit, .. } => LengthUnit::parseDimension(value, unit, is_not_in_page_rule),
 				
-				ref unexpectedToken @ _ => Err(BasicParseError::UnexpectedToken(unexpectedToken.clone()).into()),
+				ref unexpectedToken @ _ => CustomParseError::unexpectedToken(unexpectedToken),
 			};
 			
 			input.skip_whitespace();
@@ -634,6 +369,95 @@ impl<Number: CssNumber> LengthUnit<Number>
 			Absolute(ref length) => length.to_app_units(),
 			FontRelative(ref length) => length.to_app_units(conversion),
 			ViewportPercentage(ref length) => length.to_app_units(conversion),
+		}
+	}
+	
+	#[inline(always)]
+	fn parseUnitLessNumber<'i>(value: f32, parsing_mode_allows_unitless_lengths: bool) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
+	{
+		if value == 0.
+		{
+			return Ok(Self::default())
+		}
+		else if parsing_mode_allows_unitless_lengths
+		{
+			let cssNumber = Number::new(value).map_err(|cssNumberConversionError| ParseError::Custom(CouldNotParseCssSignedNumber(cssNumberConversionError, value)))?;
+			return Ok(Absolute(px(cssNumber)))
+		}
+		else
+		{
+			return CustomParseError::dimensionless(value)
+		}
+	}
+	
+	#[inline(always)]
+	fn parseDimension<'i>(value: f32, unit: &CowRcStr<'i>, is_not_in_page_rule: bool) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
+	{
+		let cssNumber = Number::new(value).map_err(|cssNumberConversionError| ParseError::Custom(CouldNotParseCssSignedNumber(cssNumberConversionError, value)))?;
+		
+		match_ignore_ascii_case!
+		{
+			&*unit,
+			
+			"px" => Ok(Absolute(px(cssNumber))),
+			
+			"in" => Ok(Absolute(in_(cssNumber))),
+			
+			"cm" => Ok(Absolute(cm(cssNumber))),
+			
+			"mm" => Ok(Absolute(mm(cssNumber))),
+			
+			"q" => Ok(Absolute(q(cssNumber))),
+			
+			"pt" => Ok(Absolute(pt(cssNumber))),
+			
+			"pc" => Ok(Absolute(pc(cssNumber))),
+			
+			"em" => Ok(FontRelative(em(cssNumber))),
+			
+			"ex" => Ok(FontRelative(ex(cssNumber))),
+			
+			"ch" => Ok(FontRelative(ch(cssNumber))),
+			
+			"rem" => Ok(FontRelative(rem(cssNumber))),
+			
+			"vw" => if is_not_in_page_rule
+			{
+				Ok(ViewportPercentage(vw(cssNumber)))
+			}
+			else
+			{
+				Err(ParseError::Custom(CustomParseError::ViewportLengthsAreNotAllowedInAPageAtRule))
+			},
+			
+			"vh" => if is_not_in_page_rule
+			{
+				Ok(ViewportPercentage(vh(cssNumber)))
+			}
+			else
+			{
+				Err(ParseError::Custom(CustomParseError::ViewportLengthsAreNotAllowedInAPageAtRule))
+			},
+			
+			"vmin" => if is_not_in_page_rule
+			{
+				Ok(ViewportPercentage(vmin(cssNumber)))
+			}
+			else
+			{
+				Err(ParseError::Custom(CustomParseError::ViewportLengthsAreNotAllowedInAPageAtRule))
+			},
+			
+			"vmax" => if is_not_in_page_rule
+			{
+				Ok(ViewportPercentage(vmax(cssNumber)))
+			}
+			else
+			{
+				Err(ParseError::Custom(CustomParseError::ViewportLengthsAreNotAllowedInAPageAtRule))
+			},
+			
+			_ => Err(ParseError::Custom(CouldNotParseDimension(value, unit.clone()))),
 		}
 	}
 }

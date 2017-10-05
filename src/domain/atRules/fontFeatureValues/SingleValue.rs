@@ -13,7 +13,7 @@ impl Parse for SingleValue
 		match *input.next()?
 		{
 			Token::Number { int_value: Some(value), .. } if value >= 0 => Ok(SingleValue(value as u32)),
-			ref unexpectedToken => Err(BasicParseError::UnexpectedToken(unexpectedToken.clone()).into()),
+			ref unexpectedToken => CustomParseError::unexpectedToken(unexpectedToken),
 		}
 	}
 }

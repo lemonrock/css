@@ -13,19 +13,19 @@ impl Parse for PairValues
 		let first = match *input.next()?
 		{
 			Token::Number { int_value: Some(firstValue), .. } if firstValue >= 0 => firstValue as u32,
-			ref unexpectedToken => return Err(BasicParseError::UnexpectedToken(unexpectedToken.clone()).into()),
+			ref unexpectedToken => return CustomParseError::unexpectedToken(unexpectedToken),
 		};
-		
+
 		match input.next()
 		{
 			Ok(&Token::Number { int_value: Some(secondValue), .. }) if secondValue >= 0 =>
 			{
 				Ok(PairValues(first, Some(secondValue as u32)))
 			}
-			
+
 			// It can't be anything other than number.
-			Ok(unexpectedToken) => Err(BasicParseError::UnexpectedToken(unexpectedToken.clone()).into()),
-			
+			Ok(unexpectedToken) => CustomParseError::unexpectedToken(unexpectedToken),
+
 			// It can be just one value.
 			Err(_) => Ok(PairValues(first, None))
 		}
@@ -37,7 +37,7 @@ impl ToCss for PairValues
 	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
 	{
 		self.0.to_css(dest)?;
-		
+
 		if let Some(second) = self.1
 		{
 			dest.write_char(' ')?;

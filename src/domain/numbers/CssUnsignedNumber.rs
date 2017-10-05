@@ -387,73 +387,44 @@ impl Unit for CssUnsignedNumber
 		use self::CalculablePropertyValue::*;
 		use self::CustomParseError::*;
 		
-		match *input.next()?
+		let functionParser = match *input.next()?
 		{
 			Number { value, .. } =>
 			{
 				let constant = Self::new(value).map_err(|cssNumberConversionError| ParseError::Custom(CouldNotParseCssUnsignedNumber(cssNumberConversionError, value)))?;
-				Ok(Constant(constant))
+				return Ok(Constant(constant))
 			}
 			
-			Function(ref name) =>
-			{
-				match_ignore_ascii_case!
-				{
-					&*name,
-					
-					"calc" => Ok(Calc(CalcFunction(Rc::new(CalcExpression::parse(context, input)?)))),
-					
-					"attr" => Ok(Attr(AttrFunction(Rc::new(AttrExpression::parse(context, input)?)))),
-					
-					"var" => Ok(Var(VarFunction(Rc::new(VarExpression::parse(context, input)?)))),
-					
-					_ => return Err(ParseError::Custom(UnknownFunctionInValueExpression(name.to_owned())))
-				}
-			}
+			Function(ref name) => FunctionName::parser(name)?,
 			
-			ref unexpectedToken @ _ => Err(BasicParseError::UnexpectedToken(unexpectedToken.clone()).into()),
-		}
+			ref unexpectedToken @ _ => return CustomParseError::unexpectedToken(unexpectedToken),
+		};
+		functionParser.parse_one_outside_calc_function(context, input)
 	}
+	
 	#[inline(always)]
 	fn parse_one_inside_calc_function<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Either<CalculablePropertyValue<Self>, CalcExpression<Self>>, ParseError<'i, CustomParseError<'i>>>
 	{
 		use self::CalculablePropertyValue::*;
 		use self::CustomParseError::*;
 		
-		match *input.next()?
+		let functionParser = match *input.next()?
 		{
 			Token::Number { value, .. } =>
 			{
 				let constant = Self::new(value).map_err(|cssNumberConversionError| ParseError::Custom(CouldNotParseCssUnsignedNumber(cssNumberConversionError, value)))?;
-				Ok(Left(Constant(constant)))
+				return Ok(Left(Constant(constant)))
 			},
 			
-			Token::Percentage { unit_value, .. } =>
-			{
-				let percentage = Self::new(unit_value).map_err(|cssNumberConversionError| ParseError::Custom(CouldNotParseCssUnsignedNumber(cssNumberConversionError, unit_value)))?;
-				Ok(Left(Percentage(PercentageUnit(percentage))))
-			}
+			Token::Percentage { unit_value, .. } => return PercentageUnit::parse_percentage(unit_value).map(|value| Left(Percentage(value))),
 			
-			Token::ParenthesisBlock => Ok(Right(CalcExpression::parse(context, input)?)),
+			Token::ParenthesisBlock => return CalcExpression::parse_parentheses(context, input),
 			
-			Token::Function(ref name) =>
-			{
-				match_ignore_ascii_case!
-				{
-					&*name,
-					
-					"calc" => Ok(Left(Calc(CalcFunction(Rc::new(CalcExpression::parse(context, input)?))))),
-					
-					"attr" => Ok(Left(Attr(AttrFunction(Rc::new(AttrExpression::parse(context, input)?))))),
-					
-					"var" => Ok(Left(Var(VarFunction(Rc::new(VarExpression::parse(context, input)?))))),
-					
-					_ => return Err(ParseError::Custom(UnknownFunctionInValueExpression(name.clone())))
-				}
-			}
+			Token::Function(ref name) => FunctionName::parser(name)?,
 			
-			ref unexpectedToken @ _ => Err(BasicParseError::UnexpectedToken(unexpectedToken.clone()).into()),
-		}
+			ref unexpectedToken @ _ => return CustomParseError::unexpectedToken(unexpectedToken),
+		};
+		functionParser.parse_one_inside_calc_function(context, input)
 	}
 	
 	#[inline(always)]
@@ -471,7 +442,7 @@ impl Unit for CssUnsignedNumber
 			{
 				Token::Number { value, .. } => CssUnsignedNumber::new(value).map_err(|cssNumberConversionError| ParseError::Custom(CouldNotParseCssSignedNumber(cssNumberConversionError, value))),
 				
-				ref unexpectedToken @ _ => Err(BasicParseError::UnexpectedToken(unexpectedToken.clone()).into()),
+				ref unexpectedToken @ _ => CustomParseError::unexpectedToken(unexpectedToken),
 			};
 			
 			input.skip_whitespace();

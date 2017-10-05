@@ -235,118 +235,47 @@ impl<NumberX: CssNumber> Unit for ResolutionUnit<NumberX>
 	{
 		use ::cssparser::Token::*;
 		use self::CalculablePropertyValue::*;
-		use self::CustomParseError::*;
 		
-		match *input.next()?
+		let functionParser = match *input.next()?
 		{
-			Number { value, .. } =>
+			Number { value, .. } => if value == 0.
 			{
-				if value == 0.
-				{
-					Ok(Constant(dppx(Self::Number::Zero)))
-				}
-				else
-				{
-					Err(ParseError::Custom(CouldNotParseDimensionLessNumber(value)))
-				}
+				return Ok(Constant(dppx(Self::Number::Zero)))
 			}
-			
-			Dimension { value, ref unit, .. } =>
+			else
 			{
-				let cssNumber = Self::Number::new(value).map_err(|cssNumberConversionError| ParseError::Custom(CouldNotParseCssSignedNumber(cssNumberConversionError, value)))?;
-				
-				match_ignore_ascii_case!
-				{
-					&*unit,
-					
-					"dpi" => Ok(Constant(dpi(cssNumber))),
-					
-					"dppx" => Ok(Constant(dppx(cssNumber))),
-					
-					"dpcm" => Ok(Constant(dpcm(cssNumber))),
-					
-					_ => Err(ParseError::Custom(CouldNotParseDimension(value, unit.clone()))),
-				}
-			}
-			
-			Function(ref name) =>
-			{
-				match_ignore_ascii_case!
-				{
-					&*name,
-					
-					"calc" => Ok(Calc(CalcFunction(Rc::new(CalcExpression::parse(context, input)?)))),
-					
-					"attr" => Ok(Attr(AttrFunction(Rc::new(AttrExpression::parse(context, input)?)))),
-					
-					"var" => Ok(Var(VarFunction(Rc::new(VarExpression::parse(context, input)?)))),
-					
-					_ => return Err(ParseError::Custom(UnknownFunctionInValueExpression(name.to_owned())))
-				}
+				return CustomParseError::dimensionless(value)
 			},
 			
-			ref unexpectedToken @ _ => Err(BasicParseError::UnexpectedToken(unexpectedToken.clone()).into()),
-		}
+			Dimension { value, ref unit, .. } => return Self::parseDimension(value, unit).map(Constant),
+			
+			Function(ref name) => FunctionName::parser(name)?,
+			
+			ref unexpectedToken @ _ => return CustomParseError::unexpectedToken(unexpectedToken),
+		};
+		functionParser.parse_one_outside_calc_function(context, input)
 	}
 	
 	#[inline(always)]
 	fn parse_one_inside_calc_function<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Either<CalculablePropertyValue<Self>, CalcExpression<Self>>, ParseError<'i, CustomParseError<'i>>>
 	{
 		use self::CalculablePropertyValue::*;
-		use self::CustomParseError::*;
 		
-		match *input.next()?
+		let functionParser = match *input.next()?
 		{
-			Token::Number { value, .. } =>
-			{
-				let constant = Self::Number::new(value).map_err(|cssNumberConversionError| ParseError::Custom(CouldNotParseCssUnsignedNumber(cssNumberConversionError, value)))?;
-				Ok(Right(CalcExpression::Number(constant)))
-			}
+			Token::Number { value, .. } => return Self::number_inside_calc_function(value),
 			
-			Token::Percentage { unit_value, .. } =>
-			{
-				let percentage = Self::Number::new(unit_value).map_err(|cssNumberConversionError| ParseError::Custom(CouldNotParseCssUnsignedNumber(cssNumberConversionError, unit_value)))?;
-				Ok(Left(Percentage(PercentageUnit(percentage))))
-			}
+			Token::Percentage { unit_value, .. } => return PercentageUnit::parse_percentage(unit_value).map(|value| Left(Percentage(value))),
 			
-			Token::Dimension { value, ref unit, .. } =>
-			{
-				let cssNumber = Self::Number::new(value).map_err(|cssNumberConversionError| ParseError::Custom(CouldNotParseCssSignedNumber(cssNumberConversionError, value)))?;
-				
-				match_ignore_ascii_case!
-				{
-					&*unit,
-					
-					"dpi" => Ok(Left(Constant(dpi(cssNumber)))),
-					
-					"dppx" => Ok(Left(Constant(dppx(cssNumber)))),
-					
-					"dpcm" => Ok(Left(Constant(dppx(cssNumber)))),
-					
-					_ => Err(ParseError::Custom(CouldNotParseDimension(value, unit.clone()))),
-				}
-			}
+			Token::Dimension { value, ref unit, .. } => return Self::parseDimension(value, unit).map(|value| Left(Constant(value))),
 			
-			Token::ParenthesisBlock => Ok(Right(CalcExpression::parse(context, input)?)),
+			Token::ParenthesisBlock => return CalcExpression::parse_parentheses(context, input),
 			
-			Token::Function(ref name) =>
-			{
-				match_ignore_ascii_case!
-				{
-					&*name,
-					
-					"calc" => Ok(Left(Calc(CalcFunction(Rc::new(CalcExpression::parse(context, input)?))))),
-					
-					"attr" => Ok(Left(Attr(AttrFunction(Rc::new(AttrExpression::parse(context, input)?))))),
-					
-					"var" => Ok(Left(Var(VarFunction(Rc::new(VarExpression::parse(context, input)?))))),
-					
-					_ => return Err(ParseError::Custom(UnknownFunctionInValueExpression(name.to_owned())))
-				}
-			},
+			Token::Function(ref name) => FunctionName::parser(name)?,
 			
-			ref unexpectedToken @ _ => Err(BasicParseError::UnexpectedToken(unexpectedToken.clone()).into()),
-		}
+			ref unexpectedToken @ _ => return CustomParseError::unexpectedToken(unexpectedToken),
+		};
+		functionParser.parse_one_inside_calc_function(context, input)
 	}
 	
 	#[inline(always)]
@@ -386,29 +315,13 @@ impl<NumberX: CssNumber> Unit for ResolutionUnit<NumberX>
 					}
 					else
 					{
-						Err(ParseError::Custom(CouldNotParseDimensionLessNumber(value)))
+						CustomParseError::dimensionless(value)
 					}
 				}
 				
-				Token::Dimension { value, ref unit, .. } =>
-				{
-					let cssNumber = <ResolutionUnit<Number> as Unit>::Number::new(value).map_err(|cssNumberConversionError| ParseError::Custom(CouldNotParseCssSignedNumber(cssNumberConversionError, value)))?;
-					
-					match_ignore_ascii_case!
-					{
-						&*unit,
-						
-						"dpi" => Ok(dpi(cssNumber)),
-						
-						"dppx" => Ok(dppx(cssNumber)),
-						
-						"dpcm" => Ok(dppx(cssNumber)),
-						
-						_ => Err(ParseError::Custom(CouldNotParseDimension(value, unit.clone()))),
-					}
-				}
+				Token::Dimension { value, ref unit, .. } => ResolutionUnit::parseDimension(value, unit),
 				
-				ref unexpectedToken @ _ => Err(BasicParseError::UnexpectedToken(unexpectedToken.clone()).into()),
+				ref unexpectedToken @ _ => CustomParseError::unexpectedToken(unexpectedToken),
 			};
 			
 			input.skip_whitespace();
@@ -424,5 +337,27 @@ impl<NumberX: CssNumber> Unit for ResolutionUnit<NumberX>
 		let mut input = Parser::new(&mut parserInput);
 		
 		from_raw_css_for_var_expression_evaluation_internal(&mut input).ok()
+	}
+}
+
+impl<Number: CssNumber> ResolutionUnit<Number>
+{
+	#[inline(always)]
+	fn parseDimension<'i>(value: f32, unit: &CowRcStr<'i>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
+	{
+		let cssNumber = <ResolutionUnit<Number> as Unit>::Number::new(value).map_err(|cssNumberConversionError| ParseError::Custom(CouldNotParseCssSignedNumber(cssNumberConversionError, value)))?;
+		
+		match_ignore_ascii_case!
+		{
+			&*unit,
+			
+			"dpi" => Ok(dpi(cssNumber)),
+			
+			"dppx" => Ok(dppx(cssNumber)),
+			
+			"dpcm" => Ok(dppx(cssNumber)),
+			
+			_ => Err(ParseError::Custom(CouldNotParseDimension(value, unit.clone()))),
+		}
 	}
 }

@@ -3,7 +3,11 @@
 
 
 use super::*;
+use self::FunctionName::*;
 use self::domain::units::conversions::*;
+use self::domain::expressions::CalculablePropertyValue::*;
+use ::either::Either;
+use ::either::Either::*;
 use ::std::rc::Rc;
 use ::std::ascii::AsciiExt;
 
@@ -14,6 +18,7 @@ include!("CalcExpression.rs");
 include!("CalcFunction.rs");
 include!("CalculablePropertyValue.rs");
 include!("Expression.rs");
+include!("FunctionName.rs");
 include!("TypeOrUnit.rs");
 include!("VarExpression.rs");
 include!("VarFunction.rs");

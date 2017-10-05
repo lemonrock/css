@@ -25,4 +25,11 @@ pub trait Unit: Sized + ToCss + Default + CssNumberNewType<<Self as Unit>::Numbe
 	
 	#[inline(always)]
 	fn from_raw_css_for_var_expression_evaluation(value: &str, is_not_in_page_rule: bool) -> Option<Self>;
+	
+	#[inline(always)]
+	fn number_inside_calc_function<'i>(value: f32) -> Result<Either<CalculablePropertyValue<Self>, CalcExpression<Self>>, ParseError<'i, CustomParseError<'i>>>
+	{
+		let constant = Self::Number::new(value).map_err(|cssNumberConversionError| ParseError::Custom(CouldNotParseCssUnsignedNumber(cssNumberConversionError, value)))?;
+		Ok(Right(CalcExpression::Number(constant)))
+	}
 }

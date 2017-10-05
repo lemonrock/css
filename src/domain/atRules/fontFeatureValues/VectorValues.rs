@@ -19,19 +19,19 @@ impl Parse for VectorValues
 				{
 					vec.push(a as u32);
 				},
-				
+
 				// It can't be anything other than number.
-				Ok(unexpectedToken) => return Err(BasicParseError::UnexpectedToken(unexpectedToken.clone()).into()),
-				
+				Ok(unexpectedToken) => return CustomParseError::unexpectedToken(unexpectedToken),
+
 				Err(_) => break,
 			}
 		}
-		
+
 		if vec.len() == 0
 		{
 			return Err(BasicParseError::EndOfInput.into());
 		}
-		
+
 		Ok(VectorValues(vec))
 	}
 }

@@ -36,7 +36,7 @@ impl MediaResolution
 		{
 			Token::Number { value, .. } => CssSignedNumber::new(value).map_err(|cssNumberConversionError| ParseError::Custom(CustomParseError::CouldNotParseCssSignedNumber(cssNumberConversionError, value))),
 			
-			ref unexpectedToken @ _ => Err(BasicParseError::UnexpectedToken(unexpectedToken.clone()).into()),
+			ref unexpectedToken @ _ => CustomParseError::unexpectedToken(unexpectedToken),
 		}?;
 		
 		Ok(finite(CalculablePropertyValue::Constant(ResolutionUnit::dppx(value))))
