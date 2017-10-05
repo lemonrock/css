@@ -250,7 +250,7 @@ impl<NumberX: CssNumber> Unit for LengthUnit<NumberX>
 			
 			Token::Dimension { value, ref unit, .. } => return Self::parseDimension(value, unit, context.isNotInPageRule()).map(Constant),
 			
-			Token::Function(ref name) => FunctionName::parser(name)?,
+			Token::Function(ref name) => FunctionParser::parser(name)?,
 			
 			ref unexpectedToken @ _ => return CustomParseError::unexpectedToken(unexpectedToken),
 		};
@@ -270,9 +270,9 @@ impl<NumberX: CssNumber> Unit for LengthUnit<NumberX>
 			
 			Token::Dimension { value, ref unit, .. } => return Self::parseDimension(value, unit, context.isNotInPageRule()).map(|value| Left(Constant(value))),
 			
-			Token::ParenthesisBlock => return CalcExpression::parse_parentheses(context, input),
+			Token::ParenthesisBlock => FunctionParser::parentheses,
 			
-			Token::Function(ref name) => FunctionName::parser(name)?,
+			Token::Function(ref name) => FunctionParser::parser(name)?,
 			
 			ref unexpectedToken @ _ => return CustomParseError::unexpectedToken(unexpectedToken),
 		};

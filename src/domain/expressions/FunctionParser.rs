@@ -3,14 +3,15 @@
 
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub(crate) enum FunctionName
+pub(crate) enum FunctionParser
 {
 	attr,
 	calc,
 	var,
+	parentheses,
 }
 
-impl FunctionName
+impl FunctionParser
 {
 	#[inline(always)]
 	pub(crate) fn parser<'i>(name: &CowRcStr<'i>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
@@ -39,6 +40,8 @@ impl FunctionName
 			calc => Ok(Calc(CalcFunction(Rc::new(CalcExpression::parse(context, input)?)))),
 			
 			var => Ok(Var(VarFunction(Rc::new(VarExpression::parse(context, input)?)))),
+			
+			_ => panic!("Should not be called in this context"),
 		}
 	}
 	
@@ -52,6 +55,8 @@ impl FunctionName
 			calc => Ok(Left(Attr(AttrFunction(Rc::new(AttrExpression::parse(context, input)?))))),
 			
 			var => Ok(Left(Var(VarFunction(Rc::new(VarExpression::parse(context, input)?))))),
+			
+			parentheses => CalcExpression::parse_parentheses(context, input),
 		}
 	}
 }

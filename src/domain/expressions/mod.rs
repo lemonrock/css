@@ -3,7 +3,7 @@
 
 
 use super::*;
-use self::FunctionName::*;
+use self::FunctionParser::*;
 use self::domain::units::conversions::*;
 use self::domain::expressions::CalculablePropertyValue::*;
 use ::either::Either;
@@ -18,7 +18,7 @@ include!("CalcExpression.rs");
 include!("CalcFunction.rs");
 include!("CalculablePropertyValue.rs");
 include!("Expression.rs");
-include!("FunctionName.rs");
+include!("FunctionParser.rs");
 include!("TypeOrUnit.rs");
 include!("VarExpression.rs");
 include!("VarFunction.rs");

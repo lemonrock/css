@@ -173,7 +173,7 @@ impl<NumberX: CssNumber> Unit for PercentageUnit<NumberX>
 			
 			Token::Percentage { unit_value, .. } => return Self::parse_percentage_outside_calc_function(unit_value),
 			
-			Token::Function(ref name) => FunctionName::parser(name)?,
+			Token::Function(ref name) => FunctionParser::parser(name)?,
 			
 			ref unexpectedToken @ _ => return CustomParseError::unexpectedToken(unexpectedToken),
 		};
@@ -191,9 +191,9 @@ impl<NumberX: CssNumber> Unit for PercentageUnit<NumberX>
 			
 			Token::Percentage { unit_value, .. } => return PercentageUnit::parse_percentage(unit_value).map(|value| Left(Constant(value))),
 			
-			Token::ParenthesisBlock => return CalcExpression::parse_parentheses(context, input),
+			Token::ParenthesisBlock => FunctionParser::parentheses,
 			
-			Token::Function(ref name) => FunctionName::parser(name)?,
+			Token::Function(ref name) => FunctionParser::parser(name)?,
 			
 			ref unexpectedToken @ _ => return CustomParseError::unexpectedToken(unexpectedToken),
 		};

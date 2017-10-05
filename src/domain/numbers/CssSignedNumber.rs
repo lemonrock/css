@@ -389,7 +389,7 @@ impl Unit for CssSignedNumber
 				return Ok(Constant(constant))
 			}
 			
-			Function(ref name) => FunctionName::parser(name)?,
+			Function(ref name) => FunctionParser::parser(name)?,
 			
 			ref unexpectedToken @ _ => return CustomParseError::unexpectedToken(unexpectedToken),
 		};
@@ -412,9 +412,9 @@ impl Unit for CssSignedNumber
 			
 			Token::Percentage { unit_value, .. } => return PercentageUnit::parse_percentage(unit_value).map(|value| Left(Percentage(value))),
 			
-			Token::ParenthesisBlock => return CalcExpression::parse_parentheses(context, input),
+			Token::ParenthesisBlock => FunctionParser::parentheses,
 			
-			Token::Function(ref name) => FunctionName::parser(name)?,
+			Token::Function(ref name) => FunctionParser::parser(name)?,
 			
 			ref unexpectedToken @ _ => return CustomParseError::unexpectedToken(unexpectedToken),
 		};
