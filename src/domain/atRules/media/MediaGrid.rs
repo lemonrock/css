@@ -26,7 +26,7 @@ impl ToCss for MediaGrid
 
 impl Parse for MediaGrid
 {
-	fn parse<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
+	fn parse<'i, 't>(_context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
 	{
 		let is_grid = match input.expect_integer()?
 		{

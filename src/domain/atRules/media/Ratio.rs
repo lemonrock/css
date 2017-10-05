@@ -21,7 +21,7 @@ impl ToCss for Ratio
 
 impl Parse for Ratio
 {
-	fn parse<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
+	fn parse<'i, 't>(_context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
 	{
 		let width = input.expect_integer()?;
 		if width <= 0

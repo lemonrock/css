@@ -62,8 +62,6 @@ impl MediaList
 		let mut media_queries = vec![];
 		loop
 		{
-			let start_position = input.position();
-			let start_location = input.current_source_location();
 			match input.parse_until_before(Delimiter::Comma, |i| MediaQuery::parse(context, i))
 			{
 				Ok(mediaQuery) => media_queries.push(mediaQuery),

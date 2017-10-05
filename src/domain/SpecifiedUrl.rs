@@ -18,7 +18,7 @@ impl ToCss for SpecifiedUrl
 
 impl Parse for SpecifiedUrl
 {
-	fn parse<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
+	fn parse<'i, 't>(_context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
 	{
 		let url = input.expect_url()?;
 		Ok(SpecifiedUrl(url.as_ref().to_owned()))

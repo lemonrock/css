@@ -89,7 +89,7 @@ impl<'a, 'i> AtRuleParser<'i> for NestedRuleParser<'a>
 			
 			Media(media_queries, source_location) => CssRule::Media(MediaAtRule
 			{
-				media_queries: MediaList::parse_media_query_list(&CssRuleType::Media.context(self), input, false)?,
+				media_queries,
 				rules: self.parse_nested_rules(input, CssRuleType::Media)?,
 				source_location,
 			}),

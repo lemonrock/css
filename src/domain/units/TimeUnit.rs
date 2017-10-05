@@ -340,7 +340,7 @@ impl<NumberX: CssNumber> Unit for TimeUnit<NumberX>
 	}
 	
 	#[inline(always)]
-	fn to_canonical_dimension_value<Conversion: FontRelativeLengthConversion<Self::Number> + ViewportPercentageLengthConversion<Self::Number>>(&self, conversion: &Conversion) -> Self::Number
+	fn to_canonical_dimension_value<Conversion: FontRelativeLengthConversion<Self::Number> + ViewportPercentageLengthConversion<Self::Number>>(&self, _conversion: &Conversion) -> Self::Number
 	{
 		match *self
 		{
