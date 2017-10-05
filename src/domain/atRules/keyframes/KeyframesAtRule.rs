@@ -25,7 +25,7 @@ impl ToCss for KeyframesAtRule
 	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
 	{
 		dest.write_str("@")?;
-		if let Some(vendor_prefix) = self.vendor_prefix
+		if let Some(ref vendor_prefix) = self.vendor_prefix
 		{
 			vendor_prefix.to_css(dest)?;
 		}

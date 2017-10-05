@@ -68,16 +68,18 @@ impl FontFeatureValuesAtRule
 	{
 		let mut fontFeatureValuesRule = Self::new(family_names, source_location);
 		
-		let mut iterator = RuleListParser::new_for_nested_rule(input, FontFeatureValuesAtRuleParser
 		{
-			context,
-			rule: &mut fontFeatureValuesRule,
-		});
-		while let Some(possiblePreciseParseError) = iterator.next()
-		{
-			if possiblePreciseParseError.is_err()
+			let mut iterator = RuleListParser::new_for_nested_rule(input, FontFeatureValuesAtRuleParser
 			{
-				return Err(possiblePreciseParseError.unwrap_err().error);
+				context,
+				rule: &mut fontFeatureValuesRule,
+			});
+			while let Some(possiblePreciseParseError) = iterator.next()
+			{
+				if possiblePreciseParseError.is_err()
+				{
+					return Err(possiblePreciseParseError.unwrap_err().error);
+				}
 			}
 		}
 		

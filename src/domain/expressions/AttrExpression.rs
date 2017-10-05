@@ -82,8 +82,12 @@ impl AttrExpression
 	{
 		input.parse_nested_block(|input|
 		{
-			let attribute = input.expect_ident()?;
-			let attribute_lower_case_name = attribute.to_ascii_lowercase();
+			let attribute_lower_case_name =
+			{
+				let attribute = input.expect_ident()?;
+				attribute.to_ascii_lowercase()
+			};
+			
 			input.skip_whitespace();
 			
 			if input.is_exhausted()

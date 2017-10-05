@@ -397,7 +397,7 @@ impl Unit for CssUnsignedInteger
 				}
 			}
 			
-			unexpectedToken @ _ => Err(BasicParseError::UnexpectedToken(unexpectedToken.clone()).into()),
+			ref unexpectedToken @ _ => Err(BasicParseError::UnexpectedToken(unexpectedToken.clone()).into()),
 		}
 	}
 	#[inline(always)]
@@ -451,7 +451,7 @@ impl Unit for CssUnsignedInteger
 				}
 			}
 			
-			unexpectedToken @ _ => Err(BasicParseError::UnexpectedToken(unexpectedToken.clone()).into()),
+			ref unexpectedToken @ _ => Err(BasicParseError::UnexpectedToken(unexpectedToken.clone()).into()),
 		}
 	}
 	
@@ -484,7 +484,7 @@ impl Unit for CssUnsignedInteger
 					Err(ParseError::Custom(CustomParseError::UnsignedIntegersCanNotBeFloats(value)))
 				},
 				
-				unexpectedToken @ _ => Err(BasicParseError::UnexpectedToken(unexpectedToken.clone()).into()),
+				ref unexpectedToken @ _ => Err(BasicParseError::UnexpectedToken(unexpectedToken.clone()).into()),
 			};
 			
 			input.skip_whitespace();

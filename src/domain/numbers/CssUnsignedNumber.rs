@@ -259,7 +259,7 @@ impl Deref for CssUnsignedNumber
 	#[inline(always)]
 	fn deref(&self) -> &Self::Target
 	{
-		&self.to_f32()
+		&self.0
 	}
 }
 
@@ -411,7 +411,7 @@ impl Unit for CssUnsignedNumber
 				}
 			}
 			
-			unexpectedToken @ _ => Err(BasicParseError::UnexpectedToken(unexpectedToken.clone()).into()),
+			ref unexpectedToken @ _ => Err(BasicParseError::UnexpectedToken(unexpectedToken.clone()).into()),
 		}
 	}
 	#[inline(always)]
@@ -452,7 +452,7 @@ impl Unit for CssUnsignedNumber
 				}
 			}
 			
-			unexpectedToken @ _ => Err(BasicParseError::UnexpectedToken(unexpectedToken.clone()).into()),
+			ref unexpectedToken @ _ => Err(BasicParseError::UnexpectedToken(unexpectedToken.clone()).into()),
 		}
 	}
 	

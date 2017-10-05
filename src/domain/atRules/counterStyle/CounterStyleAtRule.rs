@@ -256,30 +256,34 @@ impl CounterStyleAtRule
 		{
 			ref system @ Cyclic | ref system @ Fixed { .. } | ref system @ Symbolic | ref system @ Alphabetic | ref system @ Numeric if rule.symbols.is_none() =>
 			{
-				Err(ParseError::Custom(CustomParseError::InvalidCounterStyleWithoutSymbols(system.clone())))
+				return Err(ParseError::Custom(CustomParseError::InvalidCounterStyleWithoutSymbols(system.clone())))
 			}
 			
 			ref system @ Alphabetic | ref system @ Numeric if rule.symbols().unwrap().0.len() < 2 =>
 			{
-				Err(ParseError::Custom(CustomParseError::InvalidCounterStyleNotEnoughSymbols(system.clone())))
+				return Err(ParseError::Custom(CustomParseError::InvalidCounterStyleNotEnoughSymbols(system.clone())))
 			}
 			
 			Additive if rule.additive_symbols.is_none() =>
 			{
-				Err(ParseError::Custom(CustomParseError::InvalidCounterStyleWithoutAdditiveSymbols))
+				return Err(ParseError::Custom(CustomParseError::InvalidCounterStyleWithoutAdditiveSymbols))
 			}
 			
 			Extends(_) if rule.symbols.is_some() =>
 			{
-				Err(ParseError::Custom(CustomParseError::InvalidCounterStyleExtendsWithSymbols))
+				return Err(ParseError::Custom(CustomParseError::InvalidCounterStyleExtendsWithSymbols))
 			}
 			
 			Extends(_) if rule.additive_symbols.is_some() =>
 			{
-				Err(ParseError::Custom(CustomParseError::InvalidCounterStyleExtendsWithAdditiveSymbols))
+				return Err(ParseError::Custom(CustomParseError::InvalidCounterStyleExtendsWithAdditiveSymbols))
 			}
 			
-			_ => Ok(rule)
-		}
+			_ =>
+			{
+			}
+		};
+		
+		Ok(rule)
 	}
 }
