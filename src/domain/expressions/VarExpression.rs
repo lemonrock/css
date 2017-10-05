@@ -22,7 +22,7 @@ impl ToCss for VarExpression
 		if let Some(ref default_value) = self.default_value_css
 		{
 			dest.write_char(',')?;
-			dest.write_str(default_value);
+			dest.write_str(default_value)?;
 		}
 		
 		Ok(())

@@ -89,15 +89,15 @@ impl ToCss for FontFaceAtRule
 		
 		dest.write_str("@font-face{")?;
 		
-		writePropertyDeclaration(dest, "font-family", &self.family);
-		writePropertyDeclarationValues(dest, "src", &self.sources);
-		writePropertyDeclaration(dest, "font-style", &self.style);
-		writePropertyDeclaration(dest, "font-weight", &self.weight);
-		writePropertyDeclaration(dest, "font-stretch", &self.stretch);
-		writePropertyDeclaration(dest, "font-display", &self.display);
-		writePropertyDeclarationValues(dest, "unicode-range", &self.unicode_range);
-		writePropertyDeclaration(dest, "font-feature-settings", &self.feature_settings);
-		writePropertyDeclaration(dest, "font-language-override", &self.language_override);
+		writePropertyDeclaration(dest, "font-family", &self.family)?;
+		writePropertyDeclarationValues(dest, "src", &self.sources)?;
+		writePropertyDeclaration(dest, "font-style", &self.style)?;
+		writePropertyDeclaration(dest, "font-weight", &self.weight)?;
+		writePropertyDeclaration(dest, "font-stretch", &self.stretch)?;
+		writePropertyDeclaration(dest, "font-display", &self.display)?;
+		writePropertyDeclarationValues(dest, "unicode-range", &self.unicode_range)?;
+		writePropertyDeclaration(dest, "font-feature-settings", &self.feature_settings)?;
+		writePropertyDeclaration(dest, "font-language-override", &self.language_override)?;
 		
 		dest.write_char('}')
 	}

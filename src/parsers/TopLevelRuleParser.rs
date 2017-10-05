@@ -164,12 +164,6 @@ impl TopLevelRuleParser
 		}
 	}
 	
-	/// Returns the current state of the parser.
-	pub(crate) fn state(&self) -> State
-	{
-		self.state
-	}
-	
 	#[inline(always)]
 	fn parseImportAtRule<'i, 't>(&self, input: &mut Parser<'i, 't>, source_location: SourceLocation) -> Result<ImportAtRule, ParseError<'i, CustomParseError<'i>>>
 	{

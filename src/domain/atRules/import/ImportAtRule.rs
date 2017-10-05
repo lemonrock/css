@@ -26,10 +26,10 @@ impl ToCss for ImportAtRule
 		
 		if self.media_list.is_not_empty()
 		{
-			dest.write_str(" ");
-			self.media_list.to_css(dest);
+			dest.write_char(' ')?;
+			self.media_list.to_css(dest)?;
 		}
 		
-		dest.write_str(";")
+		dest.write_char(';')
 	}
 }

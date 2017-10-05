@@ -36,18 +36,6 @@ impl ViewportAtRule
 		}
 		Ok(ViewportAtRule { declarations })
 	}
-	
-	/// Whitespace as defined by DEVICE-ADAPT § 9.2
-	const WHITESPACE: &'static [char] = &['\t', '\n', '\r', ' '];
-	
-	/// Separators as defined by DEVICE-ADAPT § 9.2 need to use \x2c instead of ',' due to test-tidy
-	const SEPARATOR: &'static [char] = &['\x2c', ';'];
-	
-	#[inline]
-	fn is_whitespace_separator_or_equals(c: &char) -> bool
-	{
-		Self::WHITESPACE.contains(c) || Self::SEPARATOR.contains(c) || *c == '='
-	}
 }
 
 impl ToCss for ViewportAtRule

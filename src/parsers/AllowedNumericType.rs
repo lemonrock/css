@@ -12,9 +12,6 @@ pub enum AllowedNumericType
 	
 	/// Allow only non-negative numeric values.
 	NonNegative,
-	
-	/// Allow only numeric values greater or equal to 1.0.
-	AtLeastOne,
 }
 
 impl Default for AllowedNumericType
@@ -46,20 +43,6 @@ impl AllowedNumericType
 				NonNegative => value >= 0.0,
 				AtLeastOne => value >= 1.0,
 			}
-		}
-	}
-	
-	/// Clamp the value following the rules of this numeric type.
-	#[inline]
-	pub fn clamp(&self, value: f32) -> f32
-	{
-		use self::AllowedNumericType::*;
-		
-		match *self
-		{
-			NonNegative if value < 0. => 0.,
-			AtLeastOne if value < 1. => 1.,
-			_ => value,
 		}
 	}
 }

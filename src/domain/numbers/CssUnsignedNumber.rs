@@ -242,7 +242,7 @@ impl CssNumberNewType<Self> for CssUnsignedNumber
 	#[inline(always)]
 	fn to_f32(&self) -> f32
 	{
-		self.to_f32()
+		self.0
 	}
 	
 	#[inline(always)]
