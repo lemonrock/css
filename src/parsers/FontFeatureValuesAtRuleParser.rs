@@ -10,8 +10,8 @@
 /// @character-variant | @swash | @ornaments | @annotation
 pub(crate) struct FontFeatureValuesAtRuleParser<'a>
 {
-	context: &'a ParserContext,
-	rule: &'a mut FontFeatureValuesAtRule,
+	pub(crate) context: &'a ParserContext,
+	pub(crate) rule: &'a mut FontFeatureValuesAtRule,
 }
 
 /// Default methods reject all qualified rules.

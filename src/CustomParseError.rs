@@ -3,36 +3,16 @@
 
 
 #[derive(Debug)]
-pub(crate) enum CustomParseError<'i>
+pub enum CustomParseError<'i>
 {
-	SpecificSelectorParseError(Box<SelectorParseError<'i, CustomParseError<'i>>>),
-	ThereAreNoSelectors,
-	SelectorIsInvalidInContext(String),
-	UnsupportedPseudoClassOrElement(String),
-	NonTreeStructuralPseudoClassScopeIsObsoleteAsOfFirefox55,
-	
-	UnexpectedTokenForAtNamespaceRuleNamespaceValue(Token<'i>),
-	
+	// @-rule
 	UnsupportedAtRule(CowRcStr<'i>),
+	InvalidParseState,
 	
-	UnexpectedCustomIdent(CowRcStr<'i>),
-	CustomIdentWasExcluded(CowRcStr<'i>),
+	// @charset
+	UnexpectedCharsetAtRule,
 	
-	KeyframePercentageWasNotBetweenZeroAndOneInclusive(f32),
-	ImportantIsNotAllowedInKeyframePropertyDeclarationValues(SourceLocation),
-	UnexpectedTokenWhenParsingZoom(Token<'i>),
-	
-	UnsupportedFontFaceProperty(CowRcStr<'i>),
-	
-	InvalidFontLanguageOverrideIdentifier(CowRcStr<'i>),
-	InvalidFontLanguageOverrideOpenTypeLanguageTag(CowRcStr<'i>),
-	FontFeatureSettingOpenTypeFeatureTagMustBeFourCharacters(CowRcStr<'i>),
-	FontFeatureSettingOpenTypeFeatureTagMustBePrintableAscii(CowRcStr<'i>),
-	FontFeatureSettingIfNotAnIntegerMustBeOnOrOff(CowRcStr<'i>),
-	FontFeatureSettingIntegerMustBePositive(i32),
-	FontFaceAtRuleFontWeightWasNotAValidIdentifierOrInteger,
-	FontFaceAtRuleFontFamilyCanNotBeGeneric,
-	
+	// @counter-style
 	UnsupportedCounterStyleProperty(CowRcStr<'i>),
 	InvalidCounterStyleWithoutSymbols(System),
 	InvalidCounterStyleNotEnoughSymbols(System),
@@ -48,6 +28,36 @@ pub(crate) enum CustomParseError<'i>
 	DecimalOrDiscIsNotAllowedInACounterStyleIdentInACounterStyleAtRule,
 	NoneIsNotAllowedInACounterStyleIdent,
 	
+	// @document
+	DocumentAtRuleUrlMatchingFunctionWasInvalid,
+	BadUrlInDeclarationValueBlock(CowRcStr<'i>),
+	BadStringInDeclarationValueBlock(CowRcStr<'i>),
+	UnbalancedCloseParenthesisInDeclarationValueBlock,
+	UnbalancedCloseSquareBracketInDeclarationValueBlock,
+	UnbalancedCloseCurlyBracketInDeclarationValueBlock,
+	
+	// @font-face
+	UnsupportedFontFaceProperty(CowRcStr<'i>),
+	
+	// @font-feature-values
+	InvalidFontLanguageOverrideIdentifier(CowRcStr<'i>),
+	InvalidFontLanguageOverrideOpenTypeLanguageTag(CowRcStr<'i>),
+	FontFeatureSettingOpenTypeFeatureTagMustBeFourCharacters(CowRcStr<'i>),
+	FontFeatureSettingOpenTypeFeatureTagMustBePrintableAscii(CowRcStr<'i>),
+	FontFeatureSettingIfNotAnIntegerMustBeOnOrOff(CowRcStr<'i>),
+	FontFeatureSettingIntegerMustBePositive(i32),
+	FontFaceAtRuleFontWeightWasNotAValidIdentifierOrInteger,
+	FontFaceAtRuleFontFamilyCanNotBeGeneric,
+	
+	// @import
+	AtRuleImportMustBeBeforeAnyRuleExceptAtRuleCharset,
+	
+	// @keyframes
+	KeyframePercentageWasNotBetweenZeroAndOneInclusive(f32),
+	ImportantIsNotAllowedInKeyframePropertyDeclarationValues(SourceLocation),
+	UnexpectedTokenWhenParsingZoom(Token<'i>),
+	
+	// @media
 	InvalidMediaType(CowRcStr<'i>),
 	DeprecatedMediaType(CowRcStr<'i>),
 	UnrecognisedMediaType(CowRcStr<'i>),
@@ -55,60 +65,41 @@ pub(crate) enum CustomParseError<'i>
 	UnsupportedMediaQueryExpression(CowRcStr<'i>),
 	RatioNumeratorCanNotBeNegativeOrZero(i32),
 	RatioDivisorCanNotBeNegativeOrZero(i32),
-	UnrecognisedMediaQueryResolutionUnit(CowRcStr<'i>),
-	MediaQueryResolutionDoesNotSupportThisIdentifier(CowRcStr<'i>),
-	MediaQueryResolutionCanNotBeNegativeOrZero,
-	UnexpectedTokenWhenParsingMediaQueryResolution(Token<'i>),
 	MediaGridMustBeEitherZeroOrOne(i32),
 	MediaTransform3DMustBeEitherZeroOrOne(i32),
-	ColorBitDepthMustBeZeroOrAPositiveInteger(i32),
-	ColorBitDepthMustBeAnInteger(f32),
-	ColorIndexMustBeZeroOrAPositiveInteger(i32),
-	ColorIndexMustBeAnInteger(f32),
-	MonochromeBitDepthMustBeZeroOrAPositiveInteger(i32),
-	MonochromeBitDepthMustBeAnInteger(f32),
 	MediaTypeIsOnlyOptionalIfQualifiedIsNotSpecified,
 	
-	UnexpectedTokenForViewportLength(Token<'i>),
-	UnexpectedViewportProperty(CowRcStr<'i>),
-	ViewportLengthsAreNotAllowedInAPageAtRule,
-	LengthDimensionWasUnrecognised(String),
-	
-	AtRuleImportMustBeBeforeAnyRuleExceptAtRuleCharset,
+	// @namespace
 	AtRuleNamespaceMustBeBeforeAnyRuleExceptAtRuleCharsetAndAtRuleImport,
-	InvalidParseState,
-	UnexpectedCharsetAtRule,
-	UnexpectedAtRule(String),
+	UnexpectedTokenForAtNamespaceRuleNamespaceValue(Token<'i>),
 	
+	// @supports
 	InvalidSupportsCondition(CowRcStr<'i>),
 	
-	DocumentAtRuleUrlMatchingFunctionWasInvalid,
+	// @viewport
+	UnexpectedViewportProperty(CowRcStr<'i>),
+	ViewportLengthsAreNotAllowedInAPageAtRule,
 	
-	BadUrlInDeclarationValueBlock(CowRcStr<'i>),
-	BadStringInDeclarationValueBlock(CowRcStr<'i>),
-	UnbalancedCloseParenthesisInDeclarationValueBlock,
-	UnbalancedCloseSquareBracketInDeclarationValueBlock,
-	UnbalancedCloseCurlyBracketInDeclarationValueBlock,
+	// selectors
+	SpecificSelectorParseError(Box<SelectorParseError<'i, CustomParseError<'i>>>),
+	ThereAreNoSelectors,
+	SelectorIsInvalidInContext(String),
+	UnsupportedPseudoClassOrElement(String),
+	NonTreeStructuralPseudoClassScopeIsObsoleteAsOfFirefox55,
 	
+	// custom ident
+	UnexpectedCustomIdent(CowRcStr<'i>),
+	CustomIdentWasExcluded(CowRcStr<'i>),
+	
+	// numbers & units
 	CouldNotParseCssSignedNumber(::domain::numbers::CssNumberConversionError, f32),
 	CouldNotParseCssUnsignedNumber(::domain::numbers::CssNumberConversionError, f32),
 	CouldNotParseDimensionLessNumber(f32),
 	CouldNotParseDimension(f32, CowRcStr<'i>),
-	UnknownFunctionInValueExpression(CowRcStr<'i>),
-	
-	CssVariablesInVarExpressionsMustStartWithTwoDashes(CowRcStr<'i>),
-	
-	CouldNotParseInteger,
-	CouldNotParsePercentage,
-	CouldNotParseNumber,
-	CouldNotParseTimeDimension,
-	CouldNotParseAngleDimension,
-	CouldNotParseLengthDimension,
-	CouldNotParseLengthDimensionOrPercentage,
-	CouldNotParseTimeDimensionInCalcFunction,
-	CouldNotParseAngleDimensionInCalcFunction,
-	CouldNotParseLengthDimensionInCalcFunction,
-	
 	UnsignedIntegersCanNotBeNegative(i32),
 	UnsignedIntegersCanNotBeFloats(f32),
+	
+	// expressions (calc(), var(), attr())
+	UnknownFunctionInValueExpression(CowRcStr<'i>),
+	CssVariablesInVarExpressionsMustStartWithTwoDashes(CowRcStr<'i>),
 }

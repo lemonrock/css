@@ -77,6 +77,7 @@ impl ToCss for NonTreeStructuralPseudoClass
 		}
 		
 		use self::NonTreeStructuralPseudoClass::*;
+		use self::VendorPrefix::*;
 		
 		match *self
 		{
@@ -209,7 +210,7 @@ impl NonTreeStructuralPseudoClass
 	}
 	
 	#[inline(always)]
-	fn parse_without_arguments<'i>(name: CowRcStr<'i>) -> Result<Self, ParseError<'i, SelectorParseError<'i, CustomParseError<'i>>>>
+	pub(crate) fn parse_without_arguments<'i>(name: CowRcStr<'i>) -> Result<Self, ParseError<'i, SelectorParseError<'i, CustomParseError<'i>>>>
 	{
 		use self::NonTreeStructuralPseudoClass::*;
 		use self::VendorPrefix::*;
@@ -295,7 +296,7 @@ impl NonTreeStructuralPseudoClass
 	}
 	
 	#[inline(always)]
-	fn parse_with_arguments<'i, 't>(name: CowRcStr<'i>, input: &mut Parser<'i, 't>, ourSelectorParser: &OurSelectorParser) -> Result<Self, ParseError<'i, SelectorParseError<'i, CustomParseError<'i>>>>
+	pub(crate) fn parse_with_arguments<'i, 't>(name: CowRcStr<'i>, input: &mut Parser<'i, 't>, ourSelectorParser: &OurSelectorParser) -> Result<Self, ParseError<'i, SelectorParseError<'i, CustomParseError<'i>>>>
 	{
 		use self::NonTreeStructuralPseudoClass::*;
 		use self::VendorPrefix::*;

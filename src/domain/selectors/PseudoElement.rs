@@ -40,8 +40,6 @@ impl ToCss for PseudoElement
 {
 	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
 	{
-		use self::PseudoElement::*;
-		
 		#[inline(always)]
 		fn write<W: fmt::Write>(dest: &mut W, classWithColonColon: &str) -> fmt::Result
 		{
@@ -58,6 +56,9 @@ impl ToCss for PseudoElement
 			}
 			dest.write_str(classWithoutColonColon)
 		}
+		
+		use self::PseudoElement::*;
+		use self::VendorPrefix::*;
 		
 		match *self
 		{
@@ -183,7 +184,7 @@ impl PseudoElement
 	}
 	
 	#[inline(always)]
-	fn parse_without_arguments<'i>(name: CowRcStr<'i>) -> Result<Self, ParseError<'i, SelectorParseError<'i, CustomParseError<'i>>>>
+	pub(crate) fn parse_without_arguments<'i>(name: CowRcStr<'i>) -> Result<Self, ParseError<'i, SelectorParseError<'i, CustomParseError<'i>>>>
 	{
 		use self::PseudoElement::*;
 		use self::VendorPrefix::*;
@@ -275,7 +276,7 @@ impl PseudoElement
 	}
 	
 	#[inline(always)]
-	fn parse_with_arguments<'i, 't>(name: CowRcStr<'i>, _arguments: &mut Parser<'i, 't>, _ourSelectorParser: &OurSelectorParser) -> Result<Self, ParseError<'i, SelectorParseError<'i, CustomParseError<'i>>>>
+	pub(crate) fn parse_with_arguments<'i, 't>(name: CowRcStr<'i>, _arguments: &mut Parser<'i, 't>, _ourSelectorParser: &OurSelectorParser) -> Result<Self, ParseError<'i, SelectorParseError<'i, CustomParseError<'i>>>>
 	{
 		Err(ParseError::Custom(SelectorParseError::UnsupportedPseudoClassOrElement(name)))
 	}

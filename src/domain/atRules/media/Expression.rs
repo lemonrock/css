@@ -67,11 +67,11 @@ impl ToCss for Expression
 			
 			Color(Exact(ref value)) => write(dest, "color", value),
 			
-			Color(AtLeast(ref value)) => write(dest, "min-color-index", value),
+			ColorIndex(AtLeast(ref value)) => write(dest, "min-color-index", value),
 			
-			Color(AtMost(ref value)) => write(dest, "max-color-index", value),
+			ColorIndex(AtMost(ref value)) => write(dest, "max-color-index", value),
 			
-			Color(Exact(ref value)) => write(dest, "color-index", value),
+			ColorIndex(Exact(ref value)) => write(dest, "color-index", value),
 			
 			Monochrome(AtLeast(ref value)) => write(dest, "min-monochrome", value),
 			
@@ -169,6 +169,12 @@ impl Expression
 						
 						"color-index" => ColorIndex(Exact(MediaColorIndex::parse(context, input)?)),
 						
+						"min-monochrome" => Monochrome(AtLeast(MonochromeBitDepth::parse(context, input)?)),
+						
+						"max-monochrome" => Monochrome(AtMost(MonochromeBitDepth::parse(context, input)?)),
+						
+						"monochrome" => Monochrome(Exact(MonochromeBitDepth::parse(context, input)?)),
+						
 						"color-gamut" => ColorGamut(MediaColorGamut::parse(input)?),
 						
 						"pointer" => Pointer(MediaPointer::parse(input)?),
@@ -181,7 +187,7 @@ impl Expression
 						
 						"-webkit-transform-3d" => Transform3D(MediaTransform3D::parse(context, input)?),
 						
-						"min-device-width" | "min-device-width" | "device-width" | "min-device-height" | "min-device-height" | "device-height" | "min-device-aspect-ratio" | "min-device-aspect-ratio" | "device-aspect-ratio" => return Err(ParseError::Custom(CustomParseError::DeprecatedMediaQueryExpression(name.clone()))),
+						"min-device-width" | "max-device-width" | "device-width" | "min-device-height" | "max-device-height" | "device-height" | "min-device-aspect-ratio" | "max-device-aspect-ratio" | "device-aspect-ratio" => return Err(ParseError::Custom(CustomParseError::DeprecatedMediaQueryExpression(name.clone()))),
 						
 						_ => return Err(ParseError::Custom(CustomParseError::UnsupportedMediaQueryExpression(name.clone())))
 					}
@@ -198,11 +204,40 @@ impl Expression
 		match self.0
 		{
 			Width(ref range) => device.viewportWidthInAppUnitsMatches(range),
+			
 			Height(ref range) => device.viewportHeightInAppUnitsMatches(range),
+			
 			AspectRatio(ref range) => device.viewportAspectRatioMatches(range),
+			
 			Orientation(orientation) => device.orientationMatches(orientation),
+			
 			Resolution(ref range) => device.viewportResolutionMatches(range),
-			_ => unimplemented!("Please implement matches for remaining behaviours")
+			
+			Scan(ref scan) => device.scanMatches(scan),
+			
+			Grid(ref grid) => device.gridMatches(grid),
+			
+			OverflowBlock(ref overflowBlock) => device.overflowBlockMatches(overflowBlock),
+			
+			OverflowInline(ref overflowInline) => device.overflowInlineMatches(overflowInline),
+			
+			Color(ref range) => device.colorBitDepthMatches(range),
+			
+			ColorIndex(ref range) => device.colorIndexMatches(range),
+			
+			Monochrome(ref range) => device.monochromeBitDepthMatches(range),
+			
+			ColorGamut(ref colorGamut) => device.colorGamutMatches(colorGamut),
+			
+			Pointer(ref pointer) => device.pointerMatches(pointer),
+			
+			Hover(ref hover) => device.hoverMatches(hover),
+			
+			AnyPointer(ref pointer) => device.anyPointerMatches(pointer),
+			
+			AnyHover(ref hover) => device.anyHoverMatches(hover),
+			
+			Transform3D(ref transform3D) => device.transform3DMatches(transform3D),
 		}
 	}
 }

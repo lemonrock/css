@@ -3,7 +3,6 @@
 
 
 use super::*;
-use super::atRules::namespace::Namespaces;
 use super::atRules::namespace::NamespaceUrl;
 use super::domain::Atom;
 use super::domain::VendorPrefix;
@@ -21,12 +20,9 @@ use ::selectors::parser::Component;
 use ::selectors::parser::Combinator;
 use ::selectors::parser::Selector;
 use ::selectors::parser::SelectorImpl;
-use ::selectors::parser::SelectorList;
 use ::selectors::parser::SelectorMethods;
 use ::selectors::visitor::SelectorVisitor;
-use ::smallvec::SmallVec;
 use ::std::fmt;
-use ::std::rc::Rc;
 
 
 include!("DeduplicatedSelectors.rs");
@@ -36,6 +32,5 @@ include!("NonTreeStructuralPseudoClass.rs");
 include!("OurSelector.rs");
 include!("OurSelectorExt.rs");
 include!("OurSelectorImpl.rs");
-include!("OurSelectorParser.rs");
 include!("PseudoElement.rs");
 include!("TextDirectionality.rs");

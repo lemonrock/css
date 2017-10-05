@@ -5,7 +5,7 @@
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub(crate) struct OurSelectorParser
 {
-	namespaces: Rc<Namespaces>,
+	pub(crate) namespaces: Rc<Namespaces>,
 }
 
 impl<'i> ::selectors::parser::Parser<'i> for OurSelectorParser
@@ -60,7 +60,7 @@ impl OurSelectorParser
 	}
 	
 	#[inline(always)]
-	fn parse_internal<'i, 't, F: Fn(&OurSelector) -> bool>(&self, input: &mut Parser<'i, 't>, isInvalidSelector: F) -> Result<DeduplicatedSelectors, ParseError<'i, CustomParseError<'i>>>
+	pub(crate) fn parse_internal<'i, 't, F: Fn(&OurSelector) -> bool>(&self, input: &mut Parser<'i, 't>, isInvalidSelector: F) -> Result<DeduplicatedSelectors, ParseError<'i, CustomParseError<'i>>>
 	{
 		let selectors = self.parse_selectors(input).map_err(|parseError|
 		{

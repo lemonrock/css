@@ -224,6 +224,11 @@ impl<NumberX: CssNumber> Unit for LengthOrPercentageUnit<NumberX>
 				{
 					Ok(Constant(Self::default()))
 				}
+				else if context.parsing_mode_allows_unitless_lengths()
+				{
+					let cssNumber = Self::Number::new(value).map_err(|cssNumberConversionError| ParseError::Custom(CouldNotParseCssSignedNumber(cssNumberConversionError, value)))?;
+					Ok(Constant(IsLength((Absolute(px(cssNumber))))))
+				}
 				else
 				{
 					Err(ParseError::Custom(CouldNotParseDimensionLessNumber(value)))

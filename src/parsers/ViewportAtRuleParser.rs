@@ -4,7 +4,7 @@
 
 pub(crate) struct ViewportAtRuleParser<'a>
 {
-	context: &'a ParserContext
+	pub(crate) context: &'a ParserContext
 }
 
 impl<'a, 'i> AtRuleParser<'i> for ViewportAtRuleParser<'a>

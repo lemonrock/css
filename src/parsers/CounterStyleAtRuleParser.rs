@@ -5,8 +5,8 @@
 // NOTE: impl<'a, 'b, 'i> DeclarationParser<'i> for CounterStyleRuleParser<'a, 'b> is in the macro definition 'counter_style_descriptors' in 'CounterStyleAtRule.rs'
 pub(crate) struct CounterStyleAtRuleParser<'a>
 {
-	context: &'a ParserContext,
-	rule: &'a mut CounterStyleAtRule,
+	pub(crate) context: &'a ParserContext,
+	pub(crate) rule: &'a mut CounterStyleAtRule,
 }
 
 /// Default methods reject all at rules.

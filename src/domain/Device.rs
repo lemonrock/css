@@ -4,17 +4,43 @@
 
 pub trait Device
 {
-	fn media_type(&self) -> MediaType;
-	
 	fn documentMatchesUrl(&self, urlMatchingFunction: &UrlMatchingFunction) -> bool;
+	
+	fn media_type(&self) -> MediaType;
 	
 	fn viewportWidthInAppUnitsMatches(&self, width: &Range<CalculablePropertyValue<LengthUnit<CssSignedNumber>>>) -> bool;
 	
-	fn viewportHeightInAppUnitsMatches(&self, width: &Range<CalculablePropertyValue<LengthUnit<CssSignedNumber>>>) -> bool;
+	fn viewportHeightInAppUnitsMatches(&self, height: &Range<CalculablePropertyValue<LengthUnit<CssSignedNumber>>>) -> bool;
 	
-	fn viewportAspectRatioMatches(&self, width: &Range<Ratio>) -> bool;
+	fn viewportAspectRatioMatches(&self, ratio: &Range<Ratio>) -> bool;
 	
 	fn orientationMatches(&self, orientation: MediaOrientation) -> bool;
 	
-	fn viewportResolutionMatches(&self, width: &Range<MediaResolution>) -> bool;
+	fn viewportResolutionMatches(&self, resolution: &Range<MediaResolution>) -> bool;
+	
+	fn scanMatches(&self, scan: &MediaScan) -> bool;
+	
+	fn gridMatches(&self, grid: &MediaGrid) -> bool;
+	
+	fn overflowBlockMatches(&self, overflowBlock: &MediaOverflowBlock) -> bool;
+	
+	fn overflowInlineMatches(&self, overflowInline: &MediaOverflowInline) -> bool;
+	
+	fn colorBitDepthMatches(&self, colorBitDepth: &Range<ColorBitDepth>) -> bool;
+	
+	fn colorIndexMatches(&self, colorIndex: &Range<MediaColorIndex>) -> bool;
+	
+	fn monochromeBitDepthMatches(&self, monochromeBitDepth: &Range<MonochromeBitDepth>) -> bool;
+	
+	fn colorGamutMatches(&self, colorGamut: &MediaColorGamut) -> bool;
+	
+	fn pointerMatches(&self, pointer: &MediaPointer) -> bool;
+	
+	fn hoverMatches(&self, hover: &MediaHover) -> bool;
+	
+	fn anyPointerMatches(&self, pointer: &MediaPointer) -> bool;
+	
+	fn anyHoverMatches(&self, hover: &MediaHover) -> bool;
+	
+	fn transform3DMatches(&self, transform3D: &MediaTransform3D) -> bool;
 }

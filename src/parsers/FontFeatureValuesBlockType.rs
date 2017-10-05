@@ -3,7 +3,7 @@
 
 
 /// Keeps the information about block type like @swash, @styleset etc.
-enum FontFeatureValuesBlockType
+pub(crate) enum FontFeatureValuesBlockType
 {
 	swash,
 	stylistic,

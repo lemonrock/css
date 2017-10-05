@@ -5,9 +5,9 @@
 #[derive(Debug, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct PropertyDeclaration
 {
-	name: Atom,
-	value: UnparsedPropertyValue,
-	importance: Importance,
+	pub name: Atom,
+	pub value: UnparsedPropertyValue,
+	pub importance: Importance,
 }
 
 impl ToCss for PropertyDeclaration

@@ -3,7 +3,7 @@
 
 
 /// The data that the parser needs from outside in order to parse a stylesheet.
-pub(crate) struct ParserContext
+pub struct ParserContext
 {
 	/// The current rule type, if any.
 	pub(crate) rule_type: Option<CssRuleType>,
@@ -14,7 +14,7 @@ pub(crate) struct ParserContext
 
 impl ParserContext
 {
-	/// Create a parser context based on a previous context, but with a modified rule type.
+	// Creates a parser context based on a previous context, but with a modified rule type.
 	pub(crate) fn new_with_rule_type(context: &ParserContext, rule_type: CssRuleType) -> ParserContext
 	{
 		Self
@@ -24,24 +24,20 @@ impl ParserContext
 		}
 	}
 	
-	/// Get the rule type, which assumes that one is available.
-	pub(crate) fn rule_type(&self) -> CssRuleType
-	{
-		self.rule_type.expect("Rule type expected, but none was found.")
-	}
-	
-	pub(crate) fn parsingModeDoesNotAllowUnitLessLengths(&self) -> bool
-	{
-		!self.parsing_mode.allows_unitless_lengths()
-	}
-	
+	#[inline(always)]
 	pub(crate) fn isInPageRule(&self) -> bool
 	{
 		self.rule_type.map_or(false, |rule_type| rule_type == CssRuleType::Page)
 	}
 	
+	#[inline(always)]
 	pub(crate) fn isNotInPageRule(&self) -> bool
 	{
 		!self.isInPageRule()
+	}
+	
+	pub(crate) fn parsing_mode_allows_unitless_lengths(&self) -> bool
+	{
+		self.parsing_mode.allows_unitless_lengths()
 	}
 }

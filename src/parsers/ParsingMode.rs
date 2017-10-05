@@ -23,15 +23,14 @@ bitflags!
 
 impl ParsingMode
 {
-	//noinspection SpellCheckingInspection
-	/// Whether the parsing mode allows unit-less units for non-zero values to be intpreted as px.
-	pub fn allows_unitless_lengths(&self) -> bool
+	/// Whether the parsing mode allows unit-less units for non-zero values to be interpreted as px.
+	pub(crate) fn allows_unitless_lengths(&self) -> bool
 	{
 		self.intersects(Self::PARSING_MODE_ALLOW_UNITLESS_LENGTH)
 	}
 	
 	/// Whether the parsing mode allows all numeric values.
-	pub fn allows_all_numeric_values(&self) -> bool
+	pub(crate) fn allows_all_numeric_values(&self) -> bool
 	{
 		self.intersects(Self::PARSING_MODE_ALLOW_ALL_NUMERIC_VALUES)
 	}

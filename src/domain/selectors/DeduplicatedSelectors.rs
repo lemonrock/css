@@ -3,7 +3,7 @@
 
 
 #[derive(Debug, Clone, Eq, PartialEq)]
-pub struct DeduplicatedSelectors(OrderMap<String, Selector<OurSelectorImpl>>);
+pub struct DeduplicatedSelectors(pub OrderMap<String, Selector<OurSelectorImpl>>);
 
 impl ToCss for DeduplicatedSelectors
 {

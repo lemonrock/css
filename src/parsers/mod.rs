@@ -17,6 +17,10 @@ use super::domain::atRules::viewport::*;
 use super::domain::properties::*;
 use super::domain::selectors::*;
 use self::separators::*;
+use ::ordermap::OrderMap;
+use ::selectors::parser::SelectorImpl;
+use ::selectors::parser::SelectorList;
+use ::smallvec::SmallVec;
 use ::std::ascii::AsciiExt;
 use ::std::rc::Rc;
 
@@ -34,6 +38,7 @@ include!("FontFeatureValuesAtRuleParser.rs");
 include!("KeyframeListParser.rs");
 include!("KeyframeSelectorParserPrelude.rs");
 include!("NestedRuleParser.rs");
+include!("OurSelectorParser.rs");
 include!("Parse.rs");
 include!("ParserContext.rs");
 include!("ParsingMode.rs");

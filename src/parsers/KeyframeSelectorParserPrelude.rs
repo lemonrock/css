@@ -3,7 +3,7 @@
 
 
 /// A wrapper to wraps the KeyframeSelector with its source location
-struct KeyframeSelectorParserPrelude
+pub(crate) struct KeyframeSelectorParserPrelude
 {
 	selector: KeyframeSelector,
 	source_location: SourceLocation,

@@ -3,7 +3,7 @@
 
 
 /// Marker trait on T to automatically implement ToCss for Vec<T> when values of T are separated by some delimiter `delim`.
-pub trait Separated
+pub(crate) trait Separated
 {
 	/// Associated type indicating which separator is used.
 	type Delimiter: Separator;

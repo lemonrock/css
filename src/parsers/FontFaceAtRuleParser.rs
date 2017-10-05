@@ -4,8 +4,8 @@
 
 pub(crate) struct FontFaceAtRuleParser<'a>
 {
-	context: &'a ParserContext,
-	rule: &'a mut FontFaceAtRule,
+	pub(crate) context: &'a ParserContext,
+	pub(crate) rule: &'a mut FontFaceAtRule,
 }
 
 /// Default methods reject all at rules.
