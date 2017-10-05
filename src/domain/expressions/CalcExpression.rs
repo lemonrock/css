@@ -171,21 +171,6 @@ impl<U: Unit> CalcExpression<U>
 					{
 						break;
 					}
-					
-					match *input.next()?
-					{
-						Delim('+') =>
-						{
-							currentSum = Addition(Box::new(currentSum), Box::new(Self::parse_product(context, input)?));
-						}
-						
-						Delim('-') =>
-						{
-							currentSum = Subtraction(Box::new(currentSum), Box::new(Self::parse_product(context, input)?));
-						}
-						
-						ref unexpectedToken => return CustomParseError::unexpectedToken(unexpectedToken),
-					}
 				}
 				
 				_ =>
@@ -193,6 +178,24 @@ impl<U: Unit> CalcExpression<U>
 					input.reset(&stateToResetParseToIfNotSum);
 					break
 				}
+			}
+			
+			let isAddition = match *input.next()?
+			{
+				Delim('+') => true,
+				
+				Delim('-') => false,
+				
+				ref unexpectedToken => return CustomParseError::unexpectedToken(unexpectedToken),
+			};
+			
+			currentSum = if isAddition
+			{
+				Addition(Box::new(currentSum), Box::new(Self::parse_product(context, input)?))
+			}
+			else
+			{
+				Subtraction(Box::new(currentSum), Box::new(Self::parse_product(context, input)?))
 			}
 		}
 		

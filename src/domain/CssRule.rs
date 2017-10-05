@@ -70,19 +70,4 @@ impl CssRule
 			Document(_)  => CssRuleType::Document,
 		}
 	}
-	
-	fn rule_state(&self) -> State
-	{
-		use self::CssRule::*;
-		use State::*;
-		
-		match *self
-		{
-			// No Charset here, CSSCharsetRule has been removed from CSSOM (https://drafts.csswg.org/cssom/#changes-from-5-december-2013)
-			// Charset(..) => Start,
-			Import(..) => Imports,
-			Namespace(..) => Namespaces,
-			_ => Body,
-		}
-	}
 }

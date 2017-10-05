@@ -3,6 +3,7 @@
 
 
 use super::*;
+use ::either::Either::*;
 
 
 include!("ColorBitDepth.rs");

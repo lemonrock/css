@@ -339,7 +339,7 @@ impl<Number: CssNumber> LengthUnit<Number>
 	}
 	
 	#[inline(always)]
-	fn is_absolute_length(&self) -> bool
+	pub fn is_absolute_length(&self) -> bool
 	{
 		match *self
 		{
@@ -350,7 +350,7 @@ impl<Number: CssNumber> LengthUnit<Number>
 	
 	/// Convert this into a pixel value.
 	#[inline(always)]
-	fn to_px<Conversion: FontRelativeLengthConversion<Number> + ViewportPercentageLengthConversion<Number>>(&self, conversion: &Conversion) -> Number
+	pub fn to_px<Conversion: FontRelativeLengthConversion<Number> + ViewportPercentageLengthConversion<Number>>(&self, conversion: &Conversion) -> Number
 	{
 		match *self
 		{
@@ -362,7 +362,7 @@ impl<Number: CssNumber> LengthUnit<Number>
 	
 	/// Convert this into AppUnits.
 	#[inline]
-	fn to_app_units<Conversion: FontRelativeLengthConversion<Number> + ViewportPercentageLengthConversion<Number>>(&self, conversion: &Conversion) -> Number
+	pub fn to_app_units<Conversion: FontRelativeLengthConversion<Number> + ViewportPercentageLengthConversion<Number>>(&self, conversion: &Conversion) -> Number
 	{
 		match *self
 		{

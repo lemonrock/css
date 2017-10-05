@@ -36,7 +36,7 @@ impl ToCss for CssWideKeyword
 impl CssWideKeyword
 {
 	#[inline(always)]
-	fn to_str(&self) -> &'static str
+	pub fn to_str(&self) -> &'static str
 	{
 		use self::CssWideKeyword::*;
 		

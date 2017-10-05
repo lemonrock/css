@@ -28,15 +28,4 @@ impl MediaQueryType
             _ => MediaType::parse(ident).map(Concrete),
         }
 	}
-	
-	fn matches(&self, other: MediaType) -> bool
-	{
-		use self::MediaQueryType::*;
-		
-		match *self
-		{
-			All => true,
-			Concrete(ref known_type) => *known_type == other,
-		}
-	}
 }

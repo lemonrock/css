@@ -107,27 +107,42 @@ impl MediaQuery
 			None
 		};
 		
-		let media_type = input.try(|input|
+		let isThereAValidMediaType = input.try(|input|
 		{
-			match input.expect_ident()
+			if let Ok(ident) = input.expect_ident()
 			{
-				Ok(ident) => MediaQueryType::parse(ident).map_err(|error| ParseError::Custom(error)),
-				
-				Err(_) =>
+				match MediaQueryType::parse(ident).map_err(|error| ParseError::Custom(error))
 				{
-					// Media type is only optional if qualifier is not specified.
-					if qualifier.is_some()
-					{
-						return Err(ParseError::Custom(CustomParseError::MediaTypeIsOnlyOptionalIfQualifiedIsNotSpecified))
-					}
-					
-					// Without a media type, require at least one expression.
-					expressions.push(MediaExpression::parse(context, input)?);
-					
-					Ok(MediaQueryType::All)
+					Ok(mediaType) => Ok(Left(mediaType)),
+					Err(error) => Ok(Right(error)),
 				}
 			}
-		})?;
+			else
+			{
+				Err(())
+			}
+		});
+		
+		let media_type = match isThereAValidMediaType
+		{
+			Ok(Left(media_type)) => media_type,
+			
+			Ok(Right(error)) => return Err(error),
+			
+			Err(()) =>
+			{
+				// Media type is only optional if qualifier is not specified.
+				if qualifier.is_some()
+				{
+					return Err(ParseError::Custom(CustomParseError::MediaTypeIsOnlyOptionalIfQualifiedIsNotSpecified))
+				}
+				
+				// Without a media type, require at least one expression.
+				expressions.push(MediaExpression::parse(context, input)?);
+				
+				MediaQueryType::All
+			}
+		};
 		
 		// Parse any subsequent expressions
 		loop

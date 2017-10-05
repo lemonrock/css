@@ -37,53 +37,6 @@ impl ViewportAtRule
 		Ok(ViewportAtRule { declarations })
 	}
 	
-	fn parse_meta_property<'a>(content: &'a str, iter: &mut Enumerate<Chars<'a>>, start: usize) -> Option<(&'a str, &'a str)>
-	{
-		fn end_of_token(iter: &mut Enumerate<Chars>) -> Option<(usize, char)>
-		{
-			iter.by_ref().skip_while(|&(_, c)| !ViewportAtRule::is_whitespace_separator_or_equals(&c)).next()
-		}
-		
-		fn skip_whitespace(iter: &mut Enumerate<Chars>) -> Option<(usize, char)>
-		{
-			iter.by_ref().skip_while(|&(_, c)| ViewportAtRule::WHITESPACE.contains(&c)).next()
-		}
-		
-		// <name> <whitespace>* '='
-		let end = match end_of_token(iter)
-		{
-			Some((end, c)) if Self::WHITESPACE.contains(&c) =>
-			{
-				match skip_whitespace(iter)
-				{
-					Some((_, c)) if c == '=' => end,
-					_ => return None
-				}
-			}
-			
-			Some((end, c)) if c == '=' => end,
-			
-			_ => return None
-		};
-		
-		let name = &content[start..end];
-		
-		// <whitespace>* <value>
-		let start = match skip_whitespace(iter)
-		{
-			Some((start, c)) if !Self::SEPARATOR.contains(&c) => start,
-			_ => return None
-		};
-		
-		let slice = match end_of_token(iter)
-		{
-			Some((end, _)) => &content[start..end],
-			_ => &content[start..]
-		};
-		
-		Some((name, slice))
-	}
-	
 	/// Whitespace as defined by DEVICE-ADAPT § 9.2
 	const WHITESPACE: &'static [char] = &['\t', '\n', '\r', ' '];
 	
