@@ -321,6 +321,26 @@ impl CssNumber for CssUnsignedInteger
 			}
 		}
 	}
+	
+	#[inline(always)]
+	fn parseNumber<'i>(value: f32, int_value: Option<i32>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
+	{
+		if let Some(constant) = int_value
+		{
+			if constant >= 0
+			{
+				Ok(CssUnsignedInteger(constant as u32))
+			}
+			else
+			{
+				Err(ParseError::Custom(CustomParseError::UnsignedIntegersCanNotBeNegative(constant)))
+			}
+		}
+		else
+		{
+			Err(ParseError::Custom(CustomParseError::UnsignedIntegersCanNotBeFloats(value)))
+		}
+	}
 }
 
 impl AppUnitsPer for CssUnsignedInteger
@@ -356,31 +376,13 @@ impl Unit for CssUnsignedInteger
 	#[inline(always)]
 	fn parse_one_outside_calc_function<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<CalculablePropertyValue<Self>, ParseError<'i, CustomParseError<'i>>>
 	{
-		use ::cssparser::Token::*;
 		use self::CalculablePropertyValue::*;
 		
 		let functionParser = match *input.next()?
 		{
-			Number { int_value, value, .. } =>
-			{
-				if let Some(constant) = int_value
-				{
-					if constant >= 0
-					{
-						return Ok(Constant(CssUnsignedInteger(constant as u32)))
-					}
-					else
-					{
-						return Err(ParseError::Custom(CustomParseError::UnsignedIntegersCanNotBeNegative(constant)))
-					}
-				}
-				else
-				{
-					return Err(ParseError::Custom(CustomParseError::UnsignedIntegersCanNotBeFloats(value)))
-				}
-			}
+			Token::Number { int_value, value, .. } => return Self::parseNumber(value, int_value).map(Constant),
 			
-			Function(ref name) => FunctionParser::parser(name)?,
+			Token::Function(ref name) => FunctionParser::parser(name)?,
 			
 			ref unexpectedToken @ _ => return CustomParseError::unexpectedToken(unexpectedToken),
 		};
@@ -393,24 +395,7 @@ impl Unit for CssUnsignedInteger
 		
 		let functionParser = match *input.next()?
 		{
-			Token::Number { value, int_value, .. } =>
-			{
-				if let Some(constant) = int_value
-				{
-					if constant >= 0
-					{
-						return Ok(Left(Constant(CssUnsignedInteger(constant as u32))))
-					}
-					else
-					{
-						return Err(ParseError::Custom(CustomParseError::UnsignedIntegersCanNotBeNegative(constant)))
-					}
-				}
-				else
-				{
-					return Err(ParseError::Custom(CustomParseError::UnsignedIntegersCanNotBeFloats(value)))
-				}
-			},
+			Token::Number { value, int_value, .. } => return Self::parseNumber(value, int_value).map(|value| Left(Constant(value))),
 			
 			Token::Percentage { unit_value, .. } => return PercentageUnit::parse_percentage(unit_value).map(|value| Left(Percentage(value))),
 			
@@ -436,21 +421,7 @@ impl Unit for CssUnsignedInteger
 		{
 			let value = match *input.next()?
 			{
-				Token::Number { value, int_value, .. } => if let Some(constant) = int_value
-				{
-					if constant >= 0
-					{
-						Ok(CssUnsignedInteger(constant as u32))
-					}
-					else
-					{
-						Err(ParseError::Custom(CustomParseError::UnsignedIntegersCanNotBeNegative(constant)))
-					}
-				}
-				else
-				{
-					Err(ParseError::Custom(CustomParseError::UnsignedIntegersCanNotBeFloats(value)))
-				},
+				Token::Number { value, int_value, .. } => CssUnsignedInteger::parseNumber(value, int_value),
 				
 				ref unexpectedToken @ _ => CustomParseError::unexpectedToken(unexpectedToken),
 			};

@@ -6,6 +6,7 @@ use super::*;
 use super::units::conversions::*;
 use self::CustomParseError::*;
 use self::Either::*;
+use ::cssparser::ParseError;
 use ::either::Either;
 use ::std::convert::From;
 use ::std::error::Error;

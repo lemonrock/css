@@ -125,4 +125,7 @@ pub trait CssNumber: Sized
 	#[doc(hidden)]
 	#[inline(always)]
 	fn _construct(value: f32) -> Self;
+	
+	#[inline(always)]
+	fn parseNumber<'i>(value: f32, _int_value: Option<i32>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>;
 }

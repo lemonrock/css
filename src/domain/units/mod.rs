@@ -8,7 +8,6 @@ use self::LengthUnit::*;
 use self::either::Left;
 use self::either::Right;
 use self::FontRelativeLength::*;
-use self::LengthOrPercentageUnit::*;
 use self::ResolutionUnit::*;
 use self::TimeUnit::*;
 use self::ViewportPercentageLength::*;
@@ -35,10 +34,11 @@ pub mod conversions;
 
 
 include!("AbsoluteLength.rs");
-include!("LengthUnit.rs");
 include!("AppUnitsPer.rs");
 include!("FontRelativeLength.rs");
 include!("LengthOrPercentageUnit.rs");
+include!("LengthUnit.rs");
+include!("NumberOrPercentageUnit.rs");
 include!("PercentageUnit.rs");
 include!("ResolutionUnit.rs");
 include!("TimeUnit.rs");

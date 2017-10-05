@@ -3,17 +3,14 @@
 
 
 /// https://drafts.csswg.org/css-device-adapt/#descdef-viewport-zoom
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub enum Zoom
 {
-    /// A number value.
-    Number(f32),
+	/// The `auto` keyword.
+	auto,
 	
-    /// A percentage value.
-    Percentage(f32),
-	
-    /// The `auto` keyword.
-    Auto,
+	/// invariant or calculated non-negative number or non-negative percentage
+	value(CalculablePropertyValue<NumberOrPercentageUnit<CssUnsignedNumber>>),
 }
 
 impl ToCss for Zoom
@@ -24,15 +21,9 @@ impl ToCss for Zoom
 		
         match *self
 		{
-            Number(number) => number.to_css(dest),
+			auto => dest.write_str("auto"),
 			
-            Auto => dest.write_str("auto"),
-			
-            Percentage(percentage) =>
-			{
-                (percentage * 100.).to_css(dest)?;
-                dest.write_char('%')
-            }
+            value(ref calculable) => calculable.to_css(dest),
         }
     }
 }
@@ -42,35 +33,15 @@ impl Zoom
     /// Parse a zoom value per:
     ///
     /// https://drafts.csswg.org/css-device-adapt/#descdef-viewport-zoom
-    pub fn parse<'i, 't>(input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
-	{
-		use self::Zoom::*;
-		use AllowedNumericType::NonNegative;
-		
-        match *input.next()?
-		{
-            // TODO: This parse() method should take ParserContext as an argument, and pass ParsingMode owned by the ParserContext to is_ok() instead of using PARSING_MODE_DEFAULT directly.  In order to do so, we might want to move this code into style::stylesheets::viewport_rule.
-            Token::Percentage { unit_value, .. } if NonNegative.is_ok(ParsingMode::PARSING_MODE_DEFAULT, unit_value) => Ok(Percentage(unit_value)),
-			
-            Token::Number { value: numeric_value, .. } if NonNegative.is_ok(ParsingMode::PARSING_MODE_DEFAULT, numeric_value) => Ok(Number(numeric_value)),
-			
-            Token::Ident(ref ident) if ident.eq_ignore_ascii_case("auto") => Ok(Auto),
-			
-            ref unexpectedToken => Err(ParseError::Custom(CustomParseError::UnexpectedTokenWhenParsingZoom(unexpectedToken.clone())))
-        }
-    }
-
-    /// Get this zoom value as a float value. Returns `None` if the value is the `auto` keyword.
-    #[inline]
-    pub fn to_f32(&self) -> Option<f32>
+    pub(crate) fn parse<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
 	{
 		use self::Zoom::*;
 		
-        match *self
+		if input.try(|input| input.expect_ident_matching("auto")).is_ok()
 		{
-            Number(number) => Some(number as f32),
-            Percentage(percentage) => Some(percentage as f32),
-            Auto => None
-        }
+			return Ok(auto);
+		}
+		
+		Ok(value(NumberOrPercentageUnit::parse_one_outside_calc_function(context, input)?))
     }
 }

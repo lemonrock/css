@@ -348,6 +348,12 @@ impl CssNumber for CssUnsignedNumber
 	{
 		CssUnsignedNumber(value)
 	}
+	
+	#[inline(always)]
+	fn parseNumber<'i>(value: f32, _int_value: Option<i32>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
+	{
+		CssUnsignedNumber::new(value).map_err(|cssNumberConversionError| ParseError::Custom(CouldNotParseCssSignedNumber(cssNumberConversionError, value)))
+	}
 }
 
 impl AppUnitsPer for CssUnsignedNumber
@@ -383,19 +389,13 @@ impl Unit for CssUnsignedNumber
 	#[inline(always)]
 	fn parse_one_outside_calc_function<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<CalculablePropertyValue<Self>, ParseError<'i, CustomParseError<'i>>>
 	{
-		use ::cssparser::Token::*;
 		use self::CalculablePropertyValue::*;
-		use self::CustomParseError::*;
 		
 		let functionParser = match *input.next()?
 		{
-			Number { value, .. } =>
-			{
-				let constant = Self::new(value).map_err(|cssNumberConversionError| ParseError::Custom(CouldNotParseCssUnsignedNumber(cssNumberConversionError, value)))?;
-				return Ok(Constant(constant))
-			}
+			Token::Number { value, int_value, .. } => return Self::parseNumber(value, int_value).map(Constant),
 			
-			Function(ref name) => FunctionParser::parser(name)?,
+			Token::Function(ref name) => FunctionParser::parser(name)?,
 			
 			ref unexpectedToken @ _ => return CustomParseError::unexpectedToken(unexpectedToken),
 		};
@@ -406,15 +406,10 @@ impl Unit for CssUnsignedNumber
 	fn parse_one_inside_calc_function<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Either<CalculablePropertyValue<Self>, CalcExpression<Self>>, ParseError<'i, CustomParseError<'i>>>
 	{
 		use self::CalculablePropertyValue::*;
-		use self::CustomParseError::*;
 		
 		let functionParser = match *input.next()?
 		{
-			Token::Number { value, .. } =>
-			{
-				let constant = Self::new(value).map_err(|cssNumberConversionError| ParseError::Custom(CouldNotParseCssUnsignedNumber(cssNumberConversionError, value)))?;
-				return Ok(Left(Constant(constant)))
-			},
+			Token::Number { value, int_value, .. } => return Self::parseNumber(value, int_value).map(|value| Left(Constant(value))),
 			
 			Token::Percentage { unit_value, .. } => return PercentageUnit::parse_percentage(unit_value).map(|value| Left(Percentage(value))),
 			
@@ -440,7 +435,7 @@ impl Unit for CssUnsignedNumber
 		{
 			let value = match *input.next()?
 			{
-				Token::Number { value, .. } => CssUnsignedNumber::new(value).map_err(|cssNumberConversionError| ParseError::Custom(CouldNotParseCssSignedNumber(cssNumberConversionError, value))),
+				Token::Number { value, int_value, .. } => CssUnsignedNumber::parseNumber(value, int_value),
 				
 				ref unexpectedToken @ _ => CustomParseError::unexpectedToken(unexpectedToken),
 			};

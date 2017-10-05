@@ -3,201 +3,201 @@
 
 
 #[derive(Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
-pub enum LengthOrPercentageUnit<Number: CssNumber>
+pub enum NumberOrPercentageUnit<Number: CssNumber>
 {
-	IsLength(LengthUnit<Number>),
+	IsNumber(Number),
 	IsPercentage(PercentageUnit<Number>)
 }
 
-impl<Number: CssNumber> ToCss for LengthOrPercentageUnit<Number>
+impl<Number: CssNumber> ToCss for NumberOrPercentageUnit<Number>
 {
 	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
 	{
-		use self::LengthOrPercentageUnit::*;
+		use self::NumberOrPercentageUnit::*;
 		match *self
 		{
-			IsLength(ref length) => length.to_css(dest),
+			IsNumber(ref length) => length.to_css(dest),
 			IsPercentage(ref length) => length.to_css(dest),
 		}
 	}
 }
 
-impl<Number: CssNumber> Default for LengthOrPercentageUnit<Number>
+impl<Number: CssNumber> Default for NumberOrPercentageUnit<Number>
 {
 	#[inline(always)]
 	fn default() -> Self
 	{
-		LengthOrPercentageUnit::IsLength(LengthUnit::default())
+		NumberOrPercentageUnit::IsNumber(Number::default())
 	}
 }
 
-impl<Number: CssNumber> Add<Number> for LengthOrPercentageUnit<Number>
+impl<Number: CssNumber> Add<Number> for NumberOrPercentageUnit<Number>
 {
 	type Output = Self;
 	
 	#[inline(always)]
 	fn add(self, rhs: Number) -> Self::Output
 	{
-		use self::LengthOrPercentageUnit::*;
+		use self::NumberOrPercentageUnit::*;
 		match self
 		{
-			IsLength(length) => IsLength(length + rhs),
+			IsNumber(length) => IsNumber(length + rhs),
 			IsPercentage(length) => IsPercentage(length + rhs),
 		}
 	}
 }
 
-impl<Number: CssNumber> AddAssign<Number> for LengthOrPercentageUnit<Number>
+impl<Number: CssNumber> AddAssign<Number> for NumberOrPercentageUnit<Number>
 {
 	#[inline(always)]
 	fn add_assign(&mut self, rhs: Number)
 	{
-		use self::LengthOrPercentageUnit::*;
+		use self::NumberOrPercentageUnit::*;
 		match *self
 		{
-			IsLength(ref mut length) => *length = *length + rhs,
+			IsNumber(ref mut length) => *length = *length + rhs,
 			IsPercentage(ref mut length) => *length = *length + rhs,
 		}
 	}
 }
 
-impl<Number: CssNumber> Sub<Number> for LengthOrPercentageUnit<Number>
+impl<Number: CssNumber> Sub<Number> for NumberOrPercentageUnit<Number>
 {
 	type Output = Self;
 	
 	#[inline(always)]
 	fn sub(self, rhs: Number) -> Self::Output
 	{
-		use self::LengthOrPercentageUnit::*;
+		use self::NumberOrPercentageUnit::*;
 		match self
 		{
-			IsLength(length) => IsLength(length - rhs),
+			IsNumber(length) => IsNumber(length - rhs),
 			IsPercentage(length) => IsPercentage(length - rhs),
 		}
 	}
 }
 
-impl<Number: CssNumber> SubAssign<Number> for LengthOrPercentageUnit<Number>
+impl<Number: CssNumber> SubAssign<Number> for NumberOrPercentageUnit<Number>
 {
 	#[inline(always)]
 	fn sub_assign(&mut self, rhs: Number)
 	{
-		use self::LengthOrPercentageUnit::*;
+		use self::NumberOrPercentageUnit::*;
 		match *self
 		{
-			IsLength(ref mut length) => *length = *length - rhs,
+			IsNumber(ref mut length) => *length = *length - rhs,
 			IsPercentage(ref mut length) => *length = *length - rhs,
 		}
 	}
 }
 
-impl<Number: CssNumber> Mul<Number> for LengthOrPercentageUnit<Number>
+impl<Number: CssNumber> Mul<Number> for NumberOrPercentageUnit<Number>
 {
 	type Output = Self;
 	
 	#[inline(always)]
 	fn mul(self, rhs: Number) -> Self::Output
 	{
-		use self::LengthOrPercentageUnit::*;
+		use self::NumberOrPercentageUnit::*;
 		match self
 		{
-			IsLength(length) => IsLength(length * rhs),
+			IsNumber(length) => IsNumber(length * rhs),
 			IsPercentage(length) => IsPercentage(length * rhs),
 		}
 	}
 }
 
-impl<Number: CssNumber> MulAssign<Number> for LengthOrPercentageUnit<Number>
+impl<Number: CssNumber> MulAssign<Number> for NumberOrPercentageUnit<Number>
 {
 	#[inline(always)]
 	fn mul_assign(&mut self, rhs: Number)
 	{
-		use self::LengthOrPercentageUnit::*;
+		use self::NumberOrPercentageUnit::*;
 		match *self
 		{
-			IsLength(ref mut length) => *length = *length * rhs,
+			IsNumber(ref mut length) => *length = *length * rhs,
 			IsPercentage(ref mut length) => *length = *length * rhs,
 		}
 	}
 }
 
-impl<Number: CssNumber> Div<Number> for LengthOrPercentageUnit<Number>
+impl<Number: CssNumber> Div<Number> for NumberOrPercentageUnit<Number>
 {
 	type Output = Self;
 	
 	#[inline(always)]
 	fn div(self, rhs: Number) -> Self::Output
 	{
-		use self::LengthOrPercentageUnit::*;
+		use self::NumberOrPercentageUnit::*;
 		match self
 		{
-			IsLength(length) => IsLength(length / rhs),
+			IsNumber(length) => IsNumber(length / rhs),
 			IsPercentage(length) => IsPercentage(length / rhs),
 		}
 	}
 }
 
-impl<Number: CssNumber> DivAssign<Number> for LengthOrPercentageUnit<Number>
+impl<Number: CssNumber> DivAssign<Number> for NumberOrPercentageUnit<Number>
 {
 	#[inline(always)]
 	fn div_assign(&mut self, rhs: Number)
 	{
-		use self::LengthOrPercentageUnit::*;
+		use self::NumberOrPercentageUnit::*;
 		match *self
 		{
-			IsLength(ref mut length) => *length = *length / rhs,
+			IsNumber(ref mut length) => *length = *length / rhs,
 			IsPercentage(ref mut length) => *length = *length / rhs,
 		}
 	}
 }
 
-impl<Number: CssNumber> Rem<Number> for LengthOrPercentageUnit<Number>
+impl<Number: CssNumber> Rem<Number> for NumberOrPercentageUnit<Number>
 {
 	type Output = Self;
 	
 	#[inline(always)]
 	fn rem(self, rhs: Number) -> Self::Output
 	{
-		use self::LengthOrPercentageUnit::*;
+		use self::NumberOrPercentageUnit::*;
 		match self
 		{
-			IsLength(length) => IsLength(length % rhs),
+			IsNumber(length) => IsNumber(length % rhs),
 			IsPercentage(length) => IsPercentage(length % rhs),
 		}
 	}
 }
 
-impl<Number: CssNumber> RemAssign<Number> for LengthOrPercentageUnit<Number>
+impl<Number: CssNumber> RemAssign<Number> for NumberOrPercentageUnit<Number>
 {
 	#[inline(always)]
 	fn rem_assign(&mut self, rhs: Number)
 	{
-		use self::LengthOrPercentageUnit::*;
+		use self::NumberOrPercentageUnit::*;
 		match *self
 		{
-			IsLength(ref mut length) => *length = *length % rhs,
+			IsNumber(ref mut length) => *length = *length % rhs,
 			IsPercentage(ref mut length) => *length = *length % rhs,
 		}
 	}
 }
 
-impl<Number: CssNumber> Neg for LengthOrPercentageUnit<Number>
+impl<Number: CssNumber> Neg for NumberOrPercentageUnit<Number>
 {
 	type Output = Self;
 	
 	#[inline(always)]
 	fn neg(self) -> Self::Output
 	{
-		use self::LengthOrPercentageUnit::*;
+		use self::NumberOrPercentageUnit::*;
 		match self
 		{
-			IsLength(length) => IsLength(-length),
+			IsNumber(length) => IsNumber(-length),
 			IsPercentage(length) => IsPercentage(-length),
 		}
 	}
 }
 
-impl<Number: CssNumber> CssNumberNewType <Number>for LengthOrPercentageUnit<Number>
+impl<Number: CssNumber> CssNumberNewType <Number>for NumberOrPercentageUnit<Number>
 {
 	#[inline(always)]
 	fn to_f32(&self) -> f32
@@ -208,16 +208,16 @@ impl<Number: CssNumber> CssNumberNewType <Number>for LengthOrPercentageUnit<Numb
 	#[inline(always)]
 	fn as_CssNumber(&self) -> &Number
 	{
-		use self::LengthOrPercentageUnit::*;
+		use self::NumberOrPercentageUnit::*;
 		match *self
 		{
-			IsLength(ref length) => length.as_CssNumber(),
+			IsNumber(ref length) => length.as_CssNumber(),
 			IsPercentage(ref length) => length.as_CssNumber(),
 		}
 	}
 }
 
-impl<NumberX: CssNumber> Unit for LengthOrPercentageUnit<NumberX>
+impl<NumberX: CssNumber> Unit for NumberOrPercentageUnit<NumberX>
 {
 	type Number = NumberX;
 	
@@ -226,14 +226,12 @@ impl<NumberX: CssNumber> Unit for LengthOrPercentageUnit<NumberX>
 	#[inline(always)]
 	fn parse_one_outside_calc_function<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<CalculablePropertyValue<Self>, ParseError<'i, CustomParseError<'i>>>
 	{
-		use self::LengthOrPercentageUnit::*;
+		use self::NumberOrPercentageUnit::*;
 		use self::CalculablePropertyValue::*;
 		
 		let functionParser = match *input.next()?
 		{
-			Token::Number { value, .. } => return LengthUnit::parseUnitLessNumber(value, context.parsing_mode_allows_unitless_lengths()).map(|value| Constant(IsLength(value))),
-			
-			Token::Dimension { value, ref unit, .. } => return LengthUnit::parseDimension(value, unit, context.isNotInPageRule()).map(|value| Constant(IsLength(value))),
+			Token::Number { value, int_value, .. } => return Self::Number::parseNumber(value, int_value).map(|value| Constant(IsNumber(value))),
 			
 			Token::Percentage { unit_value, .. } => return PercentageUnit::parse_percentage(unit_value).map(|value| Constant(IsPercentage(value))),
 			
@@ -247,14 +245,12 @@ impl<NumberX: CssNumber> Unit for LengthOrPercentageUnit<NumberX>
 	#[inline(always)]
 	fn parse_one_inside_calc_function<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Either<CalculablePropertyValue<Self>, CalcExpression<Self>>, ParseError<'i, CustomParseError<'i>>>
 	{
-		use self::LengthOrPercentageUnit::*;
+		use self::NumberOrPercentageUnit::*;
 		use self::CalculablePropertyValue::*;
 		
 		let functionParser = match *input.next()?
 		{
-			Token::Number { value, .. } => return Self::number_inside_calc_function(value),
-			
-			Token::Dimension { value, ref unit, .. } => return LengthUnit::parseDimension(value, unit, context.isNotInPageRule()).map(|value| Left(Constant(IsLength(value)))),
+			Token::Number { value, int_value, .. } => return Self::Number::parseNumber(value, int_value).map(|value| Left(Constant(IsNumber(value)))),
 			
 			Token::Percentage { unit_value, .. } => return PercentageUnit::parse_percentage(unit_value).map(|value| Left(Constant(IsPercentage(value)))),
 			
@@ -270,11 +266,11 @@ impl<NumberX: CssNumber> Unit for LengthOrPercentageUnit<NumberX>
 	#[inline(always)]
 	fn to_canonical_dimension_value<Conversion: FontRelativeLengthConversion<Self::Number> + ViewportPercentageLengthConversion<Self::Number> + PercentageConversion<Self::Number>>(&self, conversion: &Conversion) -> Self::Number
 	{
-		use self::LengthOrPercentageUnit::*;
+		use self::NumberOrPercentageUnit::*;
 		
 		match *self
 		{
-			IsLength(ref length) => length.to_canonical_dimension_value(conversion),
+			IsNumber(ref length) => length.to_canonical_dimension_value(conversion),
 			IsPercentage(ref percentage) => percentage.to_canonical_dimension_value(conversion),
 		}
 	}
@@ -282,17 +278,15 @@ impl<NumberX: CssNumber> Unit for LengthOrPercentageUnit<NumberX>
 	#[inline(always)]
 	fn from_raw_css_for_var_expression_evaluation(value: &str, is_not_in_page_rule: bool) -> Option<Self>
 	{
-		use self::LengthOrPercentageUnit::*;
+		use self::NumberOrPercentageUnit::*;
 		
-		fn from_raw_css_for_var_expression_evaluation_internal<'i: 't, 't, Number: CssNumber>(is_not_in_page_rule: bool, input: &mut Parser<'i, 't>) -> Result<LengthOrPercentageUnit<Number>, ParseError<'i, CustomParseError<'i>>>
+		fn from_raw_css_for_var_expression_evaluation_internal<'i: 't, 't, Number: CssNumber>(is_not_in_page_rule: bool, input: &mut Parser<'i, 't>) -> Result<NumberOrPercentageUnit<Number>, ParseError<'i, CustomParseError<'i>>>
 		{
 			let value = match *input.next()?
 			{
-				Token::Number { value, .. } => LengthUnit::parseUnitLessNumber(value, false).map(IsLength),
+				Token::Number { value, int_value, .. } => Number::parseNumber(value, int_value).map(IsNumber),
 				
 				Token::Percentage { unit_value, .. } => PercentageUnit::parse_percentage(unit_value).map(|value| IsPercentage(value)),
-				
-				Token::Dimension { value, ref unit, .. } => LengthUnit::parseDimension(value, unit, is_not_in_page_rule).map(IsLength),
 				
 				ref unexpectedToken @ _ => CustomParseError::unexpectedToken(unexpectedToken),
 			};
@@ -313,25 +307,18 @@ impl<NumberX: CssNumber> Unit for LengthOrPercentageUnit<NumberX>
 	}
 }
 
-impl<Number: CssNumber> LengthOrPercentageUnit<Number>
+impl<Number: CssNumber> NumberOrPercentageUnit<Number>
 {
-	/// Get an absolute length using a conversion
+	/// Get an absolute number using a conversion
 	#[inline(always)]
-	pub fn to_px<Conversion: FontRelativeLengthConversion<Number> + ViewportPercentageLengthConversion<Number> + PercentageConversion<Number>>(&self, conversion: &Conversion) -> Number
+	pub fn to_number<Conversion: PercentageConversion<Number>>(&self, conversion: &Conversion) -> Number
 	{
-		use self::LengthOrPercentageUnit::*;
+		use self::NumberOrPercentageUnit::*;
 		
 		match *self
 		{
-			IsLength(ref length) => length.to_px(conversion),
-			IsPercentage(ref percentage) => percentage.to_absolute_value(conversion),
+			IsNumber(number) => number,
+			IsPercentage(percentage) => percentage.to_absolute_value(conversion),
 		}
-	}
-	
-	/// Convert this into AppUnits.
-	#[inline]
-	pub fn to_app_units<Conversion: FontRelativeLengthConversion<Number> + ViewportPercentageLengthConversion<Number> + PercentageConversion<Number>>(&self, conversion: &Conversion) -> Number
-	{
-		self.to_px(conversion) * Number::AppUnitsPerPX
 	}
 }
