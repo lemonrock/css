@@ -17,7 +17,6 @@ use self::CustomParseError::*;
 use ::either::Either;
 use ::std::fmt;
 use ::std::error::Error;
-use ::std::hash::Hasher;
 use ::std::num::ParseFloatError;
 use ::std::ops::Add;
 use ::std::ops::AddAssign;

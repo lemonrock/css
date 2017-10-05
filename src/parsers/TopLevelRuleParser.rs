@@ -159,11 +159,13 @@ impl TopLevelRuleParser
 	#[inline(always)]
 	fn parseNamespaceAtRule<'i, 't>(&self, input: &mut Parser<'i, 't>, source_location: SourceLocation) -> Result<NamespaceAtRule, ParseError<'i, CustomParseError<'i>>>
 	{
-		let prefix = input.try(|i|
+		let prefix: Result<_, ParseError<CustomParseError>> = input.try(|i|
 		{
-			let ident = i.expect_ident()?;
+			let ident: &CowRcStr = i.expect_ident()?;
 			Ok(NamespacePrefix(Atom::from(ident)))
-		}).ok();
+		});
+		
+		let prefix = prefix.ok();
 		
 		let url = match input.expect_url_or_string()
 		{

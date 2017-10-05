@@ -79,7 +79,8 @@ impl VarExpression
 				}
 				else
 				{
-					input.parse_entirely(|input| Ok(Some(input.slice_from(startPosition).to_owned())))
+					let result: Result<_, ParseError<CustomParseError>> = input.parse_entirely(|input| Ok(Some(input.slice_from(startPosition).to_owned())));
+					result
 				}
 			});
 			

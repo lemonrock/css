@@ -33,8 +33,6 @@ use ::std::convert::From;
 use ::std::fmt;
 use ::std::fmt::Display;
 use ::std::fmt::Formatter;
-use ::std::fmt::LowerExp;
-use ::std::fmt::UpperExp;
 use ::std::hash::Hash;
 use ::std::hash::Hasher;
 use ::std::ops::Deref;

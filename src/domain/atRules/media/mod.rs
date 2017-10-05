@@ -3,7 +3,6 @@
 
 
 use super::*;
-use ::std::cmp::PartialOrd;
 
 
 include!("ColorBitDepth.rs");

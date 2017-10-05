@@ -117,7 +117,8 @@ impl AttrExpression
 					input.skip_whitespace();
 					
 					let startPosition = input.position();
-					input.parse_entirely(|input| Ok(input.slice_from(startPosition).to_owned()))
+					let result: Result<_, ParseError<CustomParseError>> = input.parse_entirely(|input| Ok(input.slice_from(startPosition).to_owned()));
+					result
 				});
 				
 				let default_value_css = if let Ok(default_value_css) = result

@@ -9,7 +9,6 @@ use super::domain::Atom;
 use super::domain::VendorPrefix;
 use super::parsers::separators::Comma;
 use super::parsers::separators::Separated;
-use super::parsers::separators::Separator;
 use ::cssparser::BasicParseError;
 use ::cssparser::Parser;
 use ::cssparser::ParseError;
@@ -27,7 +26,6 @@ use ::selectors::parser::SelectorMethods;
 use ::selectors::visitor::SelectorVisitor;
 use ::smallvec::SmallVec;
 use ::std::fmt;
-use ::std::fmt::Write;
 use ::std::rc::Rc;
 
 

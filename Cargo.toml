@@ -30,7 +30,6 @@ codegen-units = 1
 bitflags = "^1.0"
 cssparser = "0.21.2"
 either = "1.2.0"
-num-traits = "0.1.40"
 ordermap = "0.2.13"
 phf = "0.7.21"
 phf_macros = "0.7.21"
