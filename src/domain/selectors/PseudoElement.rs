@@ -13,8 +13,11 @@ pub enum PseudoElement
 	cue,
 	first_letter,
 	first_line,
-	placeholder,
-	selection,
+	marker,
+	grammar_error,
+	placeholder(Option<VendorPrefix>),
+	selection(Option<VendorPrefix>),
+	spelling_error,
 	
 	// Not standardized and quite variable
 	progress_bar(Option<VendorPrefix>),
@@ -22,6 +25,7 @@ pub enum PseudoElement
 	range_thumb(Option<VendorPrefix>),
 	range_track(Option<VendorPrefix>),
 	
+	// Servo only
 	details_summary(Option<VendorPrefix>),
 	details_content(Option<VendorPrefix>),
 	text(Option<VendorPrefix>),
@@ -64,57 +68,60 @@ impl ToCss for PseudoElement
 		{
 			after => write(dest, "::after"),
 			
+			backdrop(ref vendorPrefix) => write_with_vendor_prefix(dest, vendorPrefix, "backdrop"),
+			
 			before => write(dest, "::before"),
+			
+			cue => write(dest, "::cue"),
 			
 			first_letter => write(dest, "::first-letter"),
 			
 			first_line => write(dest, "::first-line"),
 			
-			placeholder => write(dest, "::placeholder"),
+			grammar_error => write(dest, "::grammar-error"),
 			
-			selection => write(dest, "::selection"),
+			marker => write(dest, "::marker"),
 			
-			progress_bar(ref vendorPrefix) =>
+			placeholder(ref vendorPrefix) => match *vendorPrefix
 			{
-				match *vendorPrefix
-				{
-					Some(moz) => write(dest, "::-moz-progress-bar"),
-					Some(webkit) => write(dest, "::-webkit-progress-bar"),
-					Some(ms) => write(dest, "::-ms-fill"),
-					_ => write_with_vendor_prefix(dest, vendorPrefix, "progress-bar"), // almost certainly wrong
-				}
-			}
-			
-			range_progress(ref vendorPrefix) =>
-			{
-				match *vendorPrefix
-				{
-					Some(moz) => write(dest, "::-moz-range-progress"),
-					Some(ms) => write(dest, "::-ms-fill-upper"),
-					_ => write_with_vendor_prefix(dest, vendorPrefix, "range-progress"), // almost certainly wrong
-				}
+				Some(webkit) => write(dest, "::-webkit-input-placeholder"),
+				Some(ms) => write(dest, "::-ms-input-placeholder"),
+				_ => write_with_vendor_prefix(dest, vendorPrefix, "placeholder"),
 			},
 			
-			range_thumb(ref vendorPrefix) =>
+			selection(ref vendorPrefix) => write_with_vendor_prefix(dest, vendorPrefix, "selection"),
+			
+			spelling_error => write(dest, "::spelling-error"),
+			
+			progress_bar(ref vendorPrefix) => match *vendorPrefix
 			{
-				match *vendorPrefix
-				{
-					Some(moz) => write(dest, "::-moz-range-thumb"),
-					Some(webkit) => write(dest, "::-webkit-slider-thumb"),
-					Some(ms) => write(dest, "::-ms-thumb"),
-					_ => write_with_vendor_prefix(dest, vendorPrefix, "range-thumb"), // almost certainly wrong
-				}
+				Some(moz) => write(dest, "::-moz-progress-bar"),
+				Some(webkit) => write(dest, "::-webkit-progress-bar"),
+				Some(ms) => write(dest, "::-ms-fill"),
+				_ => write_with_vendor_prefix(dest, vendorPrefix, "progress-bar"), // almost certainly wrong
 			},
 			
-			range_track(ref vendorPrefix) =>
+			range_progress(ref vendorPrefix) => match *vendorPrefix
 			{
-				match *vendorPrefix
-				{
-					Some(moz) => write(dest, "::-moz-range-track"),
-					Some(webkit) => write(dest, "::-webkit-slider-runnable-track"),
-					Some(ms) => write(dest, "::-ms-track"),
-					_ => write_with_vendor_prefix(dest, vendorPrefix, "range-track"), // almost certainly wrong
-				}
+				Some(moz) => write(dest, "::-moz-range-progress"),
+				Some(ms) => write(dest, "::-ms-fill-upper"),
+				_ => write_with_vendor_prefix(dest, vendorPrefix, "range-progress"), // almost certainly wrong
+			},
+			
+			range_thumb(ref vendorPrefix) => match *vendorPrefix
+			{
+				Some(moz) => write(dest, "::-moz-range-thumb"),
+				Some(webkit) => write(dest, "::-webkit-slider-thumb"),
+				Some(ms) => write(dest, "::-ms-thumb"),
+				_ => write_with_vendor_prefix(dest, vendorPrefix, "range-thumb"), // almost certainly wrong
+			},
+			
+			range_track(ref vendorPrefix) => match *vendorPrefix
+			{
+				Some(moz) => write(dest, "::-moz-range-track"),
+				Some(webkit) => write(dest, "::-webkit-slider-runnable-track"),
+				Some(ms) => write(dest, "::-ms-track"),
+				_ => write_with_vendor_prefix(dest, vendorPrefix, "range-track"), // almost certainly wrong
 			},
 			
 			details_summary(ref vendorPrefix) => write_with_vendor_prefix(dest, vendorPrefix, "details-summary"),
@@ -178,7 +185,7 @@ impl PseudoElement
 			range_track(..) => true,
 			range_progress(..) => true,
 			range_thumb(..) => true,
-			placeholder => true,
+			placeholder(..) => true,
 			_ => false,
 		}
 	}
@@ -209,9 +216,21 @@ impl PseudoElement
 			
 			"first-line" => Ok(first_line),
 			
-			"placeholder" => Ok(placeholder),
+			"grammar-error" => Ok(grammar_error),
 			
-			"selection" => Ok(selection),
+			"marker" => Ok(marker),
+			
+			"placeholder" => Ok(placeholder(None)),
+			
+			"-ms-placeholder" => Ok(placeholder(Some(ms))),
+			
+			"-webkit-input-placeholder" => Ok(placeholder(Some(ms))),
+			
+			"selection" => Ok(selection(None)),
+			
+			"-moz-selection" => Ok(selection(Some(moz))),
+			
+			"spelling-error" => Ok(spelling_error),
 			
 			// Doesn't really exist
 			"progress-bar" => Ok(progress_bar(None)),
@@ -241,7 +260,7 @@ impl PseudoElement
 			// Doesn't really exist
 			"range-track" => Ok(range_track(None)),
 			
-			"-moz-range-thumb" => Ok(range_track(Some(moz))),
+			"-moz-range-track" => Ok(range_track(Some(moz))),
 			
 			"-webkit-slider-runnable-track" => Ok(range_track(Some(webkit))),
 			

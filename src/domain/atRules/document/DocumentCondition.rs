@@ -35,8 +35,8 @@ impl DocumentCondition
 	}
 	
 	/// Evaluate a document condition.
-	pub fn evaluate<D: Device>(&self, device: &D) -> bool
+	pub fn evaluate<D: Document>(&self, document: &D) -> bool
 	{
-		self.0.iter().any(|ref url_matching_function| url_matching_function.evaluate(device)	)
+		self.0.iter().any(|ref url_matching_function| url_matching_function.evaluate(document)	)
 	}
 }

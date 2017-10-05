@@ -29,9 +29,10 @@ impl Error for CssNumberConversionError
 		
 		match *self
 		{
-			InfinityIsNotAllowed => "infinity is not a valid CSS float",
-			NotANumberIsNotAllowed => "not a number (NaN) is not a valid CSS float",
-			NegativeNumberMayNotBeAllowed => "negative numbers are not valid for CssUnsignedFloat",
+			InfinityIsNotAllowed => "infinity is not a valid CSS number",
+			NotANumberIsNotAllowed => "not a number (NaN) is not a valid CSS number",
+			NegativeNumberMayNotBeAllowed => "negative numbers are not valid for a CSS number",
+			FloatingPointNumberMayNotBeAllowed => "floating point numbers are not valid for a CSS integer",
 		}
 	}
 	

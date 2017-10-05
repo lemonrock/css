@@ -107,9 +107,9 @@ impl TypeOrUnit
 			
 			frequency => Ok(valueFromAttribute.to_owned()),
 			
-			hz => Ok(format!("{}hz", valueFromAttribute)),
+			Hz => Ok(format!("{}hz", valueFromAttribute)),
 			
-			khz => Ok(format!("{}khz", valueFromAttribute)),
+			kHz => Ok(format!("{}khz", valueFromAttribute)),
 			
 			percentage => Ok(format!("{}%", valueFromAttribute)),
 		}

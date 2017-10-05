@@ -15,7 +15,7 @@ pub struct MediaQuery
 	pub media_type: MediaQueryType,
 	
 	/// The set of expressions that this media query contains.
-	pub expressions: Vec<Expression>,
+	pub expressions: Vec<MediaExpression>,
 }
 
 impl Separated for MediaQuery
@@ -122,7 +122,7 @@ impl MediaQuery
 					}
 					
 					// Without a media type, require at least one expression.
-					expressions.push(Expression::parse(context, input)?);
+					expressions.push(MediaExpression::parse(context, input)?);
 					
 					Ok(MediaQueryType::All)
 				}
@@ -144,7 +144,7 @@ impl MediaQuery
 					}
 				);
 			}
-			expressions.push(Expression::parse(context, input)?)
+			expressions.push(MediaExpression::parse(context, input)?)
 		}
 	}
 }

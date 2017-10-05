@@ -2,10 +2,9 @@
 // Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
 
 
-use super::*;
-
-
-include!("Document.rs");
-include!("DocumentAtRule.rs");
-include!("DocumentCondition.rs");
-include!("UrlMatchingFunction.rs");
+/// A trait that is used when evaluating CSS rules that are decided using document attributes
+pub trait Document
+{
+	/// Used when evaluating @document rules
+	fn documentMatchesUrl(&self, urlMatchingFunction: &UrlMatchingFunction) -> bool;
+}

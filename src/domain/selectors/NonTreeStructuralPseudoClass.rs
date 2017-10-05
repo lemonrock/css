@@ -206,6 +206,7 @@ impl NonTreeStructuralPseudoClass
 			active => true,
 			focus => true,
 			hover => true,
+			_ => false,
 		}
 	}
 	

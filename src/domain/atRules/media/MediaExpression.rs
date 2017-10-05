@@ -4,13 +4,13 @@
 
 /// A single expression as per http://dev.w3.org/csswg/mediaqueries-3/#media1
 #[derive(Clone, Debug, PartialEq)]
-pub struct Expression(pub ExpressionKind);
+pub struct MediaExpression(pub MediaExpressionKind);
 
-impl ToCss for Expression
+impl ToCss for MediaExpression
 {
 	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
 	{
-		use self::ExpressionKind::*;
+		use self::MediaExpressionKind::*;
 		use self::Range::*;
 		
 		#[inline(always)]
@@ -94,11 +94,11 @@ impl ToCss for Expression
 	}
 }
 
-impl Expression
+impl MediaExpression
 {
 	pub(crate) fn parse<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
 	{
-		use self::ExpressionKind::*;
+		use self::MediaExpressionKind::*;
 		use self::Range::*;
 		
 		input.expect_parenthesis_block()?;
@@ -109,7 +109,7 @@ impl Expression
 			
 			Ok
 			(
-				Expression
+				MediaExpression
 				(
 					match_ignore_ascii_case!
 					{
@@ -199,13 +199,13 @@ impl Expression
 	/// Evaluate this expression and return whether it matches the current device.
 	pub fn matches<D: Device>(&self, device: &D) -> bool
 	{
-		use self::ExpressionKind::*;
+		use self::MediaExpressionKind::*;
 		
 		match self.0
 		{
-			Width(ref range) => device.viewportWidthInAppUnitsMatches(range),
+			Width(ref range) => device.viewportWidthMatches(range),
 			
-			Height(ref range) => device.viewportHeightInAppUnitsMatches(range),
+			Height(ref range) => device.viewportHeightMatches(range),
 			
 			AspectRatio(ref range) => device.viewportAspectRatioMatches(range),
 			
@@ -216,6 +216,8 @@ impl Expression
 			Scan(ref scan) => device.scanMatches(scan),
 			
 			Grid(ref grid) => device.gridMatches(grid),
+			
+			Update(ref update) => device.updateMatches(update),
 			
 			OverflowBlock(ref overflowBlock) => device.overflowBlockMatches(overflowBlock),
 			

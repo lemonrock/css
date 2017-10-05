@@ -38,8 +38,8 @@ impl ToCss for DocumentAtRule
 impl DocumentAtRule
 {
 	/// Evaluate a document condition.
-	pub fn evaluate<D: Device>(&self, device: &D) -> bool
+	pub fn evaluate<D: Document>(&self, document: &D) -> bool
 	{
-		self.condition.evaluate(device)
+		self.condition.evaluate(document)
 	}
 }

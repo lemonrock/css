@@ -116,8 +116,8 @@ impl UrlMatchingFunction
 	}
 	
 	/// Evaluate a document condition.
-	pub fn evaluate<D: Device>(&self, device: &D) -> bool
+	pub fn evaluate<D: Document>(&self, document: &D) -> bool
 	{
-		device.documentMatchesUrl(self)
+		document.documentMatchesUrl(self)
 	}
 }

@@ -3,7 +3,7 @@
 
 
 #[derive(Clone, Debug, PartialEq)]
-pub enum ExpressionKind
+pub enum MediaExpressionKind
 {
 	/// https://www.w3.org/TR/mediaqueries-4/#width
 	Width(Range<CalculablePropertyValue<LengthUnit<CssSignedNumber>>>),

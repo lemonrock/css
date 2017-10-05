@@ -99,7 +99,6 @@ impl MediaList
 		)
 	}
 	
-	
 	/// Evaluate a whole `MediaList` against `Device`.
 	pub fn evaluate<D: Device>(&self, device: &D) -> bool
 	{
@@ -107,7 +106,13 @@ impl MediaList
 		// https://drafts.csswg.org/mediaqueries-4/#mq-list
 		self.is_empty() || self.media_queries.iter().any(|mediaQuery|
 		{
-			let media_match = mediaQuery.media_type.matches(device.media_type());
+			use self::MediaQueryType::*;
+			
+			let media_match = match mediaQuery.media_type
+			{
+				All => true,
+				Concrete(mediaType) => device.mediaTypeMatches(mediaType)
+			};
 			
 			// Check if all conditions match (AND condition)
 			let query_match =	media_match && mediaQuery.expressions.iter().all(|expression| expression.matches(device));

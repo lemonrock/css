@@ -88,6 +88,10 @@ impl<'i> AtRuleParser<'i> for TopLevelRuleParser
 			Import(..) => { self.state = Imports },
 			
 			Namespace(..) => { self.state = Namespaces },
+			
+			_ =>
+			{
+			}
 		}
 		
 		prelude

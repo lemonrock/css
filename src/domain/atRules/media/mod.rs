@@ -6,11 +6,12 @@ use super::*;
 
 
 include!("ColorBitDepth.rs");
-include!("ExpressionKind.rs");
-include!("Expression.rs");
+include!("Device.rs");
 include!("MediaAtRule.rs");
 include!("MediaColorGamut.rs");
 include!("MediaColorIndex.rs");
+include!("MediaExpression.rs");
+include!("MediaExpressionKind.rs");
 include!("MediaGrid.rs");
 include!("MediaHover.rs");
 include!("MediaList.rs");

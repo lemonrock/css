@@ -13,7 +13,6 @@ impl OurSelectorExt for OurSelector
 	#[inline(always)]
 	fn is_false_if_any_selector_is_simple_and_only_uses_the_descendant_combinator(&self) -> bool
 	{
-		use self::Component::*;
 		use self::Combinator::*;
 		
 		for component in self.iter_raw_match_order()
@@ -21,13 +20,13 @@ impl OurSelectorExt for OurSelector
 			match *component
 			{
 				// Combinators are not allowed except for descendant
-				Combinator(ref combinator) => if combinator != &Descendant
+				Component::Combinator(ref combinator) => if combinator != &Descendant
 				{
 					return true;
-				}
+				},
 				
 				// Only simple selectors are allowed (http://www.w3.org/TR/css3-selectors/#simple-selectors)
-				PseudoElement => return true,
+				Component::PseudoElement(..) => return true,
 				
 				_ =>
 				{
