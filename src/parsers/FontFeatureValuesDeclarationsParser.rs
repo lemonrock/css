@@ -67,7 +67,7 @@ impl<'a, 'b: 'a, T: 'a + Parse + ToCss> FontFeatureValuesDeclarationsParser<'a, 
 	/// Updates with new value if same `ident` exists, otherwise pushes to the vector.
 	fn update_or_push(&mut self, newDeclaration: FontFeatureValuesDeclaration<T>)
 	{
-		let declarations = self.declarations;
+		let declarations = &mut self.declarations;
 		
 		let position = declarations.iter().position(|ref thisDeclaration| thisDeclaration.name == newDeclaration.name);
 		

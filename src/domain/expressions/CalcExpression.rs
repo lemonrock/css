@@ -184,7 +184,7 @@ impl<U: Unit> CalcExpression<U>
 							currentSum = Subtraction(Box::new(currentSum), Box::new(Self::parse_product(context, input)?));
 						}
 						
-						unexpectedToken => return Err(BasicParseError::UnexpectedToken(unexpectedToken).into()),
+						ref unexpectedToken => return Err(BasicParseError::UnexpectedToken(unexpectedToken.clone()).into()),
 					}
 				}
 				

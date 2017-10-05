@@ -58,7 +58,7 @@ impl<U: Unit> Expression<U> for CalculablePropertyValue<U>
 		
 		match *self
 		{
-			Constant(constant) => Some(constant.to_CssNumber()),
+			Constant(ref constant) => Some(constant.to_CssNumber()),
 			
 			Percentage(ref percentage) => Some(percentage.to_absolute_value(conversion)),
 			

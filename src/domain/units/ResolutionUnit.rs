@@ -285,7 +285,7 @@ impl<NumberX: CssNumber> Unit for ResolutionUnit<NumberX>
 				}
 			},
 			
-			unexpectedToken @ _ => Err(BasicParseError::UnexpectedToken(unexpectedToken.clone()).into()),
+			ref unexpectedToken @ _ => Err(BasicParseError::UnexpectedToken(unexpectedToken.clone()).into()),
 		}
 	}
 	
@@ -345,7 +345,7 @@ impl<NumberX: CssNumber> Unit for ResolutionUnit<NumberX>
 				}
 			},
 			
-			unexpectedToken @ _ => Err(BasicParseError::UnexpectedToken(unexpectedToken.clone()).into()),
+			ref unexpectedToken @ _ => Err(BasicParseError::UnexpectedToken(unexpectedToken.clone()).into()),
 		}
 	}
 	
@@ -374,7 +374,7 @@ impl<NumberX: CssNumber> Unit for ResolutionUnit<NumberX>
 	#[inline(always)]
 	fn from_raw_css_for_var_expression_evaluation(value: &str, _is_not_in_page_rule: bool) -> Option<Self>
 	{
-		fn from_raw_css_for_var_expression_evaluation_internal<'i: 't, 't, Number: CssNumber>(input: &Parser<'i, 't>) -> Result<ResolutionUnit<Number>, ParseError<'i, CustomParseError<'i>>>
+		fn from_raw_css_for_var_expression_evaluation_internal<'i: 't, 't, Number: CssNumber>(input: &mut Parser<'i, 't>) -> Result<ResolutionUnit<Number>, ParseError<'i, CustomParseError<'i>>>
 		{
 			let value = match *input.next()?
 			{
@@ -408,7 +408,7 @@ impl<NumberX: CssNumber> Unit for ResolutionUnit<NumberX>
 					}
 				}
 				
-				unexpectedToken @ _ => Err(BasicParseError::UnexpectedToken(unexpectedToken.clone()).into()),
+				ref unexpectedToken @ _ => Err(BasicParseError::UnexpectedToken(unexpectedToken.clone()).into()),
 			};
 			
 			input.skip_whitespace();
@@ -423,6 +423,6 @@ impl<NumberX: CssNumber> Unit for ResolutionUnit<NumberX>
 		let mut parserInput = ParserInput::new_with_line_number_offset(value, LineNumberingIsZeroBased);
 		let mut input = Parser::new(&mut parserInput);
 		
-		from_raw_css_for_var_expression_evaluation_internal(&input).ok()
+		from_raw_css_for_var_expression_evaluation_internal(&mut input).ok()
 	}
 }

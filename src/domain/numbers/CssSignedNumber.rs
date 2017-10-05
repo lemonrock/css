@@ -405,7 +405,7 @@ impl Unit for CssSignedNumber
 				}
 			}
 			
-			unexpectedToken @ _ => Err(BasicParseError::UnexpectedToken(unexpectedToken.clone()).into()),
+			ref unexpectedToken @ _ => Err(BasicParseError::UnexpectedToken(unexpectedToken.clone()).into()),
 		}
 	}
 	
@@ -466,7 +466,7 @@ impl Unit for CssSignedNumber
 			{
 				Token::Number { value, .. } => CssSignedNumber::new(value).map_err(|cssNumberConversionError| ParseError::Custom(CouldNotParseCssSignedNumber(cssNumberConversionError, value))),
 				
-				unexpectedToken @ _ => Err(BasicParseError::UnexpectedToken(unexpectedToken.clone()).into()),
+				ref unexpectedToken @ _ => Err(BasicParseError::UnexpectedToken(unexpectedToken.clone()).into()),
 			};
 			
 			input.skip_whitespace();
