@@ -254,7 +254,7 @@ impl<U: Unit> CalcExpression<U>
 	}
 	
 	#[inline(always)]
-	pub(crate) fn parse_parentheses<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Either<U, CalcExpression<U>>, ParseError<'i, CustomParseError<'i>>>
+	pub(crate) fn parse_parentheses<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Either<CalculablePropertyValue<U>, CalcExpression<U>>, ParseError<'i, CustomParseError<'i>>>
 	{
 		Ok(Right(CalcExpression::Parentheses(Box::new(CalcExpression::parse(context, input)?))))
 	}
