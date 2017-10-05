@@ -58,13 +58,17 @@ impl VarExpression
 	{
 		input.parse_nested_block(|input|
 		{
-			let identifier = input.expect_ident()?;
-			if !identifier.starts_with("--")
+			let custom_property_lower_case_name_without_double_dash =
 			{
-				return Err(ParseError::Custom(CustomParseError::CssVariablesInVarExpressionsMustStartWithTwoDashes(identifier.clone())))
-			}
-			let mut custom_property_lower_case_name_without_double_dash = (&identifier[2 .. ]).to_owned();
-			custom_property_lower_case_name_without_double_dash.make_ascii_lowercase();
+				let identifier = input.expect_ident()?;
+				if !identifier.starts_with("--")
+				{
+					return Err(ParseError::Custom(CustomParseError::CssVariablesInVarExpressionsMustStartWithTwoDashes(identifier.clone())))
+				}
+				let mut custom_property_lower_case_name_without_double_dash = (&identifier[2..]).to_owned();
+				custom_property_lower_case_name_without_double_dash.make_ascii_lowercase();
+				custom_property_lower_case_name_without_double_dash
+			};
 			
 			let startPosition = input.position();
 			
