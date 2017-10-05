@@ -45,6 +45,8 @@ This crate will break compatibility regularly and often as it matures. It also p
 
 The license for this project is Mozilla Public License 2.0 (MPL-2.0). The code forked from Servo is also licensed under Mozilla Public License 2.0. The Servo Developers, part of the Mozilla Foundation, retain copyright on the unaltered style source code, and also its implementation approach, forked from Servo.
 
+There is a temporary fork of the selectors crate (and its dependency servo_arc), also from Servo, in src/selectors/temporary_fork (from "https://github.com/servo/servo", rev = "4f984a6428a0f497e311a0800efa55166c15aac6"). This will be removed once a newer version of the selectors crate (such as 0.19.0) is published to [crates.io](https://crates.io/).
+
 
 ## CSS Simplifications for Size
 

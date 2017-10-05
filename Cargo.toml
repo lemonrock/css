@@ -33,9 +33,21 @@ ordermap = "0.2.13"
 phf = "0.7.21"
 phf_macros = "0.7.21"
 precomputed-hash = "^0.1"
-selectors = "0.19.0"
 smallvec = "0.4"
 
-[patch.crates-io]
+# Suspended as not yet published on crates.io
+# selectors = "0.19.0"
+
+# For servo_arc temporary crate fork
+nodrop = {version = "0.1.8"}
+stable_deref_trait = "1.0.0"
+# For selectors temporary crate fork
+matches = "0.1"
+log = "0.3"
+fnv = "1.0"
+
+[build-dependencies]
+phf_codegen = "0.7.18"
+
+#[patch.crates-io]
 #selectors = { git = "https://github.com/servo/servo", rev = "4f984a6428a0f497e311a0800efa55166c15aac6" }
-selectors = { path = "patches/servo/components/selectors" }
