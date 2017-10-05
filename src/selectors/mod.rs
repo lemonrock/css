@@ -3,8 +3,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 
-
-
 pub use self::nth_index_cache::NthIndexCache;
 pub use self::parser::{SelectorImpl, Parser, SelectorList};
 pub use self::tree::{Element, OpaqueElement};
