@@ -28,7 +28,6 @@ use ::std::rc::Rc;
 pub(crate) mod separators;
 
 
-include!("AllowedNumericType.rs");
 include!("AtRuleBlockPrelude.rs");
 include!("CounterStyleAtRuleParser.rs");
 include!("FontFaceAtRuleParser.rs");

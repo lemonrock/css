@@ -49,7 +49,7 @@ impl Stylesheet
 			context: ParserContext
 			{
 				rule_type: None,
-				parsing_mode: ParsingMode::PARSING_MODE_DEFAULT,
+				parsing_mode: ParsingMode::Default,
 			},
 			state: State::Start,
 			namespaces: Namespaces::empty(),

@@ -71,7 +71,7 @@ impl<'a, 'i> DeclarationParser<'i> for ViewportAtRuleParser<'a>
             
             "height" => ok!(shorthand -> [MinHeight, MaxHeight]),
             
-            "zoom" => ok!(shorthand -> [MinZoom, MaxZoom]),
+            "zoom" => ok!(Zoom(|i| Zoom::parse(self.context, i))),
             
             "min-zoom" => ok!(MinZoom(|i| Zoom::parse(self.context, i))),
             
