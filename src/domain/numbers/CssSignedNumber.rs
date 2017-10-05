@@ -460,7 +460,7 @@ impl Unit for CssSignedNumber
 	#[inline(always)]
 	fn from_raw_css_for_var_expression_evaluation(value: &str, _is_not_in_page_rule: bool) -> Option<Self>
 	{
-		fn from_raw_css_for_var_expression_evaluation_internal<'i: 't, 't>(input: &Parser<'i, 't>) -> Result<CssSignedNumber, ParseError<'i, CustomParseError<'i>>>
+		fn from_raw_css_for_var_expression_evaluation_internal<'i: 't, 't>(input: &mut Parser<'i, 't>) -> Result<CssSignedNumber, ParseError<'i, CustomParseError<'i>>>
 		{
 			let value = match *input.next()?
 			{
@@ -481,6 +481,6 @@ impl Unit for CssSignedNumber
 		let mut parserInput = ParserInput::new_with_line_number_offset(value, LineNumberingIsZeroBased);
 		let mut input = Parser::new(&mut parserInput);
 		
-		from_raw_css_for_var_expression_evaluation_internal(&input).ok()
+		from_raw_css_for_var_expression_evaluation_internal(&mut input).ok()
 	}
 }

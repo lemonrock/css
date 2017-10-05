@@ -32,7 +32,7 @@ impl<'i> AtRuleParser<'i> for TopLevelRuleParser
 		
 		match_ignore_ascii_case!
 		{
-			&*name,
+			&name,
 			
 			"charset" =>
 			{
@@ -72,7 +72,7 @@ impl<'i> AtRuleParser<'i> for TopLevelRuleParser
 				self.state = State::Body;
 				
 				let mut nested = self.nested();
-				<NestedRuleParser as AtRuleParser>::parse_prelude(&mut nested, name, input)
+				<NestedRuleParser as AtRuleParser>::parse_prelude(&mut nested, name.clone(), input)
 			}
 		}
 	}
@@ -161,7 +161,7 @@ impl TopLevelRuleParser
 	}
 	
 	#[inline(always)]
-	fn parseNamespaceAtRule<'i, 't>(&self, input: &mut Parser<'i, 't>, source_location: SourceLocation) -> Result<NamespaceAtRule, ParseError<'i, CustomParseError<'i>>>
+	fn parseNamespaceAtRule<'i, 't>(&mut self, input: &mut Parser<'i, 't>, source_location: SourceLocation) -> Result<NamespaceAtRule, ParseError<'i, CustomParseError<'i>>>
 	{
 		let prefix: Result<_, ParseError<CustomParseError>> = input.try(|i|
 		{

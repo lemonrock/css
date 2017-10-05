@@ -81,7 +81,7 @@ impl<'a, 'i> DeclarationParser<'i> for ViewportAtRuleParser<'a>
             
             "orientation" => ok!(Orientation(ViewportOrientation::parse)),
             
-            _ => Err(ParseError::Custom(CustomParseError::UnexpectedViewportProperty(name))),
+            _ => Err(ParseError::Custom(CustomParseError::UnexpectedViewportProperty(name.clone()))),
         }
 	}
 }

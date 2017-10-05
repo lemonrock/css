@@ -32,7 +32,7 @@ impl<'a, 'i> DeclarationParser<'i> for FontFaceAtRuleParser<'a>
 		
 		match_ignore_ascii_case!
 		{
-			&*name,
+			&name,
 			
 			"font-family" => self.rule.family = Some(input.parse_entirely(|i| Parse::parse(self.context, i))?),
 			
@@ -52,7 +52,7 @@ impl<'a, 'i> DeclarationParser<'i> for FontFaceAtRuleParser<'a>
 			
 			"font-language-override" => self.rule.language_override = Some(input.parse_entirely(|i| FontLanguageOverride::parse(i))?),
 			
-			_ => return Err(ParseError::Custom(CustomParseError::UnsupportedFontFaceProperty(name)))
+			_ => return Err(ParseError::Custom(CustomParseError::UnsupportedFontFaceProperty(name.clone())))
 		}
 		
 		Ok(())

@@ -290,7 +290,7 @@ impl PseudoElement
 			
 			"-servo-inline-absolute" => Ok(inline_absolute(Some(servo))),
 			
-			_ => Err(ParseError::Custom(SelectorParseError::UnsupportedPseudoClassOrElement(name))),
+			_ => Err(ParseError::Custom(SelectorParseError::UnsupportedPseudoClassOrElement(name.clone()))),
 		}
 	}
 	

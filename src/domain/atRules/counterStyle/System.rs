@@ -38,7 +38,7 @@ impl Parse for System
 	{
 		use self::System::*;
 		
-		let identifier = input.expect_ident()?;
+		let identifier = input.expect_ident_cloned()?;
 		
 		match_ignore_ascii_case!
 		{
@@ -62,7 +62,7 @@ impl Parse for System
             
             "extends" =>  Ok(Extends(CounterStyleIdent::parse(input)?)),
             
-            _ => Err(ParseError::Custom(CustomParseError::CounterStyleSystemIsNotKnown(identifier.clone()))),
+            _ => Err(ParseError::Custom(CustomParseError::CounterStyleSystemIsNotKnown(identifier))),
         }
 	}
 }

@@ -292,7 +292,7 @@ impl NonTreeStructuralPseudoClass
 			
 			"visited" => Ok(visited),
 			
-			_ => Err(ParseError::Custom(SelectorParseError::UnsupportedPseudoClassOrElement(name))),
+			_ => Err(ParseError::Custom(SelectorParseError::UnsupportedPseudoClassOrElement(name.clone()))),
 		}
 	}
 	
@@ -320,7 +320,7 @@ impl NonTreeStructuralPseudoClass
 			
 			"lang" => Ok(lang(Self::parse_lang(input)?)),
 			
-			_ => Err(ParseError::Custom(SelectorParseError::UnsupportedPseudoClassOrElement(name))),
+			_ => Err(ParseError::Custom(SelectorParseError::UnsupportedPseudoClassOrElement(name.clone()))),
 		}
 	}
 	

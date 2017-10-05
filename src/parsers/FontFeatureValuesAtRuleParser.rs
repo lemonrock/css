@@ -65,12 +65,12 @@ impl<'a, 'i> AtRuleParser<'i> for FontFeatureValuesAtRuleParser<'a>
 		
 		match prelude
 		{
-			swash => self.parseBlock(input, &mut self.rule.swash),
-			stylistic => self.parseBlock(input, &mut self.rule.stylistic),
-			ornaments => self.parseBlock(input, &mut self.rule.ornaments),
-			annotation => self.parseBlock(input, &mut self.rule.annotation),
-			character_variant => self.parseBlock(input, &mut self.rule.character_variant),
-			styleset => self.parseBlock(input, &mut self.rule.styleset),
+			swash => Self::parseBlock(self.context, input, &mut self.rule.swash),
+			stylistic => Self::parseBlock(self.context, input, &mut self.rule.stylistic),
+			ornaments => Self::parseBlock(self.context, input, &mut self.rule.ornaments),
+			annotation => Self::parseBlock(self.context, input, &mut self.rule.annotation),
+			character_variant => Self::parseBlock(self.context, input, &mut self.rule.character_variant),
+			styleset => Self::parseBlock(self.context, input, &mut self.rule.styleset),
 		}
 	}
 }
@@ -78,8 +78,8 @@ impl<'a, 'i> AtRuleParser<'i> for FontFeatureValuesAtRuleParser<'a>
 impl<'a> FontFeatureValuesAtRuleParser<'a>
 {
 	#[inline(always)]
-	fn parseBlock<'i, 't, T: 'a + ToCss + Parse>(&self, input: &mut Parser<'i, 't>, declarations: &'a mut Vec<FontFeatureValuesDeclaration<T>>) -> Result<(), ParseError<'i, CustomParseError<'i>>>
+	fn parseBlock<'i, 't, T: 'a + ToCss + Parse>(context: &ParserContext, input: &mut Parser<'i, 't>, declarations: &'a mut Vec<FontFeatureValuesDeclaration<T>>) -> Result<(), ParseError<'i, CustomParseError<'i>>>
 	{
-		FontFeatureValuesDeclarationsParser::parseBlock(input, self.context, declarations)
+		FontFeatureValuesDeclarationsParser::parseBlock(input, context, declarations)
 	}
 }

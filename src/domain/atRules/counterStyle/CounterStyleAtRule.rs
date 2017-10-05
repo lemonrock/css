@@ -241,7 +241,8 @@ impl CounterStyleAtRule
 				context,
 				rule: &mut rule,
 			};
-			while let Some(declaration) = DeclarationListParser::new(input, parser).next()
+			let mut iterator = DeclarationListParser::new(input, parser);
+			while let Some(declaration) = iterator.next()
 			{
 				if declaration.is_err()
 				{
@@ -255,12 +256,12 @@ impl CounterStyleAtRule
 		{
 			ref system @ Cyclic | ref system @ Fixed { .. } | ref system @ Symbolic | ref system @ Alphabetic | ref system @ Numeric if rule.symbols.is_none() =>
 			{
-				Err(ParseError::Custom(CustomParseError::InvalidCounterStyleWithoutSymbols(*system)))
+				Err(ParseError::Custom(CustomParseError::InvalidCounterStyleWithoutSymbols(system.clone())))
 			}
 			
 			ref system @ Alphabetic | ref system @ Numeric if rule.symbols().unwrap().0.len() < 2 =>
 			{
-				Err(ParseError::Custom(CustomParseError::InvalidCounterStyleNotEnoughSymbols(*system)))
+				Err(ParseError::Custom(CustomParseError::InvalidCounterStyleNotEnoughSymbols(system.clone())))
 			}
 			
 			Additive if rule.additive_symbols.is_none() =>

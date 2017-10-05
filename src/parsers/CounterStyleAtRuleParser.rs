@@ -31,7 +31,7 @@ impl<'a, 'i> DeclarationParser<'i> for CounterStyleAtRuleParser<'a>
 	{
 		match_ignore_ascii_case!
 		{
-			&*name,
+			&name,
 			
 			"system" => self.rule.system = Some(input.parse_entirely(|input| Parse::parse(self.context, input))?),
 			
@@ -53,7 +53,7 @@ impl<'a, 'i> DeclarationParser<'i> for CounterStyleAtRuleParser<'a>
 			
 			"speak-as" => self.rule.speak_as = Some(input.parse_entirely(|input| Parse::parse(self.context, input))?),
 			
-			_ => return Err(ParseError::Custom(CustomParseError::UnsupportedCounterStyleProperty(name)))
+			_ => return Err(ParseError::Custom(CustomParseError::UnsupportedCounterStyleProperty(name.clone())))
 		}
 		
 		Ok(())

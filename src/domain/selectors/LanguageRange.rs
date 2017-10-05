@@ -22,7 +22,7 @@ impl ToCss for LanguageRange
 		}
 		else
 		{
-			let characters = value.chars();
+			let mut characters = value.chars();
 			
 			match characters.next().unwrap()
 			{

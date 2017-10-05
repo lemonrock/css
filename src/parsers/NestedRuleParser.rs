@@ -29,7 +29,7 @@ impl<'a, 'i> AtRuleParser<'i> for NestedRuleParser<'a>
 		
 		match_ignore_ascii_case!
 		{
-			&*name,
+			&name,
 			
 			"counter-style" => Ok(WithBlock(CounterStyle(CounterStyleIdent::parseForCounterStyleAtRule(input)?))),
 			
@@ -55,7 +55,7 @@ impl<'a, 'i> AtRuleParser<'i> for NestedRuleParser<'a>
 			
 			"viewport" => Ok(WithBlock(Viewport)),
 			
-			_ => Err(ParseError::Custom(CustomParseError::UnsupportedAtRule(name)))
+			_ => Err(ParseError::Custom(CustomParseError::UnsupportedAtRule(name.clone())))
 		}
 	}
 	

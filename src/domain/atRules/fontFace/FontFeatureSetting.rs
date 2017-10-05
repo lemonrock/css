@@ -9,22 +9,26 @@ impl FontFeatureSetting
 {
 	fn parse<'i, 't>(input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
 	{
-		let openTypeFeatureTag = input.expect_string()?;
-		if openTypeFeatureTag.len() != 4
+		let openTypeFeatureTag =
 		{
-			return Err(ParseError::Custom(CustomParseError::FontFeatureSettingOpenTypeFeatureTagMustBeFourCharacters(openTypeFeatureTag.clone())))
-		}
-		
-		for character in openTypeFeatureTag.chars()
-		{
-			if character <= '\x20' || character > '\x7E'
+			let openTypeFeatureTag = input.expect_string()?;
+			if openTypeFeatureTag.len() != 4
 			{
-				return Err(ParseError::Custom(CustomParseError::FontFeatureSettingOpenTypeFeatureTagMustBePrintableAscii(openTypeFeatureTag.clone())))
+				return Err(ParseError::Custom(CustomParseError::FontFeatureSettingOpenTypeFeatureTagMustBeFourCharacters(openTypeFeatureTag.clone())))
 			}
-		}
+			
+			for character in openTypeFeatureTag.chars()
+			{
+				if character <= '\x20' || character > '\x7E'
+				{
+					return Err(ParseError::Custom(CustomParseError::FontFeatureSettingOpenTypeFeatureTagMustBePrintableAscii(openTypeFeatureTag.clone())))
+				}
+			}
+			
+			openTypeFeatureTag.as_ref().into()
+		};
 		
-		let integer = input.try(|input| input.expect_integer());
-		if let Ok(integer) = integer
+		if let Ok(integer) = input.try(|input| input.expect_integer())
 		{
 			if integer < 0
 			{
@@ -32,7 +36,7 @@ impl FontFeatureSetting
 			}
 			else
 			{
-				Ok(FontFeatureSetting(openTypeFeatureTag.as_ref().into(), integer as u32))
+				Ok(FontFeatureSetting(openTypeFeatureTag, integer as u32))
 			}
 		}
 		else
@@ -43,9 +47,9 @@ impl FontFeatureSetting
 			{
 				&ident,
 				
-				"on" => Ok(FontFeatureSetting(openTypeFeatureTag.as_ref().into(), 1)),
+				"on" => Ok(FontFeatureSetting(openTypeFeatureTag, 1)),
 				
-				"off" => Ok(FontFeatureSetting(openTypeFeatureTag.as_ref().into(), 0)),
+				"off" => Ok(FontFeatureSetting(openTypeFeatureTag, 0)),
 				
 				_ => Err(ParseError::Custom(CustomParseError::FontFeatureSettingIfNotAnIntegerMustBeOnOrOff(ident.clone())))
 			}
