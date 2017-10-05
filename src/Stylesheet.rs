@@ -13,7 +13,7 @@ pub struct Stylesheet
 impl Stylesheet
 {
 	// An solution is to use the HTTP header SourceMap: <url>
-	pub fn to_css<W: fmt::Write>(&self, dest: &mut W, include_source_urls: bool) -> fmt::Result
+	pub fn to_css<W: fmt::Write>(&self, destination: &mut W, include_source_urls: bool) -> fmt::Result
 	{
 		if include_source_urls
 		{
@@ -21,16 +21,16 @@ impl Stylesheet
 			
 			if let Some(ref source_map_url) = self.source_map_url
 			{
-				write!(dest, "//# sourceMappingURL=<{}>\n", source_map_url)?;
+				write!(destination, "//# sourceMappingURL=<{}>\n", source_map_url)?;
 			}
 			
 			if let Some(ref source_url) = self.source_url
 			{
-				write!(dest, "//# sourceURL=<{}>\n", source_url)?;
+				write!(destination, "//# sourceURL=<{}>\n", source_url)?;
 			}
 		}
 		
-		self.rules.to_css(dest)?;
+		self.rules.to_css(destination)?;
 		
 		Ok(())
 	}
