@@ -100,8 +100,12 @@ impl<'i> AtRuleParser<'i> for TopLevelRuleParser
 	#[inline]
 	fn parse_block<'t>(&mut self, prelude: Self::PreludeBlock, input: &mut Parser<'i, 't>) -> Result<Self::AtRule, ParseError<'i, Self::Error>>
 	{
-		let mut nested = self.nested();
-		match <NestedRuleParser as AtRuleParser>::parse_block(&mut nested, prelude, input)
+		let result =
+		{
+			let mut nested = self.nested();
+			<NestedRuleParser as AtRuleParser>::parse_block(&mut nested, prelude, input)
+		};
+		match result
 		{
 			Ok(rule) =>
 			{
@@ -131,8 +135,12 @@ impl<'i> QualifiedRuleParser<'i> for TopLevelRuleParser
 	#[inline]
 	fn parse_block<'t>(&mut self, prelude: Self::Prelude, input: &mut Parser<'i, 't>) -> Result<Self::QualifiedRule, ParseError<'i, Self::Error>>
 	{
-		let mut nested = self.nested();
-		match <NestedRuleParser as QualifiedRuleParser>::parse_block(&mut nested, prelude, input)
+		let result =
+		{
+			let mut nested = self.nested();
+			<NestedRuleParser as QualifiedRuleParser>::parse_block(&mut nested, prelude, input)
+		};
+		match result
 		{
 			Ok(rule) =>
 			{
