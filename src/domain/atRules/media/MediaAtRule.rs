@@ -18,6 +18,21 @@ pub struct MediaAtRule
 	pub source_location: SourceLocation,
 }
 
+impl HasCssRules for MediaAtRule
+{
+	#[inline(always)]
+	fn css_rules(&self) -> &[CssRule]
+	{
+		&self.rules.0[..]
+	}
+	
+	#[inline(always)]
+	fn css_rules_mut(&mut self) -> &mut Vec<CssRule>
+	{
+		&mut self.rules.0
+	}
+}
+
 impl ToCss for MediaAtRule
 {
 	// https://drafts.csswg.org/cssom/#serialize-a-css-rule CSSMediaRule

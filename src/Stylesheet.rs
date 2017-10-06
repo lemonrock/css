@@ -10,6 +10,21 @@ pub struct Stylesheet
 	pub source_url: Option<String>,
 }
 
+impl HasCssRules for Stylesheet
+{
+	#[inline(always)]
+	fn css_rules(&self) -> &[CssRule]
+	{
+		&self.rules.0[..]
+	}
+	
+	#[inline(always)]
+	fn css_rules_mut(&mut self) -> &mut Vec<CssRule>
+	{
+		&mut self.rules.0
+	}
+}
+
 impl Stylesheet
 {
 	// An solution is to use the HTTP header SourceMap: <url>

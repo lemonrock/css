@@ -18,6 +18,21 @@ pub struct SupportsAtRule
 	pub source_location: SourceLocation,
 }
 
+impl HasCssRules for SupportsAtRule
+{
+	#[inline(always)]
+	fn css_rules(&self) -> &[CssRule]
+	{
+		&self.rules.0[..]
+	}
+	
+	#[inline(always)]
+	fn css_rules_mut(&mut self) -> &mut Vec<CssRule>
+	{
+		&mut self.rules.0
+	}
+}
+
 impl ToCss for SupportsAtRule
 {
 	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result

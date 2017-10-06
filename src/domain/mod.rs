@@ -55,6 +55,7 @@ include!("CssRule.rs");
 include!("CssRules.rs");
 include!("CssRuleType.rs");
 include!("CustomIdent.rs");
+include!("HasCssRules.rs");
 include!("RulesMutateError.rs");
 include!("SpecifiedUrl.rs");
 include!("StyleRule.rs");
