@@ -8,10 +8,10 @@ use super::domain::units::Unit;
 use super::parsers::ViewportAtRuleParser;
 
 
-include!("UserZoom.rs");
+include!("ViewportUserZoom.rs");
 include!("ViewportAtRule.rs");
 include!("ViewportDescriptor.rs");
 include!("ViewportDescriptorDeclaration.rs");
 include!("ViewportLength.rs");
 include!("ViewportOrientation.rs");
-include!("Zoom.rs");
+include!("ViewportZoom.rs");

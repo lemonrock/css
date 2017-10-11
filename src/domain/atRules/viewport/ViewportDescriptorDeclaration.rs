@@ -26,12 +26,17 @@ impl ToCss for ViewportDescriptorDeclaration
 impl ViewportDescriptorDeclaration
 {
 	#[inline(always)]
-	pub(crate) fn new(descriptor: ViewportDescriptor, important: bool) -> Self
+	pub(crate) fn parse_important<'i, 't>(descriptor: ViewportDescriptor, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
 	{
-		Self
-		{
-			descriptor,
-			important
-		}
+		let important = input.try(parse_important).is_ok();
+		
+		Ok
+		(
+			Self
+			{
+				descriptor,
+				important
+			}
+		)
 	}
 }

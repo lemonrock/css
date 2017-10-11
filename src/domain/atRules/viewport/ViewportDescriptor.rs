@@ -20,13 +20,13 @@ pub enum ViewportDescriptor
 	/// Height with no maximum is similar to MinHeight; with both values, it is equivalent to MinHeight and MaxHeight
 	Height { minimum: ViewportLength, maximum: Option<ViewportLength> },
 	
-	Zoom(Zoom),
+	Zoom(ViewportZoom),
 	
-	MinZoom(Zoom),
+	MinZoom(ViewportZoom),
 	
-	MaxZoom(Zoom),
+	MaxZoom(ViewportZoom),
 	
-	UserZoom(UserZoom),
+	UserZoom(ViewportUserZoom),
 	
 	Orientation(ViewportOrientation),
 }

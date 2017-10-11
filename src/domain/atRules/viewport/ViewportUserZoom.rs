@@ -4,7 +4,7 @@
 
 define_css_keyword_enum!
 (
-	UserZoom:
+	ViewportUserZoom:
 	"zoom" => Zoom,
 	"fixed" => Fixed
 );

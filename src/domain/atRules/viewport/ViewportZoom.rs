@@ -4,7 +4,7 @@
 
 /// https://drafts.csswg.org/css-device-adapt/#descdef-viewport-zoom
 #[derive(Debug, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
-pub enum Zoom
+pub enum ViewportZoom
 {
 	/// The `auto` keyword.
 	auto,
@@ -13,11 +13,11 @@ pub enum Zoom
 	value(CalculablePropertyValue<NumberOrPercentageUnit<CssUnsignedNumber>>),
 }
 
-impl ToCss for Zoom
+impl ToCss for ViewportZoom
 {
     fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
     {
-		use self::Zoom::*;
+		use self::ViewportZoom::*;
 		
         match *self
 		{
@@ -28,14 +28,14 @@ impl ToCss for Zoom
     }
 }
 
-impl Zoom
+impl ViewportZoom
 {
     /// Parse a zoom value per:
     ///
     /// https://drafts.csswg.org/css-device-adapt/#descdef-viewport-zoom
     pub(crate) fn parse<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
 	{
-		use self::Zoom::*;
+		use self::ViewportZoom::*;
 		
 		if input.try(|input| input.expect_ident_matching("auto")).is_ok()
 		{

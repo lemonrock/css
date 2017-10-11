@@ -26,61 +26,51 @@ impl<'a, 'i> DeclarationParser<'i> for ViewportAtRuleParser<'a>
 	
 	fn parse_value<'t>(&mut self, name: CowRcStr<'i>, input: &mut Parser<'i, 't>) -> Result<Self::Declaration, ParseError<'i, CustomParseError<'i>>>
 	{
-		macro_rules! declaration
-		{
-            ($declaration:ident($parse:expr)) =>
-            {
-                declaration!($declaration(value: try!($parse(input)), important: input.try(parse_important).is_ok()))
-            };
-            ($declaration:ident(value: $value:expr, important: $important:expr)) =>
-            {
-                ViewportDescriptorDeclaration::new(ViewportDescriptor::$declaration($value), $important)
-            }
-        }
+		use self::ViewportDescriptor::*;
 		
-		macro_rules! ok
+		#[inline(alway)]
+		fn parse_property<'i, 't, Parse: FnOnce(&mut Parser<'i, 't>) -> Result<Intermediate, ParseError<'i, CustomParseError<'i>>>, Intermediate, Constructor: FnOnce(Intermediate) -> ViewportDescriptor>(input: &mut Parser<'i, 't>, constructor: Constructor, parse: Parse) -> Result<ViewportDescriptorDeclaration, ParseError<'i, CustomParseError<'i>>>
 		{
-            ($declaration:ident($parse:expr)) =>
-            {
-                Ok(declaration!($declaration($parse)))
-            }
-        }
+			ViewportDescriptorDeclaration::parse_important(constructor((parse(input))?), input)
+		}
+		
+		#[inline(alway)]
+		fn parse_shorthand_property<'a, 'i, 't, Constructor: FnOnce(ViewportLength, Option<ViewportLength>) -> ViewportDescriptor>(input: &mut Parser<'i, 't>, this: &ViewportAtRuleParser<'a>, constructor: Constructor) -> Result<ViewportDescriptorDeclaration, ParseError<'i, CustomParseError<'i>>>
+		{
+			let minimum = this.parseViewportLength(input)?;
+			let maximum = match input.try(|input| this.parseViewportLength(input))
+			{
+				Err(_) => None,
+				Ok(maximum) => Some(maximum),
+			};
+			ViewportDescriptorDeclaration::parse_important(constructor(minimum, maximum), input)
+		}
 		
 		match_ignore_ascii_case!
 		{
 			&*name,
 		
-            "min-width" => ok!(MinWidth(|i| ViewportLength::parse(self.context, i))),
+            "min-width" => parse_property(input, MinWidth, |input| self.parseViewportLength(input)),
             
-            "max-width" => ok!(MaxWidth(|i| ViewportLength::parse(self.context, i))),
+            "max-width" => parse_property(input, MaxWidth, |input| self.parseViewportLength(input)),
             
-            "width" =>
-			{
-				let (minimum, maximum) = Self::parse_shorthand_viewport_length(self.context, input)?;
-				let important = input.try(parse_important).is_ok();
-				Ok(ViewportDescriptorDeclaration::new(ViewportDescriptor::Width { minimum, maximum }, important))
-			}
+            "width" => parse_shorthand_property(input, self, |minimum, maximum| Width { minimum, maximum }),
 			
-            "min-height" => ok!(MinHeight(|i| ViewportLength::parse(self.context, i))),
+            "min-height" => parse_property(input, MinHeight, |input| self.parseViewportLength(input)),
             
-            "max-height" => ok!(MaxHeight(|i| ViewportLength::parse(self.context, i))),
+            "max-height" => parse_property(input, MaxHeight, |input| self.parseViewportLength(input)),
             
-            "height" =>
-			{
-				let (minimum, maximum) = Self::parse_shorthand_viewport_length(self.context, input)?;
-				let important = input.try(parse_important).is_ok();
-				Ok(ViewportDescriptorDeclaration::new(ViewportDescriptor::Height { minimum, maximum }, important))
-			}
+            "height" => parse_shorthand_property(input, self, |minimum, maximum| Height { minimum, maximum }),
             
-            "zoom" => ok!(Zoom(|i| Zoom::parse(self.context, i))),
+            "zoom" => parse_property(input, Zoom, |input| self.parseZoom(input)),
             
-            "min-zoom" => ok!(MinZoom(|i| Zoom::parse(self.context, i))),
+            "min-zoom" => parse_property(input, MinZoom, |input| self.parseZoom(input)),
             
-            "max-zoom" => ok!(MaxZoom(|i| Zoom::parse(self.context, i))),
+            "max-zoom" => parse_property(input, MaxZoom, |input| self.parseZoom(input)),
             
-            "user-zoom" => ok!(UserZoom(UserZoom::parse)),
+            "user-zoom" => parse_property(input, UserZoom, ViewportUserZoom::parse),
             
-            "orientation" => ok!(Orientation(ViewportOrientation::parse)),
+            "orientation" => parse_property(input, Orientation, ViewportOrientation::parse),
             
             _ => Err(ParseError::Custom(CustomParseError::UnexpectedViewportProperty(name.clone()))),
         }
@@ -89,13 +79,15 @@ impl<'a, 'i> DeclarationParser<'i> for ViewportAtRuleParser<'a>
 
 impl<'a> ViewportAtRuleParser<'a>
 {
-	fn parse_shorthand_viewport_length<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<(ViewportLength, Option<ViewportLength>), ParseError<'i, CustomParseError<'i>>>
+	#[inline(always)]
+	fn parseViewportLength<'i, 't>(&self, input: &mut Parser<'i, 't>) -> Result<ViewportLength, ParseError<'i, CustomParseError<'i>>>
 	{
-		let minimum = ViewportLength::parse(context, input)?;
-		match input.try(|i| ViewportLength::parse(context, i))
-		{
-			Err(_) => Ok((minimum, None)),
-			Ok(maximum) => Ok((minimum, Some(maximum)))
-		}
+		ViewportLength::parse(self.context, input)
+	}
+	
+	#[inline(always)]
+	fn parseZoom<'i, 't>(&self, input: &mut Parser<'i, 't>) -> Result<ViewportZoom, ParseError<'i, CustomParseError<'i>>>
+	{
+		ViewportZoom::parse(self.context, input)
 	}
 }
