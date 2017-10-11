@@ -6,6 +6,8 @@
 #[derive(Clone, Debug, PartialEq)]
 pub struct ViewportAtRule
 {
+	pub vendor_prefix: Option<VendorPrefix>,
+	
 	/// The declarations contained in this @viewport rule.
 	pub declarations: Vec<ViewportDescriptorDeclaration>
 }
@@ -13,7 +15,7 @@ pub struct ViewportAtRule
 impl ViewportAtRule
 {
 	/// Parse a single @viewport rule.
-	pub(crate) fn parse_body<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
+	pub(crate) fn parse_body<'i, 't>(vendor_prefix: Option<VendorPrefix>, context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
 	{
 		let parser = ViewportAtRuleParser { context };
 		
@@ -23,18 +25,15 @@ impl ViewportAtRule
 		{
 			match result
 			{
-				Ok(viewportDescriptorDeclarations) =>
+				Ok(viewportDescriptorDeclaration) =>
 				{
-					for viewportDescriptorDeclaration in viewportDescriptorDeclarations
-					{
-						declarations.push(viewportDescriptorDeclaration);
-					}
+					declarations.push(viewportDescriptorDeclaration);
 				}
 				
 				Err(preciseParseError) => return Err(preciseParseError.error),
 			}
 		}
-		Ok(ViewportAtRule { declarations })
+		Ok(Self { vendor_prefix, declarations })
 	}
 }
 
@@ -42,14 +41,27 @@ impl ToCss for ViewportAtRule
 {
 	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
 	{
-		dest.write_str("@viewport { ")?;
+		dest.write_char('@')?;
+		if let Some(ref vendorPrefix) = self.vendor_prefix
+		{
+			vendorPrefix.to_css(dest)?;
+		}
+		dest.write_str("viewport{")?;
 		let mut iter = self.declarations.iter();
 		iter.next().unwrap().to_css(dest)?;
 		for declaration in iter
 		{
-			dest.write_str(" ")?;
 			declaration.to_css(dest)?;
 		}
-		dest.write_str(" }")
+		dest.write_char('}')
+	}
+}
+
+impl HasVendorPrefixAtRule for ViewportAtRule
+{
+	#[inline(always)]
+	fn isNotVendorPrefixed(&self) -> bool
+	{
+		self.vendor_prefix.is_none()
 	}
 }

@@ -13,14 +13,14 @@ impl<'a, 'i> AtRuleParser<'i> for ViewportAtRuleParser<'a>
 	
 	type PreludeBlock = ();
 	
-	type AtRule = Vec<ViewportDescriptorDeclaration>;
+	type AtRule = ViewportDescriptorDeclaration;
 	
 	type Error = CustomParseError<'i>;
 }
 
 impl<'a, 'i> DeclarationParser<'i> for ViewportAtRuleParser<'a>
 {
-	type Declaration = Vec<ViewportDescriptorDeclaration>;
+	type Declaration = ViewportDescriptorDeclaration;
 	
 	type Error = CustomParseError<'i>;
 	
@@ -42,34 +42,35 @@ impl<'a, 'i> DeclarationParser<'i> for ViewportAtRuleParser<'a>
 		{
             ($declaration:ident($parse:expr)) =>
             {
-                Ok(vec![declaration!($declaration($parse))])
-            };
-            (shorthand -> [$min:ident, $max:ident]) =>
-            {
-            	{
-                	let shorthand = Self::parse_shorthand(self.context, input)?;
-                	let important = input.try(parse_important).is_ok();
-					
-                	Ok(vec![declaration!($min(value: shorthand.0, important: important)), declaration!($max(value: shorthand.1, important: important))])
-            	}
+                Ok(declaration!($declaration($parse)))
             }
         }
 		
 		match_ignore_ascii_case!
 		{
 			&*name,
-			
+		
             "min-width" => ok!(MinWidth(|i| ViewportLength::parse(self.context, i))),
             
             "max-width" => ok!(MaxWidth(|i| ViewportLength::parse(self.context, i))),
             
-            "width" => ok!(shorthand -> [MinWidth, MaxWidth]),
-            
+            "width" =>
+			{
+				let (minimum, maximum) = Self::parse_shorthand_viewport_length(self.context, input)?;
+				let important = input.try(parse_important).is_ok();
+				Ok(ViewportDescriptorDeclaration::new(ViewportDescriptor::Width { minimum, maximum }, important))
+			}
+			
             "min-height" => ok!(MinHeight(|i| ViewportLength::parse(self.context, i))),
             
             "max-height" => ok!(MaxHeight(|i| ViewportLength::parse(self.context, i))),
             
-            "height" => ok!(shorthand -> [MinHeight, MaxHeight]),
+            "height" =>
+			{
+				let (minimum, maximum) = Self::parse_shorthand_viewport_length(self.context, input)?;
+				let important = input.try(parse_important).is_ok();
+				Ok(ViewportDescriptorDeclaration::new(ViewportDescriptor::Height { minimum, maximum }, important))
+			}
             
             "zoom" => ok!(Zoom(|i| Zoom::parse(self.context, i))),
             
@@ -86,15 +87,15 @@ impl<'a, 'i> DeclarationParser<'i> for ViewportAtRuleParser<'a>
 	}
 }
 
-impl<'a: 'a> ViewportAtRuleParser<'a>
+impl<'a> ViewportAtRuleParser<'a>
 {
-	fn parse_shorthand<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<(ViewportLength, ViewportLength), ParseError<'i, CustomParseError<'i>>>
+	fn parse_shorthand_viewport_length<'i, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<(ViewportLength, Option<ViewportLength>), ParseError<'i, CustomParseError<'i>>>
 	{
 		let minimum = ViewportLength::parse(context, input)?;
 		match input.try(|i| ViewportLength::parse(context, i))
 		{
-			Err(_) => Ok((minimum.clone(), minimum)),
-			Ok(maximum) => Ok((minimum, maximum))
+			Err(_) => Ok((minimum, None)),
+			Ok(maximum) => Ok((minimum, Some(maximum)))
 		}
 	}
 }

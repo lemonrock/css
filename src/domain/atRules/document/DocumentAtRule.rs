@@ -18,6 +18,21 @@ pub struct DocumentAtRule
 	pub source_location: SourceLocation,
 }
 
+impl HasCssRules for DocumentAtRule
+{
+	#[inline(always)]
+	fn css_rules(&self) -> &[CssRule]
+	{
+		&self.rules.0[..]
+	}
+	
+	#[inline(always)]
+	fn css_rules_mut(&mut self) -> &mut Vec<CssRule>
+	{
+		&mut self.rules.0
+	}
+}
+
 impl ToCss for DocumentAtRule
 {
 	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
@@ -32,6 +47,15 @@ impl ToCss for DocumentAtRule
 		dest.write_char('{')?;
 		self.rules.to_css(dest)?;
 		dest.write_char('}')
+	}
+}
+
+impl HasVendorPrefixAtRule for DocumentAtRule
+{
+	#[inline(always)]
+	fn isNotVendorPrefixed(&self) -> bool
+	{
+		self.vendor_prefix.is_none()
 	}
 }
 

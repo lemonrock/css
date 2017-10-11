@@ -40,6 +40,15 @@ impl ToCss for KeyframesAtRule
 	}
 }
 
+impl HasVendorPrefixAtRule for KeyframesAtRule
+{
+	#[inline(always)]
+	fn isNotVendorPrefixed(&self) -> bool
+	{
+		self.vendor_prefix.is_none()
+	}
+}
+
 impl KeyframesAtRule
 {
 	/// Returns the index of the last keyframe that matches the given selector.

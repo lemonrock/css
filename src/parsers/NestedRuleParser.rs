@@ -53,7 +53,11 @@ impl<'a, 'i> AtRuleParser<'i> for NestedRuleParser<'a>
 			
 			"supports" => Ok(WithBlock(Supports(SupportsCondition::parse(input)?, source_location))),
 			
-			"viewport" => Ok(WithBlock(Viewport)),
+			"viewport" => Ok(WithBlock(Viewport(None))),
+			
+			"-ms-viewport" => Ok(WithBlock(Viewport(Some(ms)))),
+			
+			"-o-viewport" => Ok(WithBlock(Viewport(Some(o)))),
 			
 			_ => Err(ParseError::Custom(CustomParseError::UnsupportedAtRule(name.clone())))
 		}
@@ -107,7 +111,7 @@ impl<'a, 'i> AtRuleParser<'i> for NestedRuleParser<'a>
 				source_location,
 			}),
 			
-			Viewport => CssRule::Viewport(ViewportAtRule::parse_body(&CssRuleType::Viewport.context(self), input)?),
+			Viewport(vendor_prefix) => CssRule::Viewport(ViewportAtRule::parse_body(vendor_prefix, &CssRuleType::Viewport.context(self), input)?),
 		};
 		
 		Ok(cssRule)

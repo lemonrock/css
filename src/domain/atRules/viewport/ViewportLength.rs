@@ -5,7 +5,7 @@
 /// ViewportLength is a length | percentage | auto
 /// See http://dev.w3.org/csswg/css-device-adapt/#min-max-width-desc
 /// extend-to-zoom is explicitly not supported as it does not occur in CSS, only when converting from HTML's meta name="viewport" tag (see http://dev.w3.org/csswg/css-device-adapt/#extend-to-zoom)
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Debug, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
 #[allow(missing_docs)]
 pub enum ViewportLength
 {

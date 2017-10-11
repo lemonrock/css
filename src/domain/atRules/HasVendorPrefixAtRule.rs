@@ -2,36 +2,8 @@
 // Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
 
 
-#[derive(Clone, Debug, PartialEq)]
-#[allow(missing_docs)]
-pub struct ViewportDescriptorDeclaration
-{
-	pub descriptor: ViewportDescriptor,
-	pub important: bool
-}
-
-impl ToCss for ViewportDescriptorDeclaration
-{
-	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
-	{
-		self.descriptor.to_css(dest)?;
-		if self.important
-		{
-			dest.write_str("!important")?;
-		}
-		dest.write_str(";")
-	}
-}
-
-impl ViewportDescriptorDeclaration
+pub trait HasVendorPrefixAtRule
 {
 	#[inline(always)]
-	pub(crate) fn new(descriptor: ViewportDescriptor, important: bool) -> Self
-	{
-		Self
-		{
-			descriptor,
-			important
-		}
-	}
+	fn isNotVendorPrefixed(&self) -> bool;
 }

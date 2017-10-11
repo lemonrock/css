@@ -15,7 +15,7 @@ impl ToCss for PropertyDeclaration
 	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
 	{
 		self.name.to_css(dest)?;
-		dest.write_str(":")?;
+		dest.write_char(':')?;
 		
 		self.value.to_css(dest)?;
 		

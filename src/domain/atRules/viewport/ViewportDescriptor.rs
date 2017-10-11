@@ -2,98 +2,164 @@
 // Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
 
 
-macro_rules! declare_viewport_descriptor
+#[derive(Clone, Debug, PartialEq)]
+#[allow(missing_docs)]
+pub enum ViewportDescriptor
 {
-    ( $( $variant_name: expr => $variant: ident($data: ident), )+ ) =>
-    {
-         declare_viewport_descriptor_inner!([] [ $( $variant_name => $variant($data), )+ ] 0);
-    };
+	MinWidth(ViewportLength),
+	
+	MaxWidth(ViewportLength),
+	
+	/// Width with no maximum is similar to MinWidth; with both values, it is equivalent to MinWidth and MaxWidth
+	Width { minimum: ViewportLength, maximum: Option<ViewportLength> },
+	
+	MinHeight(ViewportLength),
+	
+	MaxHeight(ViewportLength),
+	
+	/// Height with no maximum is similar to MinHeight; with both values, it is equivalent to MinHeight and MaxHeight
+	Height { minimum: ViewportLength, maximum: Option<ViewportLength> },
+	
+	Zoom(Zoom),
+	
+	MinZoom(Zoom),
+	
+	MaxZoom(Zoom),
+	
+	UserZoom(UserZoom),
+	
+	Orientation(ViewportOrientation),
 }
 
-macro_rules! declare_viewport_descriptor_inner
+impl ToCss for ViewportDescriptor
 {
-    (
-        [ $( $assigned_variant_name: expr =>
-             $assigned_variant: ident($assigned_data: ident) = $assigned_discriminant: expr, )* ]
-        [
-            $next_variant_name: expr => $next_variant: ident($next_data: ident),
-            $( $variant_name: expr => $variant: ident($data: ident), )*
-        ]
-        $next_discriminant: expr
-    ) => {
-        declare_viewport_descriptor_inner!
-        {
-            [
-                $( $assigned_variant_name => $assigned_variant($assigned_data) = $assigned_discriminant, )*
-                $next_variant_name => $next_variant($next_data) = $next_discriminant,
-            ]
-            [ $( $variant_name => $variant($data), )* ]
-            $next_discriminant + 1
-        }
-    };
-
-    (
-        [ $( $assigned_variant_name: expr =>
-             $assigned_variant: ident($assigned_data: ident) = $assigned_discriminant: expr, )* ]
-        [ ]
-        $number_of_variants: expr
-    ) => {
-        #[derive(Clone, Debug, PartialEq)]
-        #[allow(missing_docs)]
-        pub enum ViewportDescriptor
-        {
-            $(
-                $assigned_variant($assigned_data),
-            )+
-        }
-
-        impl ViewportDescriptor
-        {
-            #[allow(missing_docs)]
-            pub fn discriminant_value(&self) -> usize
-            {
-                match *self
-                {
-                    $(
-                        ViewportDescriptor::$assigned_variant(..) => $assigned_discriminant,
-                    )*
-                }
-            }
-        }
-
-        impl ToCss for ViewportDescriptor
-        {
-            fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
-            {
-                match *self
-                {
-                    $(
-                        ViewportDescriptor::$assigned_variant(ref descriptor_value) =>
-                        {
-                            dest.write_str($assigned_variant_name)?;
-                            dest.write_char(':')?;
-                            descriptor_value.to_css(dest)?;
-                        },
-                    )*
-                }
-                dest.write_char(';')
-            }
-        }
-    };
+	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
+	{
+		use self::ViewportDescriptor::*;
+		
+		match *self
+		{
+			MinWidth(ref descriptor_value) =>
+			{
+				dest.write_str("min-width")?;
+				dest.write_char(':')?;
+				descriptor_value.to_css(dest)?;
+			}
+			
+			MaxWidth(ref descriptor_value) =>
+			{
+				dest.write_str("max-width")?;
+				dest.write_char(':')?;
+				descriptor_value.to_css(dest)?;
+			}
+			
+			Width { ref minimum, ref maximum } =>
+			{
+				dest.write_str("width")?;
+				dest.write_char(':')?;
+				minimum.to_css(dest)?;
+				if let &Some(ref maximum) = maximum
+				{
+					dest.write_char(' ')?;
+					maximum.to_css(dest)?;
+				}
+			}
+			
+			MinHeight(ref descriptor_value) =>
+			{
+				dest.write_str("min-height")?;
+				dest.write_char(':')?;
+				descriptor_value.to_css(dest)?;
+			}
+			
+			MaxHeight(ref descriptor_value) =>
+			{
+				dest.write_str("max-height")?;
+				dest.write_char(':')?;
+				descriptor_value.to_css(dest)?;
+			}
+			
+			Height { ref minimum, ref maximum } =>
+			{
+				dest.write_str("height")?;
+				dest.write_char(':')?;
+				minimum.to_css(dest)?;
+				if let &Some(ref maximum) = maximum
+				{
+					dest.write_char(' ')?;
+					maximum.to_css(dest)?;
+				}
+			}
+			
+			Zoom(ref descriptor_value) =>
+			{
+				dest.write_str("zoom")?;
+				dest.write_char(':')?;
+				descriptor_value.to_css(dest)?;
+			}
+			
+			MinZoom(ref descriptor_value) =>
+			{
+				dest.write_str("min-zoom")?;
+				dest.write_char(':')?;
+				descriptor_value.to_css(dest)?;
+			}
+			
+			MaxZoom(ref descriptor_value) =>
+			{
+				dest.write_str("max-zoom")?;
+				dest.write_char(':')?;
+				descriptor_value.to_css(dest)?;
+			}
+			
+			UserZoom(ref descriptor_value) =>
+			{
+				dest.write_str("user-zoom")?;
+				dest.write_char(':')?;
+				descriptor_value.to_css(dest)?;
+			}
+			
+			Orientation(ref descriptor_value) =>
+			{
+				dest.write_str("orientation")?;
+				dest.write_char(':')?;
+				descriptor_value.to_css(dest)?;
+			}
+		}
+		dest.write_char(';')
+	}
 }
 
-declare_viewport_descriptor!
+impl ViewportDescriptor
 {
-    "min-width" => MinWidth(ViewportLength),
-    "max-width" => MaxWidth(ViewportLength),
-
-    "min-height" => MinHeight(ViewportLength),
-    "max-height" => MaxHeight(ViewportLength),
-
-    "zoom" => Zoom(Zoom),
-    "min-zoom" => MinZoom(Zoom),
-    "max-zoom" => MaxZoom(Zoom),
-
-    "user-zoom" => UserZoom(UserZoom),
-    "orientation" => Orientation(ViewportOrientation),
+	#[inline(always)]
+	pub fn css_name(&self) -> &'static str
+	{
+		use self::ViewportDescriptor::*;
+		
+		match *self
+		{
+			MinWidth(_) => "min-width",
+			
+			MaxWidth(_) => "max-width",
+			
+			Width { .. } => "width",
+			
+			MinHeight(_) => "min-height",
+			
+			MaxHeight(_) => "max-height",
+			
+			Height { .. } => "height",
+			
+			Zoom(_) => "zoom",
+			
+			MinZoom(_) => "min-zoom",
+			
+			MaxZoom(_) => "max-zoom",
+			
+			UserZoom(_) => "user-zoom",
+			
+			Orientation(_) => "orientation",
+		}
+	}
 }

@@ -30,5 +30,5 @@ pub enum AtRuleBlockPrelude
 	Supports(SupportsCondition, SourceLocation),
 	
 	/// A @viewport rule prelude.
-	Viewport,
+	Viewport(Option<VendorPrefix>),
 }
