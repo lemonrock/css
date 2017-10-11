@@ -50,7 +50,7 @@ impl ToCss for DocumentAtRule
 	}
 }
 
-impl HasVendorPrefixAtRule for DocumentAtRule
+impl HasVendorPrefix for DocumentAtRule
 {
 	#[inline(always)]
 	fn isNotVendorPrefixed(&self) -> bool

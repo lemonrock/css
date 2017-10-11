@@ -40,7 +40,7 @@ impl ToCss for KeyframesAtRule
 	}
 }
 
-impl HasVendorPrefixAtRule for KeyframesAtRule
+impl HasVendorPrefix for KeyframesAtRule
 {
 	#[inline(always)]
 	fn isNotVendorPrefixed(&self) -> bool

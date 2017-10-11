@@ -27,6 +27,15 @@ impl ToCss for PropertyDeclaration
 	}
 }
 
+impl HasVendorPrefix for PropertyDeclaration
+{
+	#[inline(always)]
+	fn isNotVendorPrefixed(&self) -> bool
+	{
+		self.vendor_prefix.is_none()
+	}
+}
+
 impl PropertyDeclaration
 {
 	/// https://drafts.csswg.org/css-variables/#typedef-custom-property-name
@@ -34,19 +43,6 @@ impl PropertyDeclaration
 	pub fn hasACustomPropertyName(&self) -> bool
 	{
 		self.name.starts_with("--")
-	}
-	
-	#[inline(always)]
-	pub fn hasAVendorPrefix(&self) -> bool
-	{
-		if self.hasACustomPropertyName()
-		{
-			false
-		}
-		else
-		{
-			self.name.starts_with("-")
-		}
 	}
 	
 	#[inline(always)]

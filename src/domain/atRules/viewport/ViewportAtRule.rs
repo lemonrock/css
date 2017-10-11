@@ -57,7 +57,7 @@ impl ToCss for ViewportAtRule
 	}
 }
 
-impl HasVendorPrefixAtRule for ViewportAtRule
+impl HasVendorPrefix for ViewportAtRule
 {
 	#[inline(always)]
 	fn isNotVendorPrefixed(&self) -> bool

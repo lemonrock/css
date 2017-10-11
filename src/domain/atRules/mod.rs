@@ -16,6 +16,3 @@ pub mod namespace;
 pub mod page;
 pub mod supports;
 pub mod viewport;
-
-
-include!("HasVendorPrefixAtRule.rs");
