@@ -37,7 +37,6 @@ impl<'a, 'i> QualifiedRuleParser<'i> for KeyframeListParser<'a>
 	
 	fn parse_prelude<'t>(&mut self, input: &mut Parser<'i, 't>) -> Result<Self::Prelude, ParseError<'i, CustomParseError<'i>>>
 	{
-		let source_location = input.current_source_location();
 		match KeyframeSelector::parse(input)
 		{
 			Ok(selector) => Ok
@@ -45,7 +44,6 @@ impl<'a, 'i> QualifiedRuleParser<'i> for KeyframeListParser<'a>
 				KeyframeSelectorParserPrelude
 				{
 					selector,
-					source_location,
 				}
 			),
 			
@@ -63,7 +61,6 @@ impl<'a, 'i> QualifiedRuleParser<'i> for KeyframeListParser<'a>
 			{
 				selector: prelude.selector,
 				property_declarations: PropertyDeclarations::parse_property_declaration_list(&context, input, true)?,
-				source_location: prelude.source_location,
 			}
 		)
 	}

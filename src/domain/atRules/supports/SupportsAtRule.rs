@@ -13,9 +13,6 @@ pub struct SupportsAtRule
 	
 	/// Child rules
 	pub rules: CssRules,
-	
-	/// The line and column of the rule's source code.
-	pub source_location: SourceLocation,
 }
 
 impl HasCssRules for SupportsAtRule

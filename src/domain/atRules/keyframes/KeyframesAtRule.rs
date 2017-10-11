@@ -15,9 +15,6 @@ pub struct KeyframesAtRule
 	
 	/// The keyframes specified for this CSS rule.
 	pub keyframes: Vec<Keyframe>,
-	
-	/// The line and column of the rule's source code.
-	pub source_location: SourceLocation,
 }
 
 impl ToCss for KeyframesAtRule

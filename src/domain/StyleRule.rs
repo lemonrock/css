@@ -11,9 +11,6 @@ pub struct StyleRule
 	
 	/// The declaration block with the properties it contains.
 	pub property_declarations: PropertyDeclarations,
-	
-	/// The location in the sheet where it was found.
-	pub source_location: SourceLocation,
 }
 
 impl ToCss for StyleRule

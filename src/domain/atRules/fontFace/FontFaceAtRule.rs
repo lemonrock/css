@@ -34,9 +34,6 @@ pub struct FontFaceAtRule
 	
 	/// The language override of this font face.
 	pub language_override: Option<FontLanguageOverride>,
-
-	/// Line and column of the @font-face rule source code.
-	pub source_location: SourceLocation,
 }
 
 impl ToCss for FontFaceAtRule
@@ -105,7 +102,8 @@ impl ToCss for FontFaceAtRule
 
 impl FontFaceAtRule
 {
-	fn empty(source_location: SourceLocation) -> Self
+	#[inline(always)]
+	fn empty() -> Self
 	{
 		Self
 		{
@@ -118,14 +116,13 @@ impl FontFaceAtRule
 			unicode_range: None,
 			feature_settings: None,
 			language_override: None,
-			source_location,
 		}
 	}
 
 	/// Parse the block inside a `@font-face` rule.
-	pub(crate) fn parse_body<'i: 't, 't>(context: &ParserContext, input: &mut Parser<'i, 't>, source_location: SourceLocation) -> Result<FontFaceAtRule, ParseError<'i, CustomParseError<'i>>>
+	pub(crate) fn parse_body<'i: 't, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<FontFaceAtRule, ParseError<'i, CustomParseError<'i>>>
 	{
-		let mut rule = Self::empty(source_location);
+		let mut rule = Self::empty();
 		
 		{
 			let parser = FontFaceAtRuleParser

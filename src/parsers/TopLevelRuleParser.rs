@@ -28,8 +28,6 @@ impl<'i> AtRuleParser<'i> for TopLevelRuleParser
 	{
 		use ::cssparser::AtRuleType::WithoutBlock;
 		
-		let source_location = input.current_source_location();
-		
 		match_ignore_ascii_case!
 		{
 			&name,
@@ -47,7 +45,7 @@ impl<'i> AtRuleParser<'i> for TopLevelRuleParser
 					return Err(ParseError::Custom(CustomParseError::AtRuleImportMustBeBeforeAnyRuleExceptAtRuleCharset));
 				}
 				
-				Ok(WithoutBlock(CssRule::Import(self.parseImportAtRule(input, source_location)?)))
+				Ok(WithoutBlock(CssRule::Import(self.parseImportAtRule(input)?)))
 			}
 			
 			"namespace" =>
@@ -58,7 +56,7 @@ impl<'i> AtRuleParser<'i> for TopLevelRuleParser
 					return Err(ParseError::Custom(CustomParseError::AtRuleNamespaceMustBeBeforeAnyRuleExceptAtRuleCharsetAndAtRuleImport));
 				}
 				
-				Ok(WithoutBlock(CssRule::Namespace(self.parseNamespaceAtRule(input, source_location)?)))
+				Ok(WithoutBlock(CssRule::Namespace(self.parseNamespaceAtRule(input)?)))
 			}
 			
 			_ =>
@@ -165,7 +163,7 @@ impl TopLevelRuleParser
 	}
 	
 	#[inline(always)]
-	fn parseImportAtRule<'i, 't>(&self, input: &mut Parser<'i, 't>, source_location: SourceLocation) -> Result<ImportAtRule, ParseError<'i, CustomParseError<'i>>>
+	fn parseImportAtRule<'i, 't>(&self, input: &mut Parser<'i, 't>) -> Result<ImportAtRule, ParseError<'i, CustomParseError<'i>>>
 	{
 		Ok
 		(
@@ -173,13 +171,12 @@ impl TopLevelRuleParser
 			{
 				url: SpecifiedUrl(input.expect_url_or_string()?.as_ref().to_owned()),
 				media_list: MediaList::parse_media_query_list(&self.context, input, false)?,
-				source_location,
 			}
 		)
 	}
 	
 	#[inline(always)]
-	fn parseNamespaceAtRule<'i, 't>(&mut self, input: &mut Parser<'i, 't>, source_location: SourceLocation) -> Result<NamespaceAtRule, ParseError<'i, CustomParseError<'i>>>
+	fn parseNamespaceAtRule<'i, 't>(&mut self, input: &mut Parser<'i, 't>) -> Result<NamespaceAtRule, ParseError<'i, CustomParseError<'i>>>
 	{
 		let prefix: Result<_, ParseError<CustomParseError>> = input.try(|i|
 		{
@@ -206,7 +203,6 @@ impl TopLevelRuleParser
 			{
 				prefix,
 				url,
-				source_location,
 			}
 		)
 	}

@@ -6,5 +6,4 @@
 pub(crate) struct KeyframeSelectorParserPrelude
 {
 	selector: KeyframeSelector,
-	source_location: SourceLocation,
 }

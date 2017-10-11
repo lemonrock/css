@@ -15,9 +15,6 @@ pub struct PageAtRule
 {
 	/// The declaration block this page rule contains.
 	pub property_declarations: PropertyDeclarations,
-	
-	/// The source position this rule was found at.
-	pub source_location: SourceLocation,
 }
 
 impl ToCss for PageAtRule

@@ -13,9 +13,6 @@ pub struct MediaAtRule
 	
 	/// The nested rules to this media rule.
 	pub rules: CssRules,
-	
-	/// The source position where this media rule was found.
-	pub source_location: SourceLocation,
 }
 
 impl HasCssRules for MediaAtRule

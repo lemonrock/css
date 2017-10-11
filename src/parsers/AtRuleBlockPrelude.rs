@@ -9,25 +9,25 @@ pub enum AtRuleBlockPrelude
 	CounterStyle(CounterStyleIdent),
 	
 	/// A @document rule, with its conditional.
-	Document(Option<VendorPrefix>, DocumentCondition, SourceLocation),
+	Document(Option<VendorPrefix>, DocumentCondition),
 	
 	/// A @font-face rule prelude.
-	FontFace(SourceLocation),
+	FontFace,
 	
 	/// A @font-feature-values rule prelude, with its FamilyName list.
-	FontFeatureValues(Vec<FamilyName>, SourceLocation),
+	FontFeatureValues(Vec<FamilyName>),
 	
 	/// A @keyframes rule, with its animation name and vendor prefix if exists.
-	Keyframes(Option<VendorPrefix>, KeyframesName, SourceLocation),
+	Keyframes(Option<VendorPrefix>, KeyframesName),
 	
 	/// A @media rule prelude, with its media queries.
-	Media(MediaList, SourceLocation),
+	Media(MediaList),
 	
 	/// A @page rule prelude.
-	Page(SourceLocation),
+	Page,
 	
 	/// An @supports rule, with its conditional
-	Supports(SupportsCondition, SourceLocation),
+	Supports(SupportsCondition),
 	
 	/// A @viewport rule prelude.
 	Viewport(Option<VendorPrefix>),

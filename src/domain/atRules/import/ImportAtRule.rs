@@ -12,9 +12,6 @@ pub struct ImportAtRule
 	pub url: SpecifiedUrl,
 	
 	pub media_list: MediaList,
-	
-	/// The line and column of the rule's source code.
-	pub source_location: SourceLocation,
 }
 
 impl ToCss for ImportAtRule

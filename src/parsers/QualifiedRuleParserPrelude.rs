@@ -5,5 +5,4 @@
 pub(crate) struct QualifiedRuleParserPrelude
 {
 	selectors: DeduplicatedSelectors,
-	source_location: SourceLocation,
 }

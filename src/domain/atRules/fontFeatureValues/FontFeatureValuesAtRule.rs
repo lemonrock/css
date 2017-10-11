@@ -30,9 +30,6 @@ pub struct FontFeatureValuesAtRule
 	
 	/// A @styleset block. Specifies a feature name that will work with the character-variant() functional notation of font-variant-alternates. The value can be a list.
 	pub styleset: Vec<FontFeatureValuesDeclaration<VectorValues>>,
-	
-	/// The line and column of the rule's source code.
-	pub source_location: SourceLocation,
 }
 
 impl ToCss for FontFeatureValuesAtRule
@@ -49,7 +46,8 @@ impl ToCss for FontFeatureValuesAtRule
 
 impl FontFeatureValuesAtRule
 {
-	fn new(family_names: Vec<FamilyName>, source_location: SourceLocation) -> Self
+	#[inline(always)]
+	fn new(family_names: Vec<FamilyName>) -> Self
 	{
 		Self
 		{
@@ -60,13 +58,12 @@ impl FontFeatureValuesAtRule
 			annotation: vec![],
 			character_variant: vec![],
 			styleset: vec![],
-			source_location,
 		}
 	}
 	
-	pub(crate) fn parse_body<'i: 't, 't>(context: &ParserContext, input: &mut Parser<'i, 't>, family_names: Vec<FamilyName>, source_location: SourceLocation) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
+	pub(crate) fn parse_body<'i: 't, 't>(context: &ParserContext, input: &mut Parser<'i, 't>, family_names: Vec<FamilyName>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
 	{
-		let mut fontFeatureValuesRule = Self::new(family_names, source_location);
+		let mut fontFeatureValuesRule = Self::new(family_names);
 		
 		{
 			let mut iterator = RuleListParser::new_for_nested_rule(input, FontFeatureValuesAtRuleParser

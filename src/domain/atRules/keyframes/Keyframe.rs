@@ -11,9 +11,6 @@ pub struct Keyframe
 	
 	/// The declaration block that was declared inside this keyframe.
 	pub property_declarations: PropertyDeclarations,
-	
-	/// The line and column of the rule's source code.
-	pub source_location: SourceLocation,
 }
 
 impl ToCss for Keyframe

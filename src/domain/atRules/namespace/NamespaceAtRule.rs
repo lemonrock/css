@@ -12,9 +12,6 @@ pub struct NamespaceAtRule
 	
 	/// The actual namespace url.
 	pub url: NamespaceUrl,
-	
-	/// The source location this rule was found at.
-	pub source_location: SourceLocation,
 }
 
 impl ToCss for NamespaceAtRule
