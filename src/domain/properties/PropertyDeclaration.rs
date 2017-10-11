@@ -5,6 +5,7 @@
 #[derive(Debug, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct PropertyDeclaration
 {
+	pub vendor_prefix: Option<VendorPrefix>,
 	pub name: Atom,
 	pub value: UnparsedPropertyValue,
 	pub importance: Importance,
@@ -14,28 +15,28 @@ impl ToCss for PropertyDeclaration
 {
 	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
 	{
+		if let Some(ref vendorPrefix) = self.vendor_prefix
+		{
+			vendorPrefix.to_css(dest)?;
+		}
 		self.name.to_css(dest)?;
 		dest.write_char(':')?;
-		
 		self.value.to_css(dest)?;
-		
-		if self.importance.important()
-		{
-			dest.write_str("!important")?;
-		}
-		
-		dest.write_str(";")
+		self.importance.to_css(dest)?;
+		dest.write_char(';')
 	}
 }
 
 impl PropertyDeclaration
 {
 	/// https://drafts.csswg.org/css-variables/#typedef-custom-property-name
+	#[inline(always)]
 	pub fn hasACustomPropertyName(&self) -> bool
 	{
 		self.name.starts_with("--")
 	}
 	
+	#[inline(always)]
 	pub fn hasAVendorPrefix(&self) -> bool
 	{
 		if self.hasACustomPropertyName()
@@ -46,5 +47,11 @@ impl PropertyDeclaration
 		{
 			self.name.starts_with("-")
 		}
+	}
+	
+	#[inline(always)]
+	pub fn hasAsciiNameIgnoringCase(&self, name: &str) -> bool
+	{
+		self.name.eq_ignore_ascii_case(name)
 	}
 }

@@ -27,13 +27,13 @@ impl PropertyDeclarations
 	}
 	
 	// Parse a list of property declarations and return a property declaration block.
-	pub (crate) fn parse_property_declaration_list<'i: 't, 't>(context: &ParserContext, input: &mut Parser<'i, 't>, isImportantDisallowed: bool) -> Result<PropertyDeclarations, ParseError<'i, CustomParseError<'i>>>
+	pub(crate) fn parse_property_declaration_list<'i: 't, 't>(context: &ParserContext, input: &mut Parser<'i, 't>, parsingAKeyFramePropertyDeclarationListSoImportantIsDisallowed: bool) -> Result<PropertyDeclarations, ParseError<'i, CustomParseError<'i>>>
 	{
 		let mut propertyDeclarations = Vec::new();
 		let mut parsedPropertyDeclarations = DeclarationListParser::new(input, PropertyDeclarationParser
 		{
 			context,
-			isImportantDisallowed,
+			parsingAKeyFramePropertyDeclarationListSoImportantIsDisallowed,
 		});
 		
 		while let Some(propertyDeclaration) = parsedPropertyDeclarations.next()

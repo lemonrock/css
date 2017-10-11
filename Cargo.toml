@@ -4,7 +4,7 @@
 
 [package]
 name = "css"
-description = "css"
+description = "A crate that uses the cssparser and selectors crates to provide a domain model for CSS Stylesheets. Intended to allow effective minification of CSS and CSS transformations such as autoprefixing and removal by other crates"
 keywords = ["css"]
 license = "MPL-2.0"
 authors = ["Raphael Cohn <raphael.cohn@stormmq.com>"]
@@ -15,7 +15,7 @@ exclude = ["*"]
 include = ["README.md", "LICENSE", "COPYRIGHT", "src/**/*.rs", "build.rs", "Cargo.toml", "rustfmt.toml", "clippy.toml"]
 readme = "README.md"
 publish = true
-version = "0.0.3"
+version = "0.0.4"
 
 [profile.release]
 opt-level = 3

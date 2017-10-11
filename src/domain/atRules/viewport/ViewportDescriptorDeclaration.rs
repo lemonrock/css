@@ -7,7 +7,7 @@
 pub struct ViewportDescriptorDeclaration
 {
 	pub descriptor: ViewportDescriptor,
-	pub important: bool
+	pub importance: Importance
 }
 
 impl ToCss for ViewportDescriptorDeclaration
@@ -15,11 +15,8 @@ impl ToCss for ViewportDescriptorDeclaration
 	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
 	{
 		self.descriptor.to_css(dest)?;
-		if self.important
-		{
-			dest.write_str("!important")?;
-		}
-		dest.write_str(";")
+		self.importance.to_css(dest)?;
+		dest.write_char(';')
 	}
 }
 
@@ -28,14 +25,14 @@ impl ViewportDescriptorDeclaration
 	#[inline(always)]
 	pub(crate) fn parse_important<'i, 't>(descriptor: ViewportDescriptor, input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
 	{
-		let important = input.try(parse_important).is_ok();
+		let importance = Importance::parse(input);
 		
 		Ok
 		(
 			Self
 			{
 				descriptor,
-				important
+				importance
 			}
 		)
 	}

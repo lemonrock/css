@@ -22,6 +22,7 @@ pub enum VendorPrefix
 	/// -servo- prefix
 	servo,
 	
+	/// An unrecognised prefix, usually implies unusual or mistaken CSS
 	Unrecognised(String),
 }
 
@@ -33,13 +34,13 @@ impl ToCss for VendorPrefix
 		
 		match *self
 		{
+			o => dest.write_str("-o-"),
+			
 			moz => dest.write_str("-moz-"),
 			
 			webkit => dest.write_str("-webkit-"),
 			
 			ms => dest.write_str("-ms-"),
-			
-			o => dest.write_str("-o-"),
 			
 			servo => dest.write_str("-servo-"),
 			
@@ -55,6 +56,48 @@ impl ToCss for VendorPrefix
 
 impl VendorPrefix
 {
+	/// Finds a prefix for an ascii lower case name, returning the prefix (if any) and the unprefixed name
+	/// Is not confused by CSS custom properties which start `--`
+	#[inline(always)]
+	pub fn findPrefixIfAnyForAsciiLowerCaseName<'i>(asciiLowerCaseName: String) -> (Option<VendorPrefix>, String)
+	{
+		if asciiLowerCaseName.len() < 3
+		{
+			return (None, asciiLowerCaseName);
+		}
+		
+		{
+			let (firstCharacter, remainder) = asciiLowerCaseName.split_at(1);
+			
+			if firstCharacter == "-" && !remainder.starts_with('-')
+			{
+				let mut split = remainder.splitn(2, '-');
+				let prefix = split.next().unwrap();
+				let unprefixedRemainder = split.next().unwrap();
+				
+				use self::VendorPrefix::*;
+				
+				return match prefix
+				{
+					"o" => (Some(o), unprefixedRemainder.to_owned()),
+					
+					"moz" => (Some(moz), unprefixedRemainder.to_owned()),
+					
+					"webkit" => (Some(webkit), unprefixedRemainder.to_owned()),
+					
+					"ms" => (Some(ms), unprefixedRemainder.to_owned()),
+					
+					"servo" => (Some(servo), unprefixedRemainder.to_owned()),
+					
+					_ => (Some(Unrecognised(prefix.to_owned())), unprefixedRemainder.to_owned()),
+				};
+			}
+		}
+		
+		return (None, asciiLowerCaseName);
+	}
+	
+	/// Prefixes a name with a vendor prefix, eg 'background' might become '-moz-background' if Self is `moz`
 	#[inline(always)]
 	pub fn prefix(&self, name: &str) -> String
 	{
@@ -70,13 +113,13 @@ impl VendorPrefix
 		
 		match self
 		{
+			&o => knownPrefix("-o-", name),
+			
 			&moz => knownPrefix("-moz-", name),
 			
 			&webkit => knownPrefix("-webkit-", name),
 			
 			&ms => knownPrefix("-ms-", name),
-			
-			&o => knownPrefix("-o-", name),
 			
 			&servo => knownPrefix("-servo-", name),
 			

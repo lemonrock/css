@@ -23,6 +23,7 @@ use self::selectors::*;
 use self::units::*;
 use ::precomputed_hash::PrecomputedHash;
 use ::std::ascii::AsciiExt;
+use ::std::borrow::Cow;
 use ::std::cmp::PartialEq;
 use ::std::cmp::Eq;
 use ::std::cmp::PartialOrd;
@@ -36,6 +37,7 @@ use ::std::fmt::Formatter;
 use ::std::hash::Hash;
 use ::std::hash::Hasher;
 use ::std::ops::Deref;
+use ::std::str::FromStr;
 
 
 include!("define_css_keyword_enum.rs");

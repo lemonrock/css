@@ -6,7 +6,7 @@
 pub(crate) struct PropertyDeclarationParser<'a>
 {
 	pub(crate) context: &'a ParserContext,
-	pub(crate) isImportantDisallowed: bool,
+	pub(crate) parsingAKeyFramePropertyDeclarationListSoImportantIsDisallowed: bool,
 }
 
 /// In theory, @rules may be present. In practice, none are currently defined (Sep 2017)
@@ -31,7 +31,9 @@ impl<'a, 'i> DeclarationParser<'i> for PropertyDeclarationParser<'a>
 	{
 		let sourceLocation = input.current_source_location();
 		
-		let name = Atom::from(name.to_ascii_lowercase());
+		let (vendor_prefix, unprefixedPropertyName) = VendorPrefix::findPrefixIfAnyForAsciiLowerCaseName(name.to_ascii_lowercase());
+		
+		let name = Atom::from(unprefixedPropertyName);
 		
 		let value = input.parse_until_before(Delimiter::Bang, |input|
 		{
@@ -45,19 +47,19 @@ impl<'a, 'i> DeclarationParser<'i> for PropertyDeclarationParser<'a>
 			}
 		})?;
 		
-		let importance = Importance::from_bool(input.try(parse_important).is_ok());
-		if importance.important() && self.isImportantDisallowed
+		let importance = Importance::parse(input);
+		if self.parsingAKeyFramePropertyDeclarationListSoImportantIsDisallowed && importance.isImportant()
 		{
 			return Err(ParseError::Custom(CustomParseError::ImportantIsNotAllowedInKeyframePropertyDeclarationValues(sourceLocation)));
 		}
 		
-		// In case there is still unparsed text in the declaration, we should roll back.
 		input.expect_exhausted()?;
 		
 		Ok
 		(
 			PropertyDeclaration
 			{
+				vendor_prefix,
 				name,
 				value,
 				importance,

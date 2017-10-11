@@ -61,12 +61,31 @@ impl<'i> From<CowRcStr<'i>> for Atom
 	}
 }
 
+impl<'a> From<Cow<'a, str>> for Atom
+{
+	#[inline(always)]
+	fn from(value: Cow<'a, str>) -> Self
+	{
+		Atom(value.into_owned())
+	}
+}
+
 impl<'a, 'i> From<&'a CowRcStr<'i>> for Atom
 {
 	#[inline(always)]
 	fn from(value: &'a CowRcStr<'i>) -> Self
 	{
 		Atom::from(value.as_ref())
+	}
+}
+
+impl FromStr for Atom
+{
+	type Err = ();
+	
+	fn from_str(s: &str) -> Result<Self, Self::Err>
+	{
+		Ok(Atom(s.to_owned()))
 	}
 }
 
@@ -78,5 +97,20 @@ impl PrecomputedHash for Atom
 		let mut state = DefaultHasher::new();
 		self.0.hash(&mut state);
 		state.finish() as u32
+	}
+}
+
+impl Atom
+{
+	#[inline(always)]
+	pub fn is_ascii(&self) -> bool
+	{
+		self.0.is_ascii()
+	}
+	
+	#[inline(always)]
+	pub fn eq_ignore_ascii_case(&self, name: &str) -> bool
+	{
+		self.deref().eq_ignore_ascii_case(name)
 	}
 }

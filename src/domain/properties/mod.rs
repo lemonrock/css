@@ -4,6 +4,7 @@
 
 use super::*;
 use super::parsers::PropertyDeclarationParser;
+use self::Importance::*;
 use ::std::borrow::Cow;
 use ::std::collections::HashSet;
 use ::std::iter::Iterator;

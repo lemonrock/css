@@ -1,6 +1,7 @@
 // This file is part of css. It is subject to the license terms in the COPYRIGHT file found in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT. No part of predicator, including this file, may be copied, modified, propagated, or distributed except according to the terms contained in the COPYRIGHT file.
 // Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
 
+
 /// A declaration [importance][importance].
 ///
 /// [importance]: https://drafts.csswg.org/css-cascade/#importance
@@ -23,15 +24,25 @@ impl Default for Importance
 	}
 }
 
+impl ToCss for Importance
+{
+	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
+	{
+		match *self
+		{
+			Normal => Ok(()),
+			Important => dest.write_str("!important"),
+		}
+	}
+}
+
 impl Importance
 {
 	/// Return whether this is an important declaration.
 	#[inline(always)]
-	pub fn important(self) -> bool
+	pub fn isImportant(&self) -> bool
 	{
-		use self::Importance::*;
-		
-		match self
+		match *self
 		{
 			Normal => false,
 			Important => true,
@@ -43,11 +54,17 @@ impl Importance
 	{
 		if isImportant
 		{
-			Importance::Important
+			Important
 		}
 		else
 		{
-			Importance::Normal
+			Normal
 		}
+	}
+	
+	#[inline(always)]
+	pub(crate) fn parse<'i, 't>(input: &mut Parser<'i, 't>) -> Self
+	{
+		Self::from_bool(input.try(parse_important).is_ok())
 	}
 }
