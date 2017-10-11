@@ -28,13 +28,13 @@ impl<'a, 'i> DeclarationParser<'i> for ViewportAtRuleParser<'a>
 	{
 		use self::ViewportDescriptor::*;
 		
-		#[inline(alway)]
+		#[inline(always)]
 		fn parse_property<'i, 't, Parse: FnOnce(&mut Parser<'i, 't>) -> Result<Intermediate, ParseError<'i, CustomParseError<'i>>>, Intermediate, Constructor: FnOnce(Intermediate) -> ViewportDescriptor>(input: &mut Parser<'i, 't>, constructor: Constructor, parse: Parse) -> Result<ViewportDescriptorDeclaration, ParseError<'i, CustomParseError<'i>>>
 		{
 			ViewportDescriptorDeclaration::parse_important(constructor((parse(input))?), input)
 		}
 		
-		#[inline(alway)]
+		#[inline(always)]
 		fn parse_shorthand_property<'a, 'i, 't, Constructor: FnOnce(ViewportLength, Option<ViewportLength>) -> ViewportDescriptor>(input: &mut Parser<'i, 't>, this: &ViewportAtRuleParser<'a>, constructor: Constructor) -> Result<ViewportDescriptorDeclaration, ParseError<'i, CustomParseError<'i>>>
 		{
 			let minimum = this.parseViewportLength(input)?;
