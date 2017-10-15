@@ -54,7 +54,7 @@ pub enum CustomParseError<'i>
 	
 	// @keyframes
 	KeyframePercentageWasNotBetweenZeroAndOneInclusive(f32),
-	ImportantIsNotAllowedInKeyframePropertyDeclarationValues(SourceLocation),
+	ImportantIsNotAllowedInKeyframePropertyDeclarationValues,
 	UnexpectedTokenWhenParsingZoom(Token<'i>),
 	
 	// @media
@@ -73,12 +73,16 @@ pub enum CustomParseError<'i>
 	AtRuleNamespaceMustBeBeforeAnyRuleExceptAtRuleCharsetAndAtRuleImport,
 	UnexpectedTokenForAtNamespaceRuleNamespaceValue(Token<'i>),
 	
+	// @page
+	InvalidPageSelectorPseudoClass(CowRcStr<'i>),
+	FontRelativeLengthsAreNotAllowedInAPageAtRule,
+	ViewportLengthsAreNotAllowedInAPageAtRule,
+	
 	// @supports
 	InvalidSupportsCondition(CowRcStr<'i>),
 	
 	// @viewport
 	UnexpectedViewportProperty(CowRcStr<'i>),
-	ViewportLengthsAreNotAllowedInAPageAtRule,
 	
 	// selectors
 	SpecificSelectorParseError(Box<SelectorParseError<'i, CustomParseError<'i>>>),

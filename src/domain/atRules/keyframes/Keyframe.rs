@@ -10,7 +10,7 @@ pub struct Keyframe
 	pub selector: KeyframeSelector,
 	
 	/// The declaration block that was declared inside this keyframe.
-	pub property_declarations: PropertyDeclarations,
+	pub property_declarations: PropertyDeclarations<DoesNotHaveImportance>,
 }
 
 impl ToCss for Keyframe
@@ -22,5 +22,38 @@ impl ToCss for Keyframe
 		self.property_declarations.to_css(dest)?;
 		dest.write_char('}')?;
 		Ok(())
+	}
+}
+
+impl HasPropertyDeclarations<DoesNotHaveImportance> for Keyframe
+{
+	#[inline(always)]
+	fn property_declarations(&self) -> &PropertyDeclarations<DoesNotHaveImportance>
+	{
+		&self.property_declarations
+	}
+	
+	#[inline(always)]
+	fn property_declarations_mut(&mut self) -> &mut PropertyDeclarations<DoesNotHaveImportance>
+	{
+		&mut self.property_declarations
+	}
+	
+	#[inline(always)]
+	fn property_declarations_slice(&self) -> &[PropertyDeclaration<DoesNotHaveImportance>]
+	{
+		&self.property_declarations.0[..]
+	}
+	
+	#[inline(always)]
+	fn property_declarations_vec(&self) -> &Vec<PropertyDeclaration<DoesNotHaveImportance>>
+	{
+		&self.property_declarations.0
+	}
+	
+	#[inline(always)]
+	fn property_declarations_vec_mut(&mut self) -> &mut Vec<PropertyDeclaration<DoesNotHaveImportance>>
+	{
+		&mut self.property_declarations.0
 	}
 }

@@ -18,13 +18,31 @@ pub struct MediaAtRule
 impl HasCssRules for MediaAtRule
 {
 	#[inline(always)]
-	fn css_rules(&self) -> &[CssRule]
+	fn css_rules(&self) -> &CssRules
+	{
+		&self.rules
+	}
+	
+	#[inline(always)]
+	fn css_rules_mut(&mut self) -> &mut CssRules
+	{
+		&mut self.rules
+	}
+	
+	#[inline(always)]
+	fn css_rules_slice(&self) -> &[CssRule]
 	{
 		&self.rules.0[..]
 	}
 	
 	#[inline(always)]
-	fn css_rules_mut(&mut self) -> &mut Vec<CssRule>
+	fn css_rules_vec(&self) -> &Vec<CssRule>
+	{
+		&self.rules.0
+	}
+	
+	#[inline(always)]
+	fn css_rules_vec_mut(&mut self) -> &mut Vec<CssRule>
 	{
 		&mut self.rules.0
 	}

@@ -60,7 +60,7 @@ impl<'a, 'i> QualifiedRuleParser<'i> for KeyframeListParser<'a>
 			Keyframe
 			{
 				selector: prelude.selector,
-				property_declarations: PropertyDeclarations::parse_property_declaration_list(&context, input, true)?,
+				property_declarations: PropertyDeclarations::parse_property_declaration_list(&context, input)?,
 			}
 		)
 	}

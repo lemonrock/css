@@ -22,6 +22,7 @@ use ::selectors::parser::SelectorImpl;
 use ::selectors::parser::SelectorList;
 use ::smallvec::SmallVec;
 use ::std::ascii::AsciiExt;
+use ::std::marker::PhantomData;
 use ::std::rc::Rc;
 
 

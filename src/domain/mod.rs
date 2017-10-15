@@ -5,6 +5,7 @@
 use super::*;
 use super::parsers::NestedRuleParser;
 use super::parsers::separators::*;
+use self::atRules::VendorPrefixedAtRule;
 use self::atRules::counterStyle::*;
 use self::atRules::document::*;
 use self::atRules::fontFace::*;
@@ -39,7 +40,6 @@ use ::std::hash::Hasher;
 use ::std::ops::Deref;
 use ::std::str::FromStr;
 
-
 include!("define_css_keyword_enum.rs");
 
 
@@ -58,6 +58,7 @@ include!("CssRules.rs");
 include!("CssRuleType.rs");
 include!("CustomIdent.rs");
 include!("HasCssRules.rs");
+include!("HasPropertyDeclarations.rs");
 include!("HasVendorPrefix.rs");
 include!("RulesMutateError.rs");
 include!("SpecifiedUrl.rs");

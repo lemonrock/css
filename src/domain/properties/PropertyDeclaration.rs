@@ -3,15 +3,15 @@
 
 
 #[derive(Debug, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
-pub struct PropertyDeclaration
+pub struct PropertyDeclaration<I: HasImportance>
 {
 	pub vendor_prefix: Option<VendorPrefix>,
 	pub name: Atom,
 	pub value: UnparsedPropertyValue,
-	pub importance: Importance,
+	pub importance: I,
 }
 
-impl ToCss for PropertyDeclaration
+impl<I: HasImportance> ToCss for PropertyDeclaration<I>
 {
 	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
 	{
@@ -27,7 +27,7 @@ impl ToCss for PropertyDeclaration
 	}
 }
 
-impl HasVendorPrefix for PropertyDeclaration
+impl<I: HasImportance> HasVendorPrefix for PropertyDeclaration<I>
 {
 	#[inline(always)]
 	fn isNotVendorPrefixed(&self) -> bool
@@ -36,7 +36,7 @@ impl HasVendorPrefix for PropertyDeclaration
 	}
 }
 
-impl PropertyDeclaration
+impl<I: HasImportance> PropertyDeclaration<I>
 {
 	/// https://drafts.csswg.org/css-variables/#typedef-custom-property-name
 	#[inline(always)]

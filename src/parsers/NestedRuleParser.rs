@@ -47,7 +47,7 @@ impl<'a, 'i> AtRuleParser<'i> for NestedRuleParser<'a>
 			
 			"media" => Ok(WithBlock(Media(MediaList::parse_media_query_list(self.context, input, false)?))),
 			
-			"page" => Ok(WithBlock(Page)),
+			"page" => Ok(WithBlock(Page(PageSelectorPseudoClass::parse(input)?))),
 			
 			"supports" => Ok(WithBlock(Supports(SupportsCondition::parse(input)?))),
 			
@@ -93,9 +93,10 @@ impl<'a, 'i> AtRuleParser<'i> for NestedRuleParser<'a>
 				rules: self.parse_nested_rules(input, CssRuleType::Media)?,
 			}),
 			
-			Page => CssRule::Page(PageAtRule
+			Page(page_selector_pseudo_class) => CssRule::Page(PageAtRule
 			{
-				property_declarations: PropertyDeclarations::parse_property_declaration_list(&CssRuleType::Page.context(self), input, false)?,
+				page_selector_pseudo_class,
+				property_declarations: PropertyDeclarations::parse_property_declaration_list(&CssRuleType::Page.context(self), input)?,
 			}),
 			
 			Supports(condition) => CssRule::Supports(SupportsAtRule
@@ -144,7 +145,7 @@ impl<'a, 'i> QualifiedRuleParser<'i> for NestedRuleParser<'a>
 		let styleRule = StyleRule
 		{
 			selectors: prelude.selectors,
-			property_declarations: PropertyDeclarations::parse_property_declaration_list(&context, input, false)?,
+			property_declarations: PropertyDeclarations::parse_property_declaration_list(&context, input)?,
 		};
 		
 		Ok(CssRule::Style(styleRule))

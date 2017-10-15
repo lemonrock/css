@@ -7,11 +7,14 @@ use super::parsers::PropertyDeclarationParser;
 use self::Importance::*;
 use ::std::borrow::Cow;
 use ::std::collections::HashSet;
+use ::std::marker::PhantomData;
 use ::std::iter::Iterator;
 
 
 include!("CssWideKeyword.rs");
+include!("DoesNotHaveImportance.rs");
 include!("Importance.rs");
+include!("HasImportance.rs");
 include!("PropertyDeclaration.rs");
 include!("PropertyDeclarations.rs");
 include!("SpecifiedValue.rs");

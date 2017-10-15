@@ -65,3 +65,7 @@ impl HasVendorPrefix for ViewportAtRule
 		self.vendor_prefix.is_none()
 	}
 }
+
+impl VendorPrefixedAtRule for ViewportAtRule
+{
+}

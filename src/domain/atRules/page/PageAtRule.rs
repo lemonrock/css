@@ -3,26 +3,62 @@
 
 
 /// A [`@page`][page] rule.
-///
-/// This implements only a limited subset of the CSS 2.2 syntax.
-///
-/// In this subset, [page selectors][page-selectors] are not implemented.
-///
 /// [page]: https://drafts.csswg.org/css2/page.html#page-box
 /// [page-selectors]: https://drafts.csswg.org/css2/page.html#page-selectors
-#[derive(Debug, Clone)]
+#[derive(Default, Debug, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct PageAtRule
 {
+	pub page_selector_pseudo_class: Option<PageSelectorPseudoClass>,
+	
 	/// The declaration block this page rule contains.
-	pub property_declarations: PropertyDeclarations,
+	pub property_declarations: PropertyDeclarations<Importance>,
 }
 
 impl ToCss for PageAtRule
 {
 	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
 	{
-		dest.write_str("@page{")?;
+		dest.write_str("@page")?;
+		if let Some(ref page_selector_pseudo_class) = self.page_selector_pseudo_class
+		{
+			dest.write_char(' ')?;
+			page_selector_pseudo_class.to_css(dest)?;
+		}
+		dest.write_char('{')?;
 		self.property_declarations.to_css(dest)?;
 		dest.write_char('}')
+	}
+}
+
+impl HasPropertyDeclarations<Importance> for PageAtRule
+{
+	#[inline(always)]
+	fn property_declarations(&self) -> &PropertyDeclarations<Importance>
+	{
+		&self.property_declarations
+	}
+	
+	#[inline(always)]
+	fn property_declarations_mut(&mut self) -> &mut PropertyDeclarations<Importance>
+	{
+		&mut self.property_declarations
+	}
+	
+	#[inline(always)]
+	fn property_declarations_slice(&self) -> &[PropertyDeclaration<Importance>]
+	{
+		&self.property_declarations.0[..]
+	}
+	
+	#[inline(always)]
+	fn property_declarations_vec(&self) -> &Vec<PropertyDeclaration<Importance>>
+	{
+		&self.property_declarations.0
+	}
+	
+	#[inline(always)]
+	fn property_declarations_vec_mut(&mut self) -> &mut Vec<PropertyDeclaration<Importance>>
+	{
+		&mut self.property_declarations.0
 	}
 }

@@ -2,20 +2,6 @@
 // Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
 
 
-pub trait HasCssRules
+pub trait VendorPrefixedAtRule: Sized + HasVendorPrefix
 {
-	#[inline(always)]
-	fn css_rules(&self) -> &CssRules;
-	
-	#[inline(always)]
-	fn css_rules_mut(&mut self) -> &mut CssRules;
-	
-	#[inline(always)]
-	fn css_rules_slice(&self) -> &[CssRule];
-	
-	#[inline(always)]
-	fn css_rules_vec(&self) -> &Vec<CssRule>;
-	
-	#[inline(always)]
-	fn css_rules_vec_mut(&mut self) -> &mut Vec<CssRule>;
 }

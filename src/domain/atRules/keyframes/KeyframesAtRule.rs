@@ -46,6 +46,10 @@ impl HasVendorPrefix for KeyframesAtRule
 	}
 }
 
+impl VendorPrefixedAtRule for KeyframesAtRule
+{
+}
+
 impl KeyframesAtRule
 {
 	/// Returns the index of the last keyframe that matches the given selector.

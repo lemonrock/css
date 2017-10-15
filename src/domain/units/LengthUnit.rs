@@ -413,9 +413,23 @@ impl<Number: CssNumber> LengthUnit<Number>
 			
 			"pc" => Ok(Absolute(pc(cssNumber))),
 			
-			"em" => Ok(FontRelative(em(cssNumber))),
+			"em" => if is_not_in_page_rule
+			{
+				Ok(FontRelative(em(cssNumber)))
+			}
+			else
+			{
+				Err(ParseError::Custom(CustomParseError::FontRelativeLengthsAreNotAllowedInAPageAtRule))
+			},
 			
-			"ex" => Ok(FontRelative(ex(cssNumber))),
+			"ex" => if is_not_in_page_rule
+			{
+				Ok(FontRelative(ex(cssNumber)))
+			}
+			else
+			{
+				Err(ParseError::Custom(CustomParseError::FontRelativeLengthsAreNotAllowedInAPageAtRule))
+			},
 			
 			"ch" => Ok(FontRelative(ch(cssNumber))),
 			

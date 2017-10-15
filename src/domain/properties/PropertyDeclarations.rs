@@ -2,10 +2,11 @@
 // Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
 
 
-#[derive(Debug, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
-pub struct PropertyDeclarations(pub Vec<PropertyDeclaration>);
+/// A list of property declarations
+#[derive(Default, Debug, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
+pub struct PropertyDeclarations<I: HasImportance>(pub Vec<PropertyDeclaration<I>>);
 
-impl ToCss for PropertyDeclarations
+impl<I: HasImportance> ToCss for PropertyDeclarations<I>
 {
 	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
 	{
@@ -18,7 +19,40 @@ impl ToCss for PropertyDeclarations
 	}
 }
 
-impl PropertyDeclarations
+impl<I: HasImportance> HasPropertyDeclarations<I> for PropertyDeclarations<I>
+{
+	#[inline(always)]
+	fn property_declarations(&self) -> &PropertyDeclarations<I>
+	{
+		self
+	}
+	
+	#[inline(always)]
+	fn property_declarations_mut(&mut self) -> &mut PropertyDeclarations<I>
+	{
+		self
+	}
+	
+	#[inline(always)]
+	fn property_declarations_slice(&self) -> &[PropertyDeclaration<I>]
+	{
+		&self.0[..]
+	}
+	
+	#[inline(always)]
+	fn property_declarations_vec(&self) -> &Vec<PropertyDeclaration<I>>
+	{
+		&self.0
+	}
+	
+	#[inline(always)]
+	fn property_declarations_vec_mut(&mut self) -> &mut Vec<PropertyDeclaration<I>>
+	{
+		&mut self.0
+	}
+}
+
+impl<I: HasImportance> PropertyDeclarations<I>
 {
 	#[inline(always)]
 	pub fn is_empty(&self) -> bool
@@ -27,13 +61,13 @@ impl PropertyDeclarations
 	}
 	
 	// Parse a list of property declarations and return a property declaration block.
-	pub(crate) fn parse_property_declaration_list<'i: 't, 't>(context: &ParserContext, input: &mut Parser<'i, 't>, parsingAKeyFramePropertyDeclarationListSoImportantIsDisallowed: bool) -> Result<PropertyDeclarations, ParseError<'i, CustomParseError<'i>>>
+	pub(crate) fn parse_property_declaration_list<'i: 't, 't>(context: &ParserContext, input: &mut Parser<'i, 't>) -> Result<PropertyDeclarations<I>, ParseError<'i, CustomParseError<'i>>>
 	{
 		let mut propertyDeclarations = Vec::new();
 		let mut parsedPropertyDeclarations = DeclarationListParser::new(input, PropertyDeclarationParser
 		{
 			context,
-			parsingAKeyFramePropertyDeclarationListSoImportantIsDisallowed,
+			marker: PhantomData,
 		});
 		
 		while let Some(propertyDeclaration) = parsedPropertyDeclarations.next()

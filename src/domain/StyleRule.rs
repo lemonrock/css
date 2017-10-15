@@ -10,7 +10,7 @@ pub struct StyleRule
 	pub selectors: DeduplicatedSelectors,
 	
 	/// The declaration block with the properties it contains.
-	pub property_declarations: PropertyDeclarations,
+	pub property_declarations: PropertyDeclarations<Importance>,
 }
 
 impl ToCss for StyleRule
@@ -25,5 +25,38 @@ impl ToCss for StyleRule
 		self.property_declarations.to_css(dest)?;
 		
 		dest.write_char('}')
+	}
+}
+
+impl HasPropertyDeclarations<Importance> for StyleRule
+{
+	#[inline(always)]
+	fn property_declarations(&self) -> &PropertyDeclarations<Importance>
+	{
+		&self.property_declarations
+	}
+	
+	#[inline(always)]
+	fn property_declarations_mut(&mut self) -> &mut PropertyDeclarations<Importance>
+	{
+		&mut self.property_declarations
+	}
+	
+	#[inline(always)]
+	fn property_declarations_slice(&self) -> &[PropertyDeclaration<Importance>]
+	{
+		&self.property_declarations.0[..]
+	}
+	
+	#[inline(always)]
+	fn property_declarations_vec(&self) -> &Vec<PropertyDeclaration<Importance>>
+	{
+		&self.property_declarations.0
+	}
+	
+	#[inline(always)]
+	fn property_declarations_vec_mut(&mut self) -> &mut Vec<PropertyDeclaration<Importance>>
+	{
+		&mut self.property_declarations.0
 	}
 }

@@ -2,20 +2,13 @@
 // Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
 
 
-pub trait HasCssRules
+pub trait HasImportance: ToCss + Sized
 {
+	/// Validate and convert importance, if permitted
 	#[inline(always)]
-	fn css_rules(&self) -> &CssRules;
+	fn validateParsedImportance<'i>(importance: Importance) -> Result<Self, ParseError<'i, CustomParseError<'i>>>;
 	
+	/// Return whether this is an important declaration.
 	#[inline(always)]
-	fn css_rules_mut(&mut self) -> &mut CssRules;
-	
-	#[inline(always)]
-	fn css_rules_slice(&self) -> &[CssRule];
-	
-	#[inline(always)]
-	fn css_rules_vec(&self) -> &Vec<CssRule>;
-	
-	#[inline(always)]
-	fn css_rules_vec_mut(&mut self) -> &mut Vec<CssRule>;
+	fn isImportant(&self) -> bool;
 }

@@ -3,34 +3,32 @@
 
 
 /// A struct to parse property declarations.
-pub(crate) struct PropertyDeclarationParser<'a>
+pub(crate) struct PropertyDeclarationParser<'a, I: 'a + HasImportance>
 {
 	pub(crate) context: &'a ParserContext,
-	pub(crate) parsingAKeyFramePropertyDeclarationListSoImportantIsDisallowed: bool,
+	pub(crate) marker: PhantomData<&'a I>,
 }
 
 /// In theory, @rules may be present. In practice, none are currently defined (Sep 2017)
-impl<'a, 'i> AtRuleParser<'i> for PropertyDeclarationParser<'a>
+impl<'a, 'i, I: HasImportance> AtRuleParser<'i> for PropertyDeclarationParser<'a, I>
 {
 	type PreludeNoBlock = ();
 	
 	type PreludeBlock = ();
 	
-	type AtRule = PropertyDeclaration;
+	type AtRule = PropertyDeclaration<I>;
 	
 	type Error = CustomParseError<'i>;
 }
 
-impl<'a, 'i> DeclarationParser<'i> for PropertyDeclarationParser<'a>
+impl<'a, 'i, I: HasImportance> DeclarationParser<'i> for PropertyDeclarationParser<'a, I>
 {
-	type Declaration = PropertyDeclaration;
+	type Declaration = PropertyDeclaration<I>;
 	
 	type Error = CustomParseError<'i>;
 	
 	fn parse_value<'t>(&mut self, name: CowRcStr<'i>, input: &mut Parser<'i, 't>) -> Result<Self::Declaration, ParseError<'i, Self::Error>>
 	{
-		let sourceLocation = input.current_source_location();
-		
 		let (vendor_prefix, unprefixedPropertyName) = VendorPrefix::findPrefixIfAnyForAsciiLowerCaseName(name.to_ascii_lowercase());
 		
 		let name = Atom::from(unprefixedPropertyName);
@@ -47,11 +45,7 @@ impl<'a, 'i> DeclarationParser<'i> for PropertyDeclarationParser<'a>
 			}
 		})?;
 		
-		let importance = Importance::parse(input);
-		if self.parsingAKeyFramePropertyDeclarationListSoImportantIsDisallowed && importance.isImportant()
-		{
-			return Err(ParseError::Custom(CustomParseError::ImportantIsNotAllowedInKeyframePropertyDeclarationValues(sourceLocation)));
-		}
+		let importance = I::validateParsedImportance(Importance::parse(input))?;
 		
 		input.expect_exhausted()?;
 		

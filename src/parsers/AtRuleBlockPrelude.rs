@@ -24,7 +24,7 @@ pub enum AtRuleBlockPrelude
 	Media(MediaList),
 	
 	/// A @page rule prelude.
-	Page,
+	Page(Option<PageSelectorPseudoClass>),
 	
 	/// An @supports rule, with its conditional
 	Supports(SupportsCondition),

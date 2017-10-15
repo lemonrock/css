@@ -36,11 +36,17 @@ impl ToCss for Importance
 	}
 }
 
-impl Importance
+impl HasImportance for Importance
 {
+	#[inline(always)]
+	fn validateParsedImportance<'i>(importance: Importance) -> Result<Self, ParseError<'i, CustomParseError<'i>>>
+	{
+		Ok(importance)
+	}
+	
 	/// Return whether this is an important declaration.
 	#[inline(always)]
-	pub fn isImportant(&self) -> bool
+	fn isImportant(&self) -> bool
 	{
 		match *self
 		{
@@ -48,7 +54,10 @@ impl Importance
 			Important => true,
 		}
 	}
-	
+}
+
+impl Importance
+{
 	#[inline(always)]
 	pub fn from_bool(isImportant: bool) -> Self
 	{

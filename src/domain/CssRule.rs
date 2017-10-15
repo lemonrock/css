@@ -2,47 +2,80 @@
 // Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
 
 
-#[allow(missing_docs)]
+/// No Charset here, CSSCharsetRule has been removed from CSSOM (https://drafts.csswg.org/cssom/#changes-from-5-december-2013) and Edge doesn't support it
 #[derive(Debug, Clone)]
 pub enum CssRule
 {
-	/// No Charset here, CSSCharsetRule has been removed from CSSOM (https://drafts.csswg.org/cssom/#changes-from-5-december-2013) and Edge doesn't support it
-	// Charset(xxx),
-	Namespace(NamespaceAtRule),
-	Import(ImportAtRule),
-	Style(StyleRule),
-	Media(MediaAtRule),
-	FontFace(FontFaceAtRule),
-	FontFeatureValues(FontFeatureValuesAtRule),
+	/// @counter-style
 	CounterStyle(CounterStyleAtRule),
-	Viewport(ViewportAtRule),
-	Keyframes(KeyframesAtRule),
-	Supports(SupportsAtRule),
-	Page(PageAtRule),
+	
+	/// @document
 	Document(DocumentAtRule),
+	
+	/// @font-face
+	FontFace(FontFaceAtRule),
+	
+	/// @font-feature-values
+	FontFeatureValues(FontFeatureValuesAtRule),
+	
+	/// @import
+	Import(ImportAtRule),
+	
+	/// @keyframes
+	Keyframes(KeyframesAtRule),
+	
+	/// @media
+	Media(MediaAtRule),
+	
+	/// @namespace
+	Namespace(NamespaceAtRule),
+	
+	/// @page
+	Page(PageAtRule),
+	
+	/// Style rules, eg `div { width: 10%; }`
+	Style(StyleRule),
+	
+	/// @supports
+	Supports(SupportsAtRule),
+	
+	/// @viewport
+	Viewport(ViewportAtRule),
 }
 
 impl ToCss for CssRule
 {
-	// https://drafts.csswg.org/cssom/#serialize-a-css-rule
+	/// https://drafts.csswg.org/cssom/#serialize-a-css-rule
 	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
 	{
 		use self::CssRule::*;
 		
 		match *self
 		{
-			Namespace(ref rule) => rule.to_css(dest),
-			Import(ref rule) => rule.to_css(dest),
-			Style(ref rule) => rule.to_css(dest),
-			FontFace(ref rule) => rule.to_css(dest),
-			FontFeatureValues(ref rule) => rule.to_css(dest),
+			
 			CounterStyle(ref rule) => rule.to_css(dest),
-			Viewport(ref rule) => rule.to_css(dest),
-			Keyframes(ref rule) => rule.to_css(dest),
-			Media(ref rule) => rule.to_css(dest),
-			Supports(ref rule) => rule.to_css(dest),
-			Page(ref rule) => rule.to_css(dest),
+			
 			Document(ref rule) => rule.to_css(dest),
+			
+			FontFace(ref rule) => rule.to_css(dest),
+			
+			FontFeatureValues(ref rule) => rule.to_css(dest),
+			
+			Import(ref rule) => rule.to_css(dest),
+			
+			Keyframes(ref rule) => rule.to_css(dest),
+			
+			Media(ref rule) => rule.to_css(dest),
+			
+			Namespace(ref rule) => rule.to_css(dest),
+			
+			Page(ref rule) => rule.to_css(dest),
+			
+			Style(ref rule) => rule.to_css(dest),
+			
+			Supports(ref rule) => rule.to_css(dest),
+			
+			Viewport(ref rule) => rule.to_css(dest),
 		}
 	}
 }
@@ -50,24 +83,36 @@ impl ToCss for CssRule
 impl CssRule
 {
 	/// Returns the CSSOM rule type of this rule.
+	#[inline(always)]
 	pub fn rule_type(&self) -> CssRuleType
 	{
 		use self::CssRule::*;
 		
 		match *self
 		{
-			Style(_) => CssRuleType::Style,
-			Import(_) => CssRuleType::Import,
-			Media(_) => CssRuleType::Media,
-			FontFace(_) => CssRuleType::FontFace,
-			FontFeatureValues(_) => CssRuleType::FontFeatureValues,
 			CounterStyle(_) => CssRuleType::CounterStyle,
-			Keyframes(_) => CssRuleType::Keyframes,
-			Namespace(_) => CssRuleType::Namespace,
-			Viewport(_) => CssRuleType::Viewport,
-			Supports(_) => CssRuleType::Supports,
-			Page(_) => CssRuleType::Page,
+			
 			Document(_)  => CssRuleType::Document,
+			
+			FontFace(_) => CssRuleType::FontFace,
+			
+			FontFeatureValues(_) => CssRuleType::FontFeatureValues,
+			
+			Import(_) => CssRuleType::Import,
+			
+			Keyframes(_) => CssRuleType::Keyframes,
+			
+			Media(_) => CssRuleType::Media,
+			
+			Namespace(_) => CssRuleType::Namespace,
+			
+			Page(_) => CssRuleType::Page,
+			
+			Style(_) => CssRuleType::Style,
+			
+			Supports(_) => CssRuleType::Supports,
+			
+			Viewport(_) => CssRuleType::Viewport,
 		}
 	}
 }

@@ -1,8 +1,9 @@
 // This file is part of css. It is subject to the license terms in the COPYRIGHT file found in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT. No part of predicator, including this file, may be copied, modified, propagated, or distributed except according to the terms contained in the COPYRIGHT file.
 // Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
 
+
 /// A list of CSS rules.
-#[derive(Debug, Clone)]
+#[derive(Default, Debug, Clone)]
 pub struct CssRules(pub Vec<CssRule>);
 
 impl ToCss for CssRules
@@ -18,8 +19,86 @@ impl ToCss for CssRules
 	}
 }
 
+impl HasCssRules for CssRules
+{
+	#[inline(always)]
+	fn css_rules(&self) -> &CssRules
+	{
+		self
+	}
+	
+	#[inline(always)]
+	fn css_rules_mut(&mut self) -> &mut CssRules
+	{
+		self
+	}
+	
+	#[inline(always)]
+	fn css_rules_slice(&self) -> &[CssRule]
+	{
+		&self.0[..]
+	}
+	
+	#[inline(always)]
+	fn css_rules_vec(&self) -> &Vec<CssRule>
+	{
+		&self.0
+	}
+	
+	#[inline(always)]
+	fn css_rules_vec_mut(&mut self) -> &mut Vec<CssRule>
+	{
+		&mut self.0
+	}
+}
+
 impl CssRules
 {
+	#[inline(always)]
+	pub fn vendor_prefix_at_rules<AtRule: VendorPrefixedAtRule, CssRuleMatcher: Fn(&CssRule) -> Option<&AtRule>, VendorPrefixer: Fn(usize, &AtRule) -> Vec<CssRule>>(&mut self, removeUnprefixedAtRule: bool, cssRuleMatcher: CssRuleMatcher, vendorPrefixer: VendorPrefixer)
+	{
+		let mut index = 0;
+		while index < self.0.len()
+		{
+			let newCssRulesToInsert = match cssRuleMatcher(unsafe { &self.0.get_unchecked(index) })
+			{
+				None => None,
+				Some(atRule) => if atRule.isNotVendorPrefixed()
+				{
+					Some(vendorPrefixer(index, atRule))
+				}
+				else
+				{
+					None
+				},
+			};
+			
+			index += if let Some(mut newCssRulesToInsert) = newCssRulesToInsert
+			{
+				let indexIncrement = newCssRulesToInsert.len();
+				
+				// TODO: Inefficient
+				for newCssRuleToInsert in newCssRulesToInsert.drain(..)
+				{
+					self.css_rules_vec_mut().insert(index, newCssRuleToInsert);
+				}
+				if removeUnprefixedAtRule
+				{
+					self.css_rules_vec_mut().remove(index + indexIncrement);
+					indexIncrement
+				}
+				else
+				{
+					indexIncrement + 1
+				}
+			}
+			else
+			{
+				1
+			};
+		}
+	}
+	
 	/// Whether this CSS rules is empty.
 	pub fn is_empty(&self) -> bool
 	{

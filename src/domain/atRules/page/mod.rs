@@ -3,6 +3,9 @@
 
 
 use super::*;
+use ::either::Either;
+use ::either::Either::*;
 
 
 include!("PageAtRule.rs");
+include!("PageSelectorPseudoClass.rs");
