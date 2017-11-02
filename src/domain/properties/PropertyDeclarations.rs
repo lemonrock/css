@@ -11,19 +11,19 @@ impl<I: HasImportance> ToCss for PropertyDeclarations<I>
 	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
 	{
 		let length = self.0.len();
-		if length == 0
+		if length != 0
 		{
-			return Ok(());
+			for index in 0..(length - 1)
+			{
+				(unsafe { self.0.get_unchecked(index) }).to_css(dest)?;
+			}
+			
+			(unsafe { self.0.get_unchecked(length -1) }).to_css_without_trailing_semicolon(dest)
 		}
-		
-		for index in 0..(length - 1)
+		else
 		{
-			let propertyDeclaration = unsafe { self.0.get_unchecked(index) };
-			propertyDeclaration.to_css(dest)?;
+			Ok(())
 		}
-		
-		let propertyDeclaration = unsafe { self.0.get_unchecked(length - 1) };
-		propertyDeclaration.to_css_without_trailing_semicolon(dest)
 	}
 }
 

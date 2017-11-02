@@ -47,12 +47,18 @@ impl ToCss for ViewportAtRule
 			vendorPrefix.to_css(dest)?;
 		}
 		dest.write_str("viewport{")?;
-		let mut iter = self.declarations.iter();
-		iter.next().unwrap().to_css(dest)?;
-		for declaration in iter
+		
+		let length = self.declarations.len();
+		if length != 0
 		{
-			declaration.to_css(dest)?;
+			for index in 0..(length - 1)
+			{
+				(unsafe { self.declarations.get_unchecked(index) }).to_css(dest)?;
+			}
+			
+			(unsafe { self.declarations.get_unchecked(length -1) }).to_css_without_trailing_semicolon(dest)?
 		}
+		
 		dest.write_char('}')
 	}
 }

@@ -14,8 +14,7 @@ impl ToCss for ViewportDescriptorDeclaration
 {
 	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
 	{
-		self.descriptor.to_css(dest)?;
-		self.importance.to_css(dest)?;
+		self.to_css_without_trailing_semicolon(dest)?;
 		dest.write_char(';')
 	}
 }
@@ -35,5 +34,12 @@ impl ViewportDescriptorDeclaration
 				importance
 			}
 		)
+	}
+	
+	#[inline(always)]
+	fn to_css_without_trailing_semicolon<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
+	{
+		self.descriptor.to_css(dest)?;
+		self.importance.to_css(dest)
 	}
 }

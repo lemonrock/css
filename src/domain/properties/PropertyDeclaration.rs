@@ -44,6 +44,7 @@ impl<I: HasImportance> PropertyDeclaration<I>
 		self.name.eq_ignore_ascii_case(name)
 	}
 	
+	#[inline(always)]
 	fn to_css_without_trailing_semicolon<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
 	{
 		if let Some(ref vendorPrefix) = self.vendor_prefix

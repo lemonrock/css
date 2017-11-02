@@ -38,9 +38,9 @@ impl ToCss for FontFeatureValuesAtRule
 	{
 		dest.write_str("@font-feature-values ")?;
 		self.font_family_to_css(dest)?;
-		dest.write_str("{\n")?;
+		dest.write_char('{')?;
 		self.value_to_css(dest)?;
-		dest.write_str("}")
+		dest.write_char('}')
 	}
 }
 
