@@ -44,14 +44,21 @@ impl ToCss for CounterStyleAtRule
 	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
 	{
 		#[inline(always)]
-		fn write<W: fmt::Write, T: ToCss>(dest: &mut W, name: &str, value: &Option<T>) -> fmt::Result
+		fn write<W: fmt::Write, T: ToCss>(afterFirst: &mut bool, dest: &mut W, name: &str, value: &Option<T>) -> fmt::Result
 		{
 			if let &Some(ref value) = value
 			{
+				if *afterFirst
+				{
+					dest.write_char(';')?;
+				}
+				else
+				{
+					*afterFirst = true;
+				}
 				dest.write_str(name)?;
 				dest.write_char(':')?;
-				value.to_css(dest)?;
-				dest.write_char(';')
+				value.to_css(dest)
 			}
 			else
 			{
@@ -62,16 +69,17 @@ impl ToCss for CounterStyleAtRule
 		dest.write_str("@counter-style ")?;
 		self.name.to_css(dest)?;
 		dest.write_char('{')?;
-		write(dest, "system", &self.system)?;
-		write(dest, "negative", &self.negative)?;
-		write(dest, "prefix", &self.prefix)?;
-		write(dest, "suffix", &self.suffix)?;
-		write(dest, "range", &self.range)?;
-		write(dest, "pad", &self.pad)?;
-		write(dest, "fallback", &self.fallback)?;
-		write(dest, "symbols", &self.symbols)?;
-		write(dest, "additive-symbols", &self.additive_symbols)?;
-		write(dest, "speak-as", &self.speak_as)?;
+		let mut afterFirst = false;
+		write(&mut afterFirst, dest, "system", &self.system)?;
+		write(&mut afterFirst, dest, "negative", &self.negative)?;
+		write(&mut afterFirst, dest, "prefix", &self.prefix)?;
+		write(&mut afterFirst, dest, "suffix", &self.suffix)?;
+		write(&mut afterFirst, dest, "range", &self.range)?;
+		write(&mut afterFirst, dest, "pad", &self.pad)?;
+		write(&mut afterFirst, dest, "fallback", &self.fallback)?;
+		write(&mut afterFirst, dest, "symbols", &self.symbols)?;
+		write(&mut afterFirst, dest, "additive-symbols", &self.additive_symbols)?;
+		write(&mut afterFirst, dest, "speak-as", &self.speak_as)?;
 		dest.write_char('}')
 	}
 }
