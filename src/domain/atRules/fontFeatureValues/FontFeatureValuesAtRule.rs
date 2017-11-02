@@ -90,7 +90,7 @@ impl FontFeatureValuesAtRule
 		iter.next().unwrap().to_css(dest)?;
 		for val in iter
 		{
-			dest.write_str(", ")?;
+			dest.write_char(',')?;
 			val.to_css(dest)?;
 		}
 		Ok(())
@@ -107,10 +107,17 @@ impl FontFeatureValuesAtRule
 				dest.write_char('@')?;
 				dest.write_str(name)?;
 				dest.write_char('{')?;
-				for declaration in block.iter()
+				
+				let length = block.len();
+				if length != 0
 				{
-					declaration.to_css(dest)?;
+					for index in 0..(length - 1)
+					{
+						(unsafe { block.get_unchecked(index) }).to_css(dest)?;
+					}
+					(unsafe { block.get_unchecked(length - 1) }).to_css_without_trailing_semicolon(dest)?;
 				}
+				
 				dest.write_char('}')
 			}
 			else

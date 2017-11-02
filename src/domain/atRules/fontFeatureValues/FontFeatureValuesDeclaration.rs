@@ -20,11 +20,21 @@ pub struct FontFeatureValuesDeclaration<T: ToCss>
 
 impl<T: ToCss> ToCss for FontFeatureValuesDeclaration<T>
 {
+	#[inline(always)]
 	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
+	{
+		self.to_css_without_trailing_semicolon(dest)?;
+		dest.write_char(';')
+	}
+}
+
+impl<T: ToCss> FontFeatureValuesDeclaration<T>
+{
+	#[inline(always)]
+	fn to_css_without_trailing_semicolon<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
 	{
 		self.name.to_css(dest)?;
 		dest.write_char(':')?;
-		self.value.to_css(dest)?;
-		dest.write_char(';')
+		self.value.to_css(dest)
 	}
 }
