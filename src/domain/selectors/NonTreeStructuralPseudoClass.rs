@@ -19,6 +19,7 @@ pub enum NonTreeStructuralPseudoClass
 	enabled,
 	first, // Only valid in @page
 	focus,
+	focus_ring(Option<VendorPrefix>),
 	focus_within,
 	in_range,
 	invalid,
@@ -102,6 +103,8 @@ impl ToCss for NonTreeStructuralPseudoClass
 			first => write(dest, ":first"),
 			
 			focus => write(dest, ":focus"),
+			
+			focus_ring(ref vendorPrefix) => write_with_vendor_prefix(dest, vendorPrefix, "focus-ring"),
 			
 			focus_within => write(dest, ":focus-within"),
 			
@@ -239,6 +242,10 @@ impl NonTreeStructuralPseudoClass
 			"first" => Ok(first),
 			
 			"focus" => Ok(focus),
+			
+			"focus-ring" => Ok(focus_ring(None)),
+			
+			"-moz-focus-ring" => Ok(focus_ring(Some(moz))),
 			
 			"focus-within" => Ok(focus_within),
 			
