@@ -1,5 +1,5 @@
 <component name="CopyrightManager">
-  <settings default="cordial">
+  <settings default="css">
     <module2copyright>
       <element module="All" copyright="css" />
     </module2copyright>

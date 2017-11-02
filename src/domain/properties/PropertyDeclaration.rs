@@ -15,14 +15,7 @@ impl<I: HasImportance> ToCss for PropertyDeclaration<I>
 {
 	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
 	{
-		if let Some(ref vendorPrefix) = self.vendor_prefix
-		{
-			vendorPrefix.to_css(dest)?;
-		}
-		self.name.to_css(dest)?;
-		dest.write_char(':')?;
-		self.value.to_css(dest)?;
-		self.importance.to_css(dest)?;
+		self.to_css_without_trailing_semicolon(dest)?;
 		dest.write_char(';')
 	}
 }
@@ -49,5 +42,17 @@ impl<I: HasImportance> PropertyDeclaration<I>
 	pub fn hasAsciiNameIgnoringCase(&self, name: &str) -> bool
 	{
 		self.name.eq_ignore_ascii_case(name)
+	}
+	
+	fn to_css_without_trailing_semicolon<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
+	{
+		if let Some(ref vendorPrefix) = self.vendor_prefix
+		{
+			vendorPrefix.to_css(dest)?;
+		}
+		self.name.to_css(dest)?;
+		dest.write_char(':')?;
+		self.value.to_css(dest)?;
+		self.importance.to_css(dest)
 	}
 }
