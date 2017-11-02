@@ -41,14 +41,22 @@ impl ToCss for FontFaceAtRule
 	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
 	{
 		#[inline(always)]
-		fn writePropertyDeclaration<W: fmt::Write, T: ToCss>(dest: &mut W, name: &str, value: &Option<T>) -> fmt::Result
+		fn writePropertyDeclaration<W: fmt::Write, T: ToCss>(afterFirst: &mut bool, dest: &mut W, name: &str, value: &Option<T>) -> fmt::Result
 		{
 			if let &Some(ref value) = value
 			{
+				if *afterFirst
+				{
+					dest.write_char(';')?;
+				}
+				else
+				{
+					*afterFirst = true;
+				}
+				
 				dest.write_str(name)?;
 				dest.write_char(':')?;
-				value.to_css(dest)?;
-				dest.write_char(';')
+				value.to_css(dest)
 			}
 			else
 			{
@@ -57,13 +65,22 @@ impl ToCss for FontFaceAtRule
 		}
 		
 		#[inline(always)]
-		fn writePropertyDeclarationValues<W: fmt::Write, T: ToCss>(dest: &mut W, name: &str, value: &Option<Vec<T>>) -> fmt::Result
+		fn writePropertyDeclarationValues<W: fmt::Write, T: ToCss>(afterFirst: &mut bool, dest: &mut W, name: &str, value: &Option<Vec<T>>) -> fmt::Result
 		{
 			if let &Some(ref value) = value
 			{
 				if value.is_empty()
 				{
 					return Ok(());
+				}
+				
+				if *afterFirst
+				{
+					dest.write_char(';')?;
+				}
+				else
+				{
+					*afterFirst = true;
 				}
 				
 				dest.write_str(name)?;
@@ -73,28 +90,26 @@ impl ToCss for FontFaceAtRule
 				iterator.next().unwrap().to_css(dest)?;
 				for value in iterator
 				{
+					dest.write_char(',')?;
 					value.to_css(dest)?;
 				}
-				
-				dest.write_char(';')
 			}
-			else
-			{
-				Ok(())
-			}
+			
+			Ok(())
 		}
 		
 		dest.write_str("@font-face{")?;
 		
-		writePropertyDeclaration(dest, "font-family", &self.family)?;
-		writePropertyDeclarationValues(dest, "src", &self.sources)?;
-		writePropertyDeclaration(dest, "font-style", &self.style)?;
-		writePropertyDeclaration(dest, "font-weight", &self.weight)?;
-		writePropertyDeclaration(dest, "font-stretch", &self.stretch)?;
-		writePropertyDeclaration(dest, "font-display", &self.display)?;
-		writePropertyDeclarationValues(dest, "unicode-range", &self.unicode_range)?;
-		writePropertyDeclaration(dest, "font-feature-settings", &self.feature_settings)?;
-		writePropertyDeclaration(dest, "font-language-override", &self.language_override)?;
+		let mut afterFirst = false;
+		writePropertyDeclaration(&mut afterFirst, dest, "font-family", &self.family)?;
+		writePropertyDeclarationValues(&mut afterFirst, dest, "src", &self.sources)?;
+		writePropertyDeclaration(&mut afterFirst, dest, "font-style", &self.style)?;
+		writePropertyDeclaration(&mut afterFirst, dest, "font-weight", &self.weight)?;
+		writePropertyDeclaration(&mut afterFirst, dest, "font-stretch", &self.stretch)?;
+		writePropertyDeclaration(&mut afterFirst, dest, "font-display", &self.display)?;
+		writePropertyDeclarationValues(&mut afterFirst, dest, "unicode-range", &self.unicode_range)?;
+		writePropertyDeclaration(&mut afterFirst, dest, "font-feature-settings", &self.feature_settings)?;
+		writePropertyDeclaration(&mut afterFirst, dest, "font-language-override", &self.language_override)?;
 		
 		dest.write_char('}')
 	}

@@ -18,6 +18,7 @@ impl ToCss for LanguageRanges
 		iterator.next().unwrap().to_css(dest)?;
 		for languageRange in iterator
 		{
+			dest.write_char(',')?;
 			languageRange.to_css(dest)?;
 		}
 		Ok(())
