@@ -418,9 +418,15 @@ impl NonTreeStructuralPseudoClass
 		}
 	}
 	
+	#[inline(always)]
+	fn applyVendorPrefix(pseudoClassName: VendorPrefixablePseudoClassName, applyVendorPrefixToPseudoClasses: &HashMap<VendorPrefixablePseudoClassName, VendorPrefix>) -> Option<VendorPrefix>
+	{
+		applyVendorPrefixToPseudoClasses.get(&pseudoClassName).map(|vendorPrefix| vendorPrefix.clone())
+	}
+	
 	//noinspection SpellCheckingInspection
 	#[inline(always)]
-	pub(crate) fn parse_without_arguments<'i>(name: CowRcStr<'i>) -> Result<Self, ParseError<'i, SelectorParseError<'i, CustomParseError<'i>>>>
+	pub(crate) fn parse_without_arguments<'i>(applyVendorPrefixToPseudoClasses: &HashMap<VendorPrefixablePseudoClassName, VendorPrefix>, name: CowRcStr<'i>) -> Result<Self, ParseError<'i, SelectorParseError<'i, CustomParseError<'i>>>>
 	{
 		use self::NonTreeStructuralPseudoClass::*;
 		use self::VendorPrefix::*;
@@ -431,7 +437,7 @@ impl NonTreeStructuralPseudoClass
 			
 			"active" => Ok(active),
 			
-			"any-link" => Ok(any_link(None)),
+			"any-link" => Ok(any_link(Self::applyVendorPrefix(VendorPrefixablePseudoClassName::any_link, applyVendorPrefixToPseudoClasses))),
 			
 			"-moz-any-link" => Ok(any_link(Some(moz))),
 			
@@ -451,7 +457,7 @@ impl NonTreeStructuralPseudoClass
 			
 			"focus-within" => Ok(focus_within),
 			
-			"fullscreen" => Ok(fullscreen(None)),
+			"fullscreen" => Ok(fullscreen(Self::applyVendorPrefix(VendorPrefixablePseudoClassName::fullscreen, applyVendorPrefixToPseudoClasses))),
 			
 			"-ms-fullscreen" => Ok(fullscreen(Some(ms))),
 			
@@ -475,18 +481,18 @@ impl NonTreeStructuralPseudoClass
 			
 			"out-of-range" => Ok(out_of_range),
 			
-			"placeholder-shown" => Ok(placeholder_shown(None)),
+			"placeholder-shown" => Ok(placeholder_shown(Self::applyVendorPrefix(VendorPrefixablePseudoClassName::placeholder_shown, applyVendorPrefixToPseudoClasses))),
 			
 			"-moz-placeholder-shown" => Ok(placeholder_shown(Some(moz))),
 			
 			// See https://developer.mozilla.org/en-US/docs/Web/CSS/:-moz-placeholder
-			"-moz-placeholder" => Ok(placeholder_shown(None)),
+			"-moz-placeholder" => Ok(placeholder_shown(Self::applyVendorPrefix(VendorPrefixablePseudoClassName::placeholder_shown, applyVendorPrefixToPseudoClasses))),
 			
-			"read-only" => Ok(read_only(None)),
+			"read-only" => Ok(read_only(Self::applyVendorPrefix(VendorPrefixablePseudoClassName::read_only, applyVendorPrefixToPseudoClasses))),
 			
 			"-moz-read-only" => Ok(read_only(Some(moz))),
 			
-			"read-write" => Ok(read_write(None)),
+			"read-write" => Ok(read_write(Self::applyVendorPrefix(VendorPrefixablePseudoClassName::read_write, applyVendorPrefixToPseudoClasses))),
 			
 			"-moz-read-write" => Ok(read_write(Some(moz))),
 			
@@ -580,6 +586,7 @@ impl NonTreeStructuralPseudoClass
 			// -webkit- only, with potential Mozilla support coming
 			
 			"-webkit-autofill" => Ok(autofill(Some(webkit))),
+			
 			"-moz-autofill" => Ok(autofill(Some(moz))),
 			
 			
@@ -588,7 +595,7 @@ impl NonTreeStructuralPseudoClass
 	}
 	
 	#[inline(always)]
-	pub(crate) fn parse_with_arguments<'i, 't>(name: CowRcStr<'i>, input: &mut Parser<'i, 't>, ourSelectorParser: &OurSelectorParser) -> Result<Self, ParseError<'i, SelectorParseError<'i, CustomParseError<'i>>>>
+	pub(crate) fn parse_with_arguments<'i, 't>(applyVendorPrefixToPseudoClasses: &HashMap<VendorPrefixablePseudoClassName, VendorPrefix>, name: CowRcStr<'i>, input: &mut Parser<'i, 't>, ourSelectorParser: &OurSelectorParser) -> Result<Self, ParseError<'i, SelectorParseError<'i, CustomParseError<'i>>>>
 	{
 		use self::NonTreeStructuralPseudoClass::*;
 		use self::VendorPrefix::*;
@@ -597,13 +604,13 @@ impl NonTreeStructuralPseudoClass
 		{
 			&name,
 			
-			"any" => Ok(any(None, Self::parse_any(input, ourSelectorParser)?)),
+			"any" => Ok(any(Self::applyVendorPrefix(VendorPrefixablePseudoClassName::any, applyVendorPrefixToPseudoClasses), Self::parse_any(input, ourSelectorParser)?)),
 			
 			"-moz-any" => Ok(any(Some(moz), Self::parse_any(input, ourSelectorParser)?)),
 			
 			"-webkit-any" => Ok(any(Some(webkit), Self::parse_any(input, ourSelectorParser)?)),
 			
-			"dir" => Ok(dir(None, Self::parse_text_directionality(input)?)),
+			"dir" => Ok(dir(Self::applyVendorPrefix(VendorPrefixablePseudoClassName::dir, applyVendorPrefixToPseudoClasses), Self::parse_text_directionality(input)?)),
 			
 			"-moz-dir" => Ok(dir(Some(moz), Self::parse_text_directionality(input)?)),
 			

@@ -3,12 +3,14 @@
 
 
 #[derive(Debug, Clone, Eq, PartialEq)]
-pub(crate) struct OurSelectorParser
+pub(crate) struct OurSelectorParser<'a>
 {
 	pub(crate) namespaces: Rc<Namespaces>,
+	pub(crate) applyVendorPrefixToPseudoClasses: &'a HashMap<VendorPrefixablePseudoClassName, VendorPrefix>,
+	pub(crate) applyVendorPrefixToPseudoElements: &'a HashMap<VendorPrefixablePseudoElementName, VendorPrefix>,
 }
 
-impl<'i> ::selectors::parser::Parser<'i> for OurSelectorParser
+impl<'a, 'i> ::selectors::parser::Parser<'i> for OurSelectorParser<'a>
 {
 	type Impl = OurSelectorImpl;
 	
@@ -17,25 +19,25 @@ impl<'i> ::selectors::parser::Parser<'i> for OurSelectorParser
 	#[inline(always)]
 	fn parse_non_ts_pseudo_class(&self, name: CowRcStr<'i>) -> Result<<Self::Impl as SelectorImpl>::NonTSPseudoClass, ParseError<'i, SelectorParseError<'i, Self::Error>>>
 	{
-		NonTreeStructuralPseudoClass::parse_without_arguments(name)
+		NonTreeStructuralPseudoClass::parse_without_arguments(self.applyVendorPrefixToPseudoClasses, name)
 	}
 	
 	#[inline(always)]
 	fn parse_non_ts_functional_pseudo_class<'t>(&self, name: CowRcStr<'i>, arguments: &mut Parser<'i, 't>) -> Result<<Self::Impl as SelectorImpl>::NonTSPseudoClass, ParseError<'i, SelectorParseError<'i, Self::Error>>>
 	{
-		NonTreeStructuralPseudoClass::parse_with_arguments(name, arguments, self)
+		NonTreeStructuralPseudoClass::parse_with_arguments(self.applyVendorPrefixToPseudoClasses, name, arguments, self)
 	}
 	
 	#[inline(always)]
 	fn parse_pseudo_element(&self, name: CowRcStr<'i>) -> Result<<Self::Impl as SelectorImpl>::PseudoElement, ParseError<'i, SelectorParseError<'i, Self::Error>>>
 	{
-		PseudoElement::parse_without_arguments(name)
+		PseudoElement::parse_without_arguments(self.applyVendorPrefixToPseudoElements, name)
 	}
 	
 	#[inline(always)]
 	fn parse_functional_pseudo_element<'t>(&self, name: CowRcStr<'i>, arguments: &mut Parser<'i, 't>) -> Result<<Self::Impl as SelectorImpl>::PseudoElement, ParseError<'i, SelectorParseError<'i, Self::Error>>>
 	{
-		PseudoElement::parse_with_arguments(name, arguments, self)
+		PseudoElement::parse_with_arguments(self.applyVendorPrefixToPseudoElements, name, arguments, self)
 	}
 	
 	#[inline(always)]
@@ -51,7 +53,7 @@ impl<'i> ::selectors::parser::Parser<'i> for OurSelectorParser
 	}
 }
 
-impl OurSelectorParser
+impl<'a> OurSelectorParser<'a>
 {
 	#[inline(always)]
 	pub(crate) fn parse<'i, 't>(&self, input: &mut Parser<'i, 't>) -> Result<DeduplicatedSelectors, ParseError<'i, CustomParseError<'i>>>

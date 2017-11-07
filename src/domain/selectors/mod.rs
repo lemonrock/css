@@ -21,6 +21,7 @@ use ::selectors::parser::Selector;
 use ::selectors::parser::SelectorImpl;
 use ::selectors::parser::SelectorMethods;
 use ::selectors::visitor::SelectorVisitor;
+use ::std::collections::HashMap;
 use ::std::fmt;
 
 
@@ -35,3 +36,5 @@ include!("PseudoElement.rs");
 include!("SystemMetric.rs");
 include!("TextDirectionality.rs");
 include!("TreeHover.rs");
+include!("VendorPrefixablePseudoClassName.rs");
+include!("VendorPrefixablePseudoElementName.rs");

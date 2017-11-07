@@ -451,9 +451,15 @@ impl PseudoElement
 		}
 	}
 	
+	#[inline(always)]
+	fn applyVendorPrefix(pseudoElementName: VendorPrefixablePseudoElementName, applyVendorPrefixToPseudoElements: &HashMap<VendorPrefixablePseudoElementName, VendorPrefix>) -> Option<VendorPrefix>
+	{
+		applyVendorPrefixToPseudoElements.get(&pseudoElementName).map(|vendorPrefix| vendorPrefix.clone())
+	}
+	
 	//noinspection SpellCheckingInspection
 	#[inline(always)]
-	pub(crate) fn parse_without_arguments<'i>(name: CowRcStr<'i>) -> Result<Self, ParseError<'i, SelectorParseError<'i, CustomParseError<'i>>>>
+	pub(crate) fn parse_without_arguments<'i>(applyVendorPrefixToPseudoElements: &HashMap<VendorPrefixablePseudoElementName, VendorPrefix>, name: CowRcStr<'i>) -> Result<Self, ParseError<'i, SelectorParseError<'i, CustomParseError<'i>>>>
 	{
 		use self::PseudoElement::*;
 		use self::VendorPrefix::*;
@@ -464,7 +470,7 @@ impl PseudoElement
 			
 			"after" => Ok(after),
 			
-			"backdrop" => Ok(backdrop(None)),
+			"backdrop" => Ok(backdrop(Self::applyVendorPrefix(VendorPrefixablePseudoElementName::backdrop, applyVendorPrefixToPseudoElements))),
 			
 			"-ms-backdrop" => Ok(backdrop(Some(ms))),
 			
@@ -482,13 +488,13 @@ impl PseudoElement
 			
 			"marker" => Ok(marker),
 			
-			"placeholder" => Ok(placeholder(None)),
+			"placeholder" => Ok(placeholder(Self::applyVendorPrefix(VendorPrefixablePseudoElementName::placeholder, applyVendorPrefixToPseudoElements))),
 			
 			"-ms-placeholder" => Ok(placeholder(Some(ms))),
 			
 			"-webkit-input-placeholder" => Ok(placeholder(Some(ms))),
 			
-			"selection" => Ok(selection(None)),
+			"selection" => Ok(selection(Self::applyVendorPrefix(VendorPrefixablePseudoElementName::selection, applyVendorPrefixToPseudoElements))),
 			
 			"-moz-selection" => Ok(selection(Some(moz))),
 			
@@ -497,7 +503,7 @@ impl PseudoElement
 			
 			// Nearly the same
 			
-			"progress-bar" => Ok(progress_bar(None)),
+			"progress-bar" => Ok(progress_bar(Self::applyVendorPrefix(VendorPrefixablePseudoElementName::progress_bar, applyVendorPrefixToPseudoElements))),
 			
 			"-moz-progress-bar" => Ok(progress_bar(Some(moz))),
 			
@@ -508,7 +514,7 @@ impl PseudoElement
 			
 			// Nearly the same
 			
-			"range-progress" => Ok(range_progress(None)),
+			"range-progress" => Ok(range_progress(Self::applyVendorPrefix(VendorPrefixablePseudoElementName::range_progress, applyVendorPrefixToPseudoElements))),
 			
 			"-moz-range-progress" => Ok(range_progress(Some(moz))),
 			
@@ -517,7 +523,7 @@ impl PseudoElement
 			
 			// Nearly the same
 			
-			"range-thumb" => Ok(range_thumb(None)),
+			"range-thumb" => Ok(range_thumb(Self::applyVendorPrefix(VendorPrefixablePseudoElementName::range_thumb, applyVendorPrefixToPseudoElements))),
 			
 			"-moz-range-thumb" => Ok(range_thumb(Some(moz))),
 			
@@ -528,7 +534,7 @@ impl PseudoElement
 			
 			// Nearly the same
 			
-			"range-track" => Ok(range_track(None)),
+			"range-track" => Ok(range_track(Self::applyVendorPrefix(VendorPrefixablePseudoElementName::range_track, applyVendorPrefixToPseudoElements))),
 			
 			"-moz-range-track" => Ok(range_track(Some(moz))),
 			
@@ -678,7 +684,7 @@ impl PseudoElement
 	}
 	
 	#[inline(always)]
-	pub(crate) fn parse_with_arguments<'i, 't>(name: CowRcStr<'i>, _arguments: &mut Parser<'i, 't>, _ourSelectorParser: &OurSelectorParser) -> Result<Self, ParseError<'i, SelectorParseError<'i, CustomParseError<'i>>>>
+	pub(crate) fn parse_with_arguments<'i, 't>(_applyVendorPrefixToPseudoElements: &HashMap<VendorPrefixablePseudoElementName, VendorPrefix>, name: CowRcStr<'i>, _arguments: &mut Parser<'i, 't>, _ourSelectorParser: &OurSelectorParser) -> Result<Self, ParseError<'i, SelectorParseError<'i, CustomParseError<'i>>>>
 	{
 		Err(ParseError::Custom(SelectorParseError::UnsupportedPseudoClassOrElement(name)))
 	}

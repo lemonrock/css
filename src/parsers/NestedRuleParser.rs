@@ -122,9 +122,13 @@ impl<'a, 'i> QualifiedRuleParser<'i> for NestedRuleParser<'a>
 	
 	fn parse_prelude<'t>(&mut self, input: &mut Parser<'i, 't>) -> Result<Self::Prelude, ParseError<'i, Self::Error>>
 	{
+		let applyVendorPrefixToPseudoClasses = HashMap::default();
+		let applyVendorPrefixToPseudoElements = HashMap::default();
 		let ourSelectorParser = OurSelectorParser
 		{
 			namespaces: self.namespaces.clone(),
+			applyVendorPrefixToPseudoClasses: &applyVendorPrefixToPseudoClasses,
+			applyVendorPrefixToPseudoElements: &applyVendorPrefixToPseudoElements,
 		};
 		
 		let selectors = ourSelectorParser.parse(input)?;
