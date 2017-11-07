@@ -2,6 +2,7 @@
 // Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
 
 
+#[doc(hidden)]
 #[macro_export]
 macro_rules! define_css_keyword_enum
 {
@@ -33,6 +34,7 @@ macro_rules! define_css_keyword_enum
     };
 }
 
+#[doc(hidden)]
 #[macro_export]
 macro_rules! __define_css_keyword_enum__add_optional_traits
 {
@@ -46,6 +48,7 @@ macro_rules! __define_css_keyword_enum__add_optional_traits
     };
 }
 
+#[doc(hidden)]
 #[macro_export]
 macro_rules! __define_css_keyword_enum__actual
 {

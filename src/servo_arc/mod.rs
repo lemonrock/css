@@ -8,17 +8,8 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-//! Fork of Arc for Servo. This has the following advantages over std::Arc:
-//! * We don't waste storage on the weak reference count.
-//! * We don't do extra RMU operations to handle the possibility of weak references.
-//! * We can experiment with arena allocation (todo).
-//! * We can add methods to support our custom use cases [1].
-//! * We have support for dynamically-sized types (see from_header_and_iter).
-//! * We have support for thin arcs to unsized types (see ThinArc).
-//!
-//! [1] https://bugzilla.mozilla.org/show_bug.cgi?id=1360883
 
-// The semantics of Arc are alread documented in the Rust docs, so we don't
+// The semantics of Arc are already documented in the Rust docs, so we don't
 // duplicate those here.
 
 

@@ -14,7 +14,8 @@
 //! A Rust library crate for parsing, manipulating and serializing CSS stylesheets.
 //! Makes use of existing CSS parser logic from Servo.
 //! Includes forks of code from Servo because these are unpublished on <https://crates.io>.
-//! One use of this library is to compress CSS, as the serialized form it produces is minimal.
+//! One use of this library is to minify CSS, as the serialized form it produces is minimal.
+//! Another use is provide a crate that others can use for auto-prefixing CSS and to eliminate unused CSS.
 //! The values of property declarations are currently stored as a string. Parsing property declarations is a monster job (in effect there are bespoke rules for every property). If you feel like helping...
 //!
 //!
@@ -64,19 +65,21 @@ pub mod domain;
 pub(crate) mod parsers;
 pub(crate) mod serializers;
 
+
 // This module is forked from the servo repository 'https://github.com/servo/servo' component selectors crate (components/selectors) at revision 4f984a6428a0f497e311a0800efa55166c15aac6
 // To be removed once selectors 0.19.0 lands in crates.io
 #[macro_use] extern crate log;
 #[macro_use] extern crate matches;
 extern crate fnv;
-/// Temporary fork of CSS selectors.
+/// Temporary fork of CSS selectors as the version we need is not yet available in <https://crates.io>.
 pub mod selectors;
+
 
 // This module is forked from the servo repository 'https://github.com/servo/servo' component servo_arc crate (components/servo_arc) at revision 4f984a6428a0f497e311a0800efa55166c15aac6
 // To be removed once selectors 0.19.0 lands in crates.io
 extern crate nodrop;
 extern crate stable_deref_trait;
-/// Temporary fork of Servo Arc.
+/// Temporary fork of Servo Arc as the version we need to support CSS selectors is not yet available in <https://crates.io>.
 pub mod servo_arc;
 
 
