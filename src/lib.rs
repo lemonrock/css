@@ -9,6 +9,35 @@
 #![plugin(phf_macros)]
 
 
+//! # css
+//!
+//! A Rust library crate for parsing, manipulating and serializing CSS stylesheets.
+//! Makes use of existing CSS parser logic from Servo.
+//! Includes forks of code from Servo because these are unpublished on <https://crates.io>.
+//! One use of this library is to compress CSS, as the serialized form it produces is minimal.
+//! The values of property declarations are currently stored as a string. Parsing property declarations is a monster job (in effect there are bespoke rules for every property). If you feel like helping...
+//!
+//!
+//! ## Getting Going
+//!
+//!
+//! ### To get started
+//!
+//! ```
+//! extern crate css;
+//! use css::Stylesheet;
+//!
+//! let some_css = "margin-left: 10pt; top: 20px;".to_owned();
+//! let stylesheet = Stylesheet::parse(&some_css).expect("CSS was invalid");
+//!
+//! let mut destination = String::new();
+//! // Don't write source-map and source-url comments if any are present in the stylesheet
+//! let include_source_urls = false;
+//! stylesheet.to_css(&mut destination, include_source_urls).expect("Failed to write to destination");
+//! assert_eq!(&destination, "margin-left:10pt;top:20px");
+//! ```
+
+
 #[macro_use] extern crate bitflags;
 #[macro_use] pub extern crate cssparser;
 extern crate either;
@@ -30,6 +59,7 @@ use ::selectors::parser::SelectorParseError;
 use ::std::fmt;
 
 
+/// Contains definitions of objects used in Stylesheet.
 pub mod domain;
 pub(crate) mod parsers;
 pub(crate) mod serializers;
@@ -39,12 +69,14 @@ pub(crate) mod serializers;
 #[macro_use] extern crate log;
 #[macro_use] extern crate matches;
 extern crate fnv;
+/// Temporary fork of CSS selectors.
 pub mod selectors;
 
 // This module is forked from the servo repository 'https://github.com/servo/servo' component servo_arc crate (components/servo_arc) at revision 4f984a6428a0f497e311a0800efa55166c15aac6
 // To be removed once selectors 0.19.0 lands in crates.io
 extern crate nodrop;
 extern crate stable_deref_trait;
+/// Temporary fork of Servo Arc.
 pub mod servo_arc;
 
 

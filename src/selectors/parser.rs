@@ -1712,9 +1712,9 @@ fn parse_simple_pseudo_class<'i, P, E, Impl>(parser: &P, name: CowRcStr<'i>)
 // NB: pub module in order to access the DummyParser
 #[cfg(test)]
 pub mod tests {
-    use builder::HAS_PSEUDO_BIT;
+    use selectors::parser;
+    use selectors::builder::HAS_PSEUDO_BIT;
     use cssparser::{Parser as CssParser, ToCss, serialize_identifier, ParserInput};
-    use parser;
     use std::collections::HashMap;
     use std::fmt;
     use super::*;
