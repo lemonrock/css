@@ -2,8 +2,11 @@
 // Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
 
 
+//noinspection SpellCheckingInspection
 /// Vendor prefixes
-/// Sort order is such that -o- sorts before -webkit- and -ms- sorts after -webkit-
+/// Sort order is such that -o- sorts before -webkit- and -ms- sorts after -webkit-, but -epub- (which is only supported by Webkit) sorts before -webkit-
+/// There ae other, now rare prefixes, such as -vx- (for Opera before -o-), -wap- (for WAP; a very defunct standard from 1999), -khtml- (for Webkit's predecessor) and so on.
+/// However, there are hardly ever encountered and so aren't explicitly coded for.
 #[derive(Debug, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub enum VendorPrefix
 {
@@ -12,6 +15,9 @@ pub enum VendorPrefix
 	
 	/// -moz- prefix.
 	moz,
+	
+	/// -epub- prefix
+	epub,
 	
 	/// -webkit- prefix (Is sometimes also used by IE, Edge and Blink-based browsers (Chrome and Opera)).
 	webkit,
@@ -43,6 +49,8 @@ impl ToCss for VendorPrefix
 			ms => dest.write_str("-ms-"),
 			
 			servo => dest.write_str("-servo-"),
+			
+			epub => dest.write_str("-epub-"),
 			
 			Unrecognised(ref prefix) =>
 			{
@@ -116,6 +124,8 @@ impl VendorPrefix
 			&o => knownPrefix("-o-", name),
 			
 			&moz => knownPrefix("-moz-", name),
+			
+			&epub => knownPrefix("-epub-", name),
 			
 			&webkit => knownPrefix("-webkit-", name),
 			

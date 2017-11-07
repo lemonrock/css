@@ -54,18 +54,19 @@ impl HasCssRules for CssRules
 
 impl CssRules
 {
+	/// Allows vendor prefixing of at-rules
 	#[inline(always)]
-	pub fn vendor_prefix_at_rules<AtRule: VendorPrefixedAtRule, CssRuleMatcher: Fn(&CssRule) -> Option<&AtRule>, VendorPrefixer: Fn(usize, &AtRule) -> Vec<CssRule>>(&mut self, removeUnprefixedAtRule: bool, cssRuleMatcher: CssRuleMatcher, vendorPrefixer: VendorPrefixer)
+	pub fn vendor_prefix_at_rules<AtRule: VendorPrefixedAtRule, CssRuleMatcher: Fn(&CssRule) -> Option<&AtRule>, VendorPrefixer: Fn(usize, &AtRule) -> Vec<CssRule>>(&mut self, remove_unprefixed_at_rule: bool, css_rule_matcher: CssRuleMatcher, vendor_prefixer: VendorPrefixer)
 	{
 		let mut index = 0;
 		while index < self.0.len()
 		{
-			let newCssRulesToInsert = match cssRuleMatcher(unsafe { &self.0.get_unchecked(index) })
+			let newCssRulesToInsert = match css_rule_matcher(unsafe { &self.0.get_unchecked(index) })
 			{
 				None => None,
 				Some(atRule) => if atRule.isNotVendorPrefixed()
 				{
-					Some(vendorPrefixer(index, atRule))
+					Some(vendor_prefixer(index, atRule))
 				}
 				else
 				{
@@ -82,7 +83,7 @@ impl CssRules
 				{
 					self.css_rules_vec_mut().insert(index, newCssRuleToInsert);
 				}
-				if removeUnprefixedAtRule
+				if remove_unprefixed_at_rule
 				{
 					self.css_rules_vec_mut().remove(index + indexIncrement);
 					indexIncrement
@@ -106,7 +107,7 @@ impl CssRules
 	}
 	
 	/// Returns whether all the rules in this list are namespace or import rules.
-	fn only_ns_or_import(&self) -> bool
+	fn only_namespace_or_import(&self) -> bool
 	{
 		use self::CssRule::*;
 		
@@ -139,7 +140,7 @@ impl CssRules
 			// Step 4
 			if let Namespace(..) = *rule
 			{
-				if !self.only_ns_or_import()
+				if !self.only_namespace_or_import()
 				{
 					return Err(InvalidState);
 				}

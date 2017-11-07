@@ -52,7 +52,6 @@ impl ToCss for CssRule
 		
 		match *self
 		{
-			
 			CounterStyle(ref rule) => rule.to_css(dest),
 			
 			Document(ref rule) => rule.to_css(dest),

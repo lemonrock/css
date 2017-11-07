@@ -33,4 +33,6 @@ include!("OurSelector.rs");
 include!("OurSelectorExt.rs");
 include!("OurSelectorImpl.rs");
 include!("PseudoElement.rs");
+include!("SystemMetric.rs");
 include!("TextDirectionality.rs");
+include!("TreeHover.rs");
