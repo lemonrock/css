@@ -8,14 +8,14 @@ description = "A crate that uses the cssparser and selectors crates to provide a
 keywords = ["css"]
 license = "MPL-2.0"
 authors = ["Raphael Cohn <raphael.cohn@stormmq.com>"]
-documentation = "https://github.com/lemonrock/css/blob/master/README.md"
+documentation = "https://docs.rs/css/"
 homepage = "https://github.com/lemonrock/css"
 repository = "https://github.com/lemonrock/css.git"
 exclude = ["*"]
 include = ["README.md", "LICENSE", "COPYRIGHT", "src/**/*.rs", "build.rs", "Cargo.toml", "rustfmt.toml", "clippy.toml"]
 readme = "README.md"
 publish = true
-version = "0.0.10"
+version = "0.0.11"
 
 [profile.release]
 opt-level = 3
