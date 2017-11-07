@@ -2,19 +2,20 @@
 // Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
 
 
+/// There is at least one selector
 #[derive(Debug, Clone, Eq, PartialEq)]
-pub struct DeduplicatedSelectors(pub OrderMap<String, Selector<OurSelectorImpl>>);
+pub struct DeduplicatedSelectors(pub Vec<Selector<OurSelectorImpl>>);
 
 impl ToCss for DeduplicatedSelectors
 {
 	fn to_css<W: fmt::Write>(&self, dest: &mut W) -> fmt::Result
 	{
-		let mut iter = self.0.keys();
-		dest.write_str(iter.next().unwrap())?;
-		for selectorCss in iter.next()
+		let mut iter = self.0.iter();
+		dest.write_str(&iter.next().unwrap().to_css_string())?;
+		for selector in iter.next()
 		{
 			dest.write_char(',')?;
-			dest.write_str(selectorCss)?;
+			dest.write_str(&selector.to_css_string())?;
 		}
 		Ok(())
 	}

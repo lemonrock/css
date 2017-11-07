@@ -90,7 +90,13 @@ impl OurSelectorParser
 			deduplicatedSelectors.insert(selectorCss, selector);
 		}
 		
-		Ok(DeduplicatedSelectors(deduplicatedSelectors))
+		let mut listOfSelectors = Vec::with_capacity(deduplicatedSelectors.len());
+		for (_css, selector) in deduplicatedSelectors.drain(..)
+		{
+			listOfSelectors.push(selector)
+		}
+		
+		Ok(DeduplicatedSelectors(listOfSelectors))
 	}
 	
 	#[inline(always)]

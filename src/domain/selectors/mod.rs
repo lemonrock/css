@@ -15,7 +15,6 @@ use ::cssparser::serialize_identifier;
 use ::cssparser::serialize_string;
 use ::cssparser::ToCss;
 use ::cssparser::Token;
-use ::ordermap::OrderMap;
 use ::selectors::parser::Component;
 use ::selectors::parser::Combinator;
 use ::selectors::parser::Selector;
