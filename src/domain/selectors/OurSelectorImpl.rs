@@ -45,13 +45,13 @@ impl OurSelectorImpl
 {
 	/// Applies a vendor prefix to a CSS selector
 	#[inline(always)]
-	pub fn reparse_with_vendor_prefix<'a>(selector: &OurSelector, applyVendorPrefixToPseudoClasses: &'a HashMap<VendorPrefixablePseudoClassName, VendorPrefix>, applyVendorPrefixToPseudoElements: &'a HashMap<VendorPrefixablePseudoElementName, VendorPrefix>) -> OurSelector
+	pub fn reparse_with_vendor_prefix<'a>(selector: &OurSelector, applyVendorPrefixToPseudoClasses: &'a HashMap<VendorPrefixablePseudoClassName, VendorPrefix>, applyVendorPrefixToPseudoElements: &'a HashMap<VendorPrefixablePseudoElementName, VendorPrefix>) -> Option<OurSelector>
 	{
 		const LineNumberingIsZeroBased: u32 = 0;
 		
-		let css_selector = selector.to_css_string();
+		let originalCss = selector.to_css_string();
 		
-		let mut parserInput = ParserInput::new_with_line_number_offset(&css_selector, LineNumberingIsZeroBased);
+		let mut parserInput = ParserInput::new_with_line_number_offset(&originalCss, LineNumberingIsZeroBased);
 		let mut input = Parser::new(&mut parserInput);
 		
 		let ourSelectorParser = OurSelectorParser
@@ -62,8 +62,15 @@ impl OurSelectorImpl
 		};
 		
 		let mut selectors = ourSelectorParser.parse(&mut input).unwrap();
-		let selector = selectors.0.drain(..).next().unwrap();
-		selector
+		let newSelector = selectors.0.drain(..).next().unwrap();
+		
+		if newSelector.to_css_string() != originalCss
+		{
+			Some(newSelector)
+		}
+		else
+		{
+			None
+		}
 	}
-	
 }
