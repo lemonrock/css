@@ -2,7 +2,8 @@
 // Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
 
 
-pub trait HasImportance: ToCss + Sized
+/// A trait representing that !important can or can not be present in a property declaration
+pub trait HasImportance: ToCss + Sized + Debug + Copy + Clone + Ord + PartialOrd + Eq + PartialEq + Hash
 {
 	/// Validate and convert importance, if permitted
 	#[inline(always)]
