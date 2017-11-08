@@ -37,6 +37,11 @@
 //! stylesheet.to_css(&mut destination, include_source_urls).expect("Failed to write to destination");
 //! assert_eq!(&destination, "margin-left:10pt;top:20px");
 //! ```
+//!
+//! ### To match CSS selectors
+//!
+//! Use the function `matches()`; in practice, better support is in the `css-purify` crate.
+//!
 
 
 #[macro_use] extern crate bitflags;

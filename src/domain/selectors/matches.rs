@@ -2,5 +2,13 @@
 // Copyright © 2017 The developers of css. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/css/master/COPYRIGHT.
 
 
-/// Use the `matches()` function to match the selector to elements
-pub type OurSelector = Selector<OurSelectorImpl>;
+/// Returns whether the given element matches this selector.
+#[inline]
+pub fn matches<E: Element>(selector: &Selector<E::Impl>, element: &E) -> bool
+{
+	const offset: usize = 0;
+	const hashes: Option<&AncestorHashes> = None;
+	const nth_index_cache: Option<&mut NthIndexCache> = None;
+	let mut context = MatchingContext::new(MatchingMode::Normal, None, nth_index_cache, QuirksMode::NoQuirks);
+	matches_selector(selector, offset, hashes, element, &mut context, &mut |_, _| {})
+}
