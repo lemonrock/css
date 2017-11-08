@@ -19,9 +19,9 @@ impl SelectorImpl for OurSelectorImpl
 	
 	type NamespaceUrl = NamespaceUrl;
 	
-	type BorrowedNamespaceUrl = NamespaceUrl;
+	type BorrowedNamespaceUrl = str;
 	
-	type BorrowedLocalName = Atom;
+	type BorrowedLocalName = str;
 	
 	type NonTSPseudoClass = NonTreeStructuralPseudoClass;
 	

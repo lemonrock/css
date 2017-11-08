@@ -14,6 +14,15 @@ impl ToCss for NamespaceUrl
 	}
 }
 
+impl Borrow<str> for NamespaceUrl
+{
+	#[inline(always)]
+	fn borrow(&self) -> &str
+	{
+		self.0.borrow()
+	}
+}
+
 impl PrecomputedHash for NamespaceUrl
 {
 	fn precomputed_hash(&self) -> u32

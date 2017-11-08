@@ -24,6 +24,7 @@ use self::selectors::*;
 use self::units::*;
 use ::precomputed_hash::PrecomputedHash;
 use ::std::ascii::AsciiExt;
+use ::std::borrow::Borrow;
 use ::std::borrow::Cow;
 use ::std::cmp::PartialEq;
 use ::std::cmp::Eq;

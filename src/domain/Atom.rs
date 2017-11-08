@@ -10,6 +10,7 @@ impl Deref for Atom
 {
 	type Target = str;
 	
+	#[inline(always)]
 	fn deref(&self) -> &Self::Target
 	{
 		&self.0
@@ -83,9 +84,19 @@ impl FromStr for Atom
 {
 	type Err = ();
 	
+	#[inline(always)]
 	fn from_str(s: &str) -> Result<Self, Self::Err>
 	{
 		Ok(Atom(s.to_owned()))
+	}
+}
+
+impl Borrow<str> for Atom
+{
+	#[inline(always)]
+	fn borrow(&self) -> &str
+	{
+		self.deref()
 	}
 }
 
