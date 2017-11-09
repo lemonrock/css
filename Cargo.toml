@@ -15,7 +15,7 @@ exclude = ["*"]
 include = ["README.md", "LICENSE", "COPYRIGHT", "src/**/*.rs", "build.rs", "Cargo.toml", "rustfmt.toml", "clippy.toml"]
 readme = "README.md"
 publish = true
-version = "0.0.18"
+version = "0.0.19"
 
 [profile.release]
 opt-level = 3
@@ -27,12 +27,13 @@ codegen-units = 1
 
 [dependencies]
 bitflags = "^1.0"
-cssparser = "0.21.2"
+cssparser = "0.21.3"
 either = "1.2.0"
 ordermap = "0.2.13"
 phf = "0.7.21"
 phf_macros = "0.7.21"
 precomputed-hash = "^0.1"
+quick-error = "1.2.1"
 smallvec = "0.4"
 
 # Suspended as not yet published on crates.io
@@ -41,10 +42,11 @@ smallvec = "0.4"
 # For servo_arc temporary crate fork
 nodrop = {version = "0.1.8"}
 stable_deref_trait = "1.0.0"
+
 # For selectors temporary crate fork
-matches = "0.1"
-log = "0.3"
 fnv = "1.0"
+log = "0.3"
+matches = "0.1"
 
 [build-dependencies]
 phf_codegen = "0.7.18"

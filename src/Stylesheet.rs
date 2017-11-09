@@ -52,7 +52,37 @@ impl HasCssRules for Stylesheet
 
 impl Stylesheet
 {
-	// An solution is to use the HTTP header SourceMap: <url>
+	/// Serializes a Stylesheet to a file path, optionally including source-map and source-url comments.
+	/// Will create or truncate `stylesheet_file_path` as required.
+	/// Convenience method wrapped `to_css()`.
+	#[inline(always)]
+	pub fn to_file_path<P: AsRef<Path>>(&self, stylesheet_file_path: P, include_source_urls: bool) -> Result<(), StylesheetError>
+	{
+		let path = stylesheet_file_path.as_ref();
+		let file = File::create(path).context(path)?;
+		self.to_css(&mut BlockingIoOnlyStdFmtWriteToStdIoWriteAdaptor(file), include_source_urls).context(path)?;
+		Ok(())
+	}
+	
+	/// Serializes a Stylesheet as a string, optionally including source-map and source-url comments.
+	/// Convenience method wrapped `to_css()`.
+	#[inline(always)]
+	pub fn to_css_string(&self, include_source_urls: bool) -> String
+	{
+		let mut string = String::new();
+		self.to_css(&mut string, include_source_urls).unwrap();
+		string
+	}
+	
+	/// Serializes a Stylesheet to a vector of UTF-8 encoded bytes.
+	/// Convenience method wrapped `to_css_string()`.
+	#[inline(always)]
+	pub fn to_bytes(&self, include_source_urls: bool) -> Vec<u8>
+	{
+		self.to_css_string(include_source_urls).into_bytes()
+	}
+	
+	/// Serializes a Stylesheet, optionally including source-map and source-url comments.
 	pub fn to_css<W: fmt::Write>(&self, destination: &mut W, include_source_urls: bool) -> fmt::Result
 	{
 		if include_source_urls
@@ -75,13 +105,39 @@ impl Stylesheet
 		Ok(())
 	}
 	
+	/// Loads and parses a Stylesheet.
+	#[inline(always)]
+	pub fn from_file_path<P: AsRef<Path>>(html_document_file_path: P) -> Result<Self, StylesheetError>
+	{
+		let path = html_document_file_path.as_ref();
+		let metadata = path.metadata().context(path)?;
+		
+		let mut file = File::open(path).context(path)?;
+		let mut css = String::with_capacity(metadata.len() as usize);
+		file.read_to_string(&mut css).context(path)?;
+		
+		let result = Self::parse(&css);
+		
+		match result
+		{
+			Ok(stylesheet) => Ok(stylesheet),
+			Err(cause) => Err(StylesheetError::Parse
+			(
+				path.to_path_buf(),
+				cause.location,
+				format!("{:?}", cause.error),
+			)),
+			
+		}
+	}
+	
 	/// Parses a string of CSS to produce a stylesheet.
 	/// Can be used with the contents of a CSS file.
 	/// Assumes the string is UTF-8 encoded.
 	/// Does not use a stream of bytes as parsing CSS involves going backwards and forwards a lot... CSS parsing is somewhat evil and is not particularly efficient.
 	/// The parser does apply a few small modifications to the incoming CSS, normalizing some pseudo-class, psuedo-element and media query names.
 	/// The parser does not parse properties as such, simply keeping them as a CSS string. Hopefully it will one day - there are only 200 odd specialist rules to implement.
-	pub fn parse<'i>(css: &'i str) -> Result<Self, PreciseParseError<CustomParseError<'i>>>
+	pub fn parse<'i>(css: &'i str) -> Result<Self, PreciseParseError<'i, CustomParseError<'i>>>
 	{
 		const LineNumberingIsZeroBased: u32 = 0;
 		

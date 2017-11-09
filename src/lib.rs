@@ -40,7 +40,7 @@
 //!
 //! ### To match CSS selectors
 //!
-//! Use the function `matches()`; in practice, better support is in the `css-purify` crate.
+//! Use the function `domain::selectors::matches()`; in practice, better support is in the `css-purify` crate.
 //!
 
 
@@ -50,6 +50,7 @@ extern crate either;
 pub extern crate ordermap;
 extern crate phf;
 extern crate precomputed_hash;
+#[macro_use] extern crate quick_error;
 // To be re-introduced once selectors 0.19.0 lands in crates.io
 // pub extern crate selectors;
 pub extern crate smallvec;
@@ -61,8 +62,14 @@ use self::domain::atRules::namespace::Namespaces;
 use self::parsers::*;
 use self::serializers::*;
 use ::cssparser::*;
+use ::quick_error::ResultExt;
 use ::selectors::parser::SelectorParseError;
 use ::std::fmt;
+use ::std::fs::File;
+use ::std::io::Read;
+use ::std::mem::uninitialized;
+use ::std::path::Path;
+use ::std::path::PathBuf;
 
 
 /// Contains definitions of objects used in Stylesheet.
@@ -88,5 +95,7 @@ extern crate stable_deref_trait;
 pub mod servo_arc;
 
 
+include!("BlockingIoOnlyStdFmtWriteToStdIoWriteAdaptor.rs");
 include!("CustomParseError.rs");
 include!("Stylesheet.rs");
+include!("StylesheetError.rs");
