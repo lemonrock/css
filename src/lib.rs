@@ -19,28 +19,50 @@
 //! The values of property declarations are currently stored as a string. Parsing property declarations is a monster job (in effect there are bespoke rules for every property). If you feel like helping...
 //!
 //!
-//! ## Getting Going
+//! ## Usages
 //!
 //!
-//! ### To get started
+//! ### Loading and Saving Stylesheets
 //!
 //! ```
 //! extern crate css;
-//! use css::Stylesheet;
+//! use ::css::Stylesheet;
 //!
 //! let some_css = "margin-left: 10pt; top: 20px;".to_owned();
 //! let stylesheet = Stylesheet::parse(&some_css).expect("CSS was invalid");
 //!
+//! // Alternatively, load from a file using Stylesheet::from_file_path("/path/to/stylesheet.css").unwrap();
+//!
 //! let mut destination = String::new();
+//!
 //! // Don't write source-map and source-url comments if any are present in the stylesheet
 //! let include_source_urls = false;
+//!
 //! stylesheet.to_css(&mut destination, include_source_urls).expect("Failed to write to destination");
+//!
 //! assert_eq!(&destination, "margin-left:10pt;top:20px");
+//!
+//! // To serialize to a Vec<u8> of bytes instead
+//! let mut bytes = stylesheet.to_bytes();
+//!
+//! // To serialize to a file instead
+//! stylesheet.to_file_path("/path/to/to/stylesheet.css").unwrap();
 //! ```
 //!
-//! ### To match CSS selectors
 //!
-//! Use the function `domain::selectors::matches()`; in practice, better support is in the `css-purify` crate.
+//! ### To parse a single CSS selector
+//!
+//! ```
+//! extern crate css;
+//! use ::css::parse_selector;
+//!
+//! let selector = parse_selector("P.myclass").unwrap();
+//! ```
+//!
+//!
+//! ### To match CSS selectors to HTML
+//!
+//! Use the `css-purify` crate. (The function `domain::selectors::matches()` can do matching but needs a lot of HTML logic to do so).
 //!
 
 
@@ -59,6 +81,7 @@ pub extern crate smallvec;
 use self::domain::*;
 use self::domain::atRules::counterStyle::System;
 use self::domain::atRules::namespace::Namespaces;
+use self::domain::selectors::*;
 use self::parsers::*;
 use self::serializers::*;
 use ::cssparser::*;
@@ -97,5 +120,6 @@ pub mod servo_arc;
 
 include!("BlockingIoOnlyStdFmtWriteToStdIoWriteAdaptor.rs");
 include!("CustomParseError.rs");
+include!("parse_selector.rs");
 include!("Stylesheet.rs");
 include!("StylesheetError.rs");

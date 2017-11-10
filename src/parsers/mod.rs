@@ -15,7 +15,6 @@ use super::domain::atRules::page::*;
 use super::domain::atRules::supports::*;
 use super::domain::atRules::viewport::*;
 use super::domain::properties::*;
-use super::domain::selectors::*;
 use self::separators::*;
 use ::ordermap::OrderMap;
 use ::selectors::parser::SelectorImpl;

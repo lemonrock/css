@@ -43,6 +43,34 @@ impl SelectorImpl for OurSelectorImpl
 
 impl OurSelectorImpl
 {
+	/// Parses a selector
+	pub fn parse_selector<'i>(selector_css: &'i str) -> Result<OurSelector, ParseError<'i, CustomParseError<'i>>>
+	{
+		const LineNumberingIsZeroBased: u32 = 0;
+		
+		let mut parserInput = ParserInput::new_with_line_number_offset(&selector_css, LineNumberingIsZeroBased);
+		let mut input = Parser::new(&mut parserInput);
+		
+		let applyVendorPrefixToPseudoClasses = HashMap::default();
+		let applyVendorPrefixToPseudoElements = HashMap::default();
+		let ourSelectorParser = OurSelectorParser
+		{
+			namespaces: Namespaces::empty(),
+			applyVendorPrefixToPseudoClasses: &applyVendorPrefixToPseudoClasses,
+			applyVendorPrefixToPseudoElements: &applyVendorPrefixToPseudoElements,
+		};
+		
+		match ourSelectorParser.parse(&mut input)
+		{
+			Err(error) => Err(error),
+			Ok(mut selectors) =>
+			{
+				let newSelector = selectors.0.drain(..).next().unwrap();
+				Ok(newSelector)
+			}
+		}
+	}
+	
 	/// Applies a vendor prefix to a CSS selector
 	#[inline(always)]
 	pub fn reparse_with_vendor_prefix<'a>(selector: &OurSelector, applyVendorPrefixToPseudoClasses: &'a HashMap<VendorPrefixablePseudoClassName, VendorPrefix>, applyVendorPrefixToPseudoElements: &'a HashMap<VendorPrefixablePseudoElementName, VendorPrefix>) -> Option<OurSelector>

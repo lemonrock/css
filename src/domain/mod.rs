@@ -20,7 +20,6 @@ use self::atRules::viewport::*;
 use self::expressions::*;
 use self::numbers::*;
 use self::properties::*;
-use self::selectors::*;
 use self::units::*;
 use ::precomputed_hash::PrecomputedHash;
 use ::std::ascii::AsciiExt;
