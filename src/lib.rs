@@ -120,6 +120,6 @@ pub mod servo_arc;
 
 include!("BlockingIoOnlyStdFmtWriteToStdIoWriteAdaptor.rs");
 include!("CustomParseError.rs");
-include!("parse_selector.rs");
+include!("parse_css_selector.rs");
 include!("Stylesheet.rs");
 include!("StylesheetError.rs");
