@@ -62,7 +62,7 @@
 //!
 //! ### To match CSS selectors to HTML
 //!
-//! Use the `css-purify` crate. (The function `domain::selectors::matches()` can do matching but needs a lot of HTML logic to do so).
+//! Use the `html5ever_ext` crate. (The function `domain::selectors::matches()` can do matching but needs a lot of HTML logic to do so).
 //!
 
 
